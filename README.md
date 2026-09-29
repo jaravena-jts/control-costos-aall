@@ -1,101 +1,81 @@
-# Control de costo de aguas lluvias 2026 — v7
+# Control de costo de aguas lluvias 2026 — v12
 
-Aplicación web preparada para **GitHub + Railway**.
+Aplicación web preparada para **GitHub + Railway**, manteniendo el diseño de las versiones anteriores.
 
-## Roles
+## Roles y visibilidad
 
-- **Administrador**: `javier.aravena@usach.cl`
-  - Ve el panel administrador.
-  - Puede bloquear/desbloquear toda la página.
-  - Puede cargar/publicar una nueva planilla.
-  - Puede revisar estado, cuadratura, usuarios configurados e historial de actualizaciones.
+- **Administrador general**: `javier.aravena@usach.cl`
+  - Ve el dashboard completo: Resumen oficial, AALL, Mandante, OBRA y Pendiente clasificar.
+  - Puede cargar/publicar nuevas planillas.
+  - Es el único que ve el **Panel administrador** y puede bloquear/desbloquear la página.
 - **Actualizador**: `jgonzalez@ingevec.cl`
-  - Puede cargar/publicar nuevas versiones del Excel.
-  - No puede entrar al panel administrador ni bloquear la página.
+  - Ve el dashboard completo: Resumen oficial, AALL, Mandante, OBRA y Pendiente clasificar.
+  - Puede cargar/publicar nuevas planillas.
+  - No puede entrar al Panel administrador ni bloquear la página.
 - **Visor**:
-  - Acceso de solo lectura al dashboard.
-  - No puede cargar planillas ni ver el panel administrador.
+  - Ve únicamente la información de **Aguas Lluvias (AALL)**.
+  - Mantiene filtros, gráfico por obra, detalle de gastos y enlaces PDF de los movimientos AALL.
+  - No recibe desde el servidor los datos de Mandante, OBRA ni Pendiente clasificar.
 
-> Las claves **no están escritas dentro del HTML ni del repositorio**. Se configuran como variables privadas en Railway.
+> Las claves no están guardadas dentro del HTML ni del repositorio. Se configuran como variables privadas en Railway.
 
-## Cambios funcionales incluidos
+## Nueva lectura desde hoja `resumen`
 
-- Gráfico de costos **por obra**.
-- Clasificación de gasto basada en la **columna K / Descripción Cuenta** de `LM a Agosto 2026`.
-- `Subcontratos` + `Subcontratos mano de obra` se muestran y suman como una sola categoría: **Subcontratos**.
-- Mantiene cuadratura con el Resumen oficial usando `AALL / Mandante / OBRA`.
-- Factura/PDF clickeable desde el detalle cuando existe `URL PDF`.
-- Publicación central: cuando administrador/actualizador carga un Excel, los visores ven la misma versión.
-- Panel administrador no solo está oculto visualmente: sus rutas de servidor requieren rol `admin`.
-- Bloqueo general persistente de la página.
-- Historial de las últimas actualizaciones publicadas.
+La versión v12 mantiene la hoja **`resumen`** como fuente oficial y agrega una segunda lectura directa del bloque de edificios con filtraciones.
 
-## Publicar en GitHub
+La lectura se detecta por encabezados, actualmente ubicados en **H:P**:
 
-1. Descomprime esta carpeta.
-2. Crea un repositorio privado en GitHub.
-3. Sube **todo el contenido de esta carpeta**.
-4. No subas ningún archivo `.env` con claves reales. El `.gitignore` ya lo excluye.
+- H: Obra
+- I: Nombre de obra
+- J: Supervisor
+- K: AALL 2026
+- L: Status
+- M: Total / costo AALL
+- N: Medio / gestionado por
+- O: Obs1
+- P: Obs2
 
-## Publicar en Railway
+La web muestra una sección **Estado de obras con filtraciones 2026**. Cada obra indica estado, costo AALL, medio de gestión y observaciones. Las obras con costo cero se muestran con una alerta **? Sin costo asociado**. Al hacer clic en la obra se despliegan Obs1 y Obs2.
 
-1. En Railway crea un proyecto nuevo.
-2. Selecciona **Deploy from GitHub repo** y conecta el repositorio.
-3. Railway detectará Node y ejecutará `npm start`.
-4. En **Variables**, crea:
+## Archivo validado
+
+Con `Gastos AALL 2026 (6).xlsx` se detectaron:
+
+- 84 edificios/obras en el bloque H:P.
+- 27 con costo AALL asociado.
+- 57 sin costo AALL asociado.
+- Suma de columna M: **$211.239.599,75**, que coincide con el total AALL de la tabla dinámica principal de la hoja `resumen`.
+
+## Publicar en GitHub + Railway
+
+1. Sube/reemplaza los archivos del proyecto en GitHub.
+2. Railway desplegará automáticamente desde la rama conectada.
+3. Mantén estas variables en Railway:
 
 ```text
 NODE_ENV=production
 ADMIN_EMAIL=javier.aravena@usach.cl
 ADMIN_PASSWORD=<clave privada del administrador>
 UPDATER_EMAIL=jgonzalez@ingevec.cl
-UPDATER_PASSWORD=<clave del actualizador definida por ustedes>
+UPDATER_PASSWORD=<clave privada del actualizador>
 SESSION_SECRET=<cadena larga aleatoria>
 DATA_DIR=/data
 ```
 
-5. En Railway agrega un **Volume** y móntalo en:
+4. Mantén un **Volume** montado en `/data`.
 
-```text
-/data
-```
+## Aplicar solo el parche v12
 
-Esto es importante: ahí se guarda la planilla publicada normalizada, el bloqueo y el historial. Sin Volume los datos pueden perderse al desplegar nuevamente.
+Reemplaza en tu repositorio:
 
-6. Genera el dominio público de Railway.
+- `public/index.html`
+- `server.js`
 
-## Primera carga
+No es necesario cambiar las contraseñas ni las variables de Railway.
 
-1. Abre la URL de Railway.
-2. Presiona **Ingresar**.
-3. Inicia sesión como administrador o actualizador.
-4. Aparecerá el bloque **Sube el Excel actualizado de Gastos AALL**.
-5. Selecciona `Gastos AALL 2026 (3).xlsx` o una versión posterior.
-6. El navegador procesa el archivo, reconstruye el dashboard y lo publica en el servidor.
-7. A partir de ese momento cualquier visor que abra la URL verá la última versión publicada.
+## Seguridad de roles
 
-## Panel administrador
+La restricción del visor no depende solo de ocultar tarjetas en HTML. El backend entrega a los visores únicamente las filas clasificadas como **AALL**. Los datos de Mandante, OBRA, Pendiente y el Resumen oficial completo solo se entregan a Administrador general y Actualizador.
 
-Solo el administrador verá el botón **Panel administrador**. Desde ahí puede:
-
-- Revisar si la página está activa o bloqueada.
-- Bloquear/desbloquear el sistema.
-- Definir el mensaje de bloqueo.
-- Ver si las credenciales Admin/Actualizador están configuradas en Railway.
-- Revisar las últimas cargas, usuario que actualizó, archivo y total publicado.
-- Revisar la diferencia entre Libro Mayor reconstruido y hoja Resumen.
-
-## Seguridad
-
-- Las claves se mantienen en variables privadas de Railway.
-- El panel administrador está protegido en backend; cambiar CSS o HTML en el navegador no entrega acceso.
-- Las sesiones están firmadas y expiran a las 8 horas.
-- La cookie de sesión es `HttpOnly`, `SameSite=Strict` y `Secure` en producción.
-- Existe límite básico de intentos de inicio de sesión.
-
-## Archivos principales
-
-- `server.js`: servidor, autenticación, roles, bloqueo y persistencia.
-- `public/index.html`: dashboard y procesamiento del Excel.
-- `.env.example`: nombres de variables requeridas, sin claves reales.
-- `data/`: almacenamiento local; en Railway corresponde al Volume `/data`.
+## v14 — lectura H:P / alertas M vacía
+La tabla de obras con filtraciones se lee directamente desde H:P de la hoja `resumen`. Las obras con M vacía o $0 se muestran primero, con alerta y los valores de L (estatus) y N (gestionado por).

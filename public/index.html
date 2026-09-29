@@ -24,11 +24,13 @@ button,input,select{font:inherit} button{cursor:pointer}
 .drop{min-height:150px;border:2px dashed #aebdca;border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#f9fbfc;transition:.15s}.drop.drag{border-color:var(--teal);background:#edf9fb}.drop strong{font-size:16px}.drop span{font-size:12px;color:var(--muted);margin-top:7px}.drop input{display:none}.upload-label{margin-top:14px;display:inline-block;background:var(--navy);color:white;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer}
 .info-panel{border:1px solid #dce7ee;border-radius:12px;background:#f7fafc;padding:16px}.info-panel h3{margin:0 0 10px;font-size:14px}.info-line{display:grid;grid-template-columns:130px 1fr;gap:8px;font-size:12px;margin:6px 0}.info-line b{color:#435263}.privacy{margin-top:12px;color:#506070;font-size:11px;line-height:1.5}
 .notice{border-left:4px solid var(--amber);background:#fff8e8;color:#694600;padding:11px 14px;border-radius:8px;margin:0 0 18px;font-size:12px;line-height:1.45}.notice.good{border-left-color:var(--green);background:#eefaf4;color:#155f43}.notice.error{border-left-color:var(--red);background:#fff0ef;color:#8c2018}
-.kpis{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px;margin-bottom:18px}.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow)}.kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);font-weight:700}.kpi .value{font-size:23px;margin-top:8px;font-weight:760;color:var(--navy)}.kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}.kpi.emph .value{color:var(--green)}.kpi.warn .value{color:var(--amber)}.kpi.no .value{color:var(--red)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px;margin-bottom:18px}.kpis.viewer-mode{grid-template-columns:minmax(220px,360px)}.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow)}.kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);font-weight:700}.kpi .value{font-size:23px;margin-top:8px;font-weight:760;color:var(--navy)}.kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}.kpi.emph .value{color:var(--green)}.kpi.warn .value{color:var(--amber)}.kpi.no .value{color:var(--red)}
 .filters{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);margin-bottom:18px}.filters-grid{display:grid;grid-template-columns:repeat(7,minmax(135px,1fr));gap:10px}.field label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:760;letter-spacing:.45px;display:block;margin:0 0 5px}.field select,.field input{width:100%;border:1px solid #ccd7df;border-radius:8px;background:white;padding:8px 9px;color:var(--ink);min-height:38px}.field.search{grid-column:span 2}
 .grid2{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr);gap:18px;margin-bottom:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}.card-head h2{font-size:14px;margin:0;color:var(--navy)}.card-body{padding:14px 16px}.mini{font-size:11px;color:var(--muted)}
 .obra-chart{max-height:520px;overflow:auto;padding:4px 2px 6px}.obra-chart-row{display:grid;grid-template-columns:minmax(145px,210px) minmax(260px,1fr) 94px;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px solid #eef2f4;transition:.15s;border-radius:8px}.obra-chart-row:last-child{border-bottom:0}.obra-chart-row.is-expanded{background:#f4f8fb}.obra-chart-name{border:0;background:transparent;text-align:left;color:var(--navy);font-size:10px;font-weight:700;padding:0;line-height:1.25}.obra-chart-name:hover{text-decoration:underline}.stack-track{height:20px;background:#edf2f5;border-radius:6px;display:flex;overflow:hidden;min-width:0;cursor:pointer}.stack-track:hover{outline:1px solid #c7d7e2}.stack-seg{height:100%;position:relative;transition:.15s;min-width:0}.stack-seg:hover{filter:brightness(.93)}.obra-chart-total{text-align:right;font-variant-numeric:tabular-nums;font-size:10px;font-weight:700;color:var(--navy)}.chart-legend{display:flex;gap:10px;flex-wrap:wrap;padding:0 0 8px}.legend-item{display:inline-flex;align-items:center;gap:5px;font-size:9px;color:#5d6875}.legend-dot{width:9px;height:9px;border-radius:3px;display:inline-block}.chart-hint{font-size:10px;color:var(--muted);margin:0 0 10px}.chart-empty{padding:35px;text-align:center;color:var(--muted);font-size:13px}.obra-breakdown{margin:0 4px 10px;padding:12px 14px;background:#f8fbfd;border:1px solid #dbe6ed;border-radius:10px}.obra-breakdown-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.obra-breakdown-head b{font-size:11px;color:var(--navy)}.obra-breakdown-head button{border:0;background:#e8eef3;color:var(--navy);border-radius:7px;padding:5px 8px;font-size:9px;font-weight:700}.breakdown-row{display:grid;grid-template-columns:minmax(155px,210px) minmax(220px,1fr) 110px 52px;gap:10px;align-items:center;padding:6px 0}.breakdown-label{font-size:10px;font-weight:700;color:#3c4d5e}.breakdown-track{height:12px;background:#e9eff3;border-radius:999px;overflow:hidden}.breakdown-fill{height:100%;border-radius:999px}.breakdown-value{text-align:right;font-size:10px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}.breakdown-pct{text-align:right;font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums}@media(max-width:720px){.breakdown-row{grid-template-columns:1fr 90px}.breakdown-track{grid-column:1/-1;order:3}.breakdown-pct{display:none}}
-.obra-list{max-height:275px;overflow:auto}.obra-row{display:grid;grid-template-columns:minmax(120px,1fr) 90px 90px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #eef2f4;font-size:11px}.obra-row:last-child{border-bottom:0}.obra-row button{border:0;background:transparent;text-align:left;padding:0;color:var(--navy);font-weight:650}.obra-row button:hover{text-decoration:underline}.num{text-align:right;font-variant-numeric:tabular-nums}
+.obra-list{max-height:275px;overflow:auto}.obra-row{display:grid;grid-template-columns:minmax(120px,1fr) 90px 90px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #eef2f4;font-size:11px}.obra-row:last-child{border-bottom:0}.obra-row button{border:0;background:transparent;text-align:left;padding:0;color:var(--navy);font-weight:650}.obra-row button:hover{text-decoration:underline}.num{text-align:right;font-variant-numeric:tabular-nums}.kpis.viewer-mode .kpi{max-width:360px}
+.rain-card{margin-bottom:18px}.rain-summary{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.rain-pill{display:inline-flex;gap:5px;align-items:center;border-radius:999px;padding:5px 8px;background:#eef3f7;color:#455565;font-size:9px;font-weight:760}.rain-pill.alert{background:#fff3db;color:#8a5a00}.rain-table-wrap{overflow:auto;max-height:560px}.rain-table{width:100%;border-collapse:separate;border-spacing:0;min-width:1050px;font-size:11px}.rain-table th{position:sticky;top:0;z-index:3;background:#eef3f7;color:#465565;padding:9px 8px;text-align:left;border-bottom:1px solid #ccd7df;font-size:10px;text-transform:uppercase;letter-spacing:.35px}.rain-table td{padding:9px 8px;border-bottom:1px solid #edf1f3;vertical-align:top}.rain-table tr.rain-row{cursor:pointer}.rain-table tr.rain-row:hover td{background:#f8fbfc}.rain-table tr.no-cost-alert td{background:#fff9ec;border-bottom-color:#efd9aa}.rain-table tr.no-cost-alert:hover td{background:#fff4d8}.rain-money{font-weight:760;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}.zero-cost{display:inline-flex;align-items:center;gap:7px;font-weight:800;color:#8f5700;margin-top:3px}.zero-cost .qmark{width:21px;height:21px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#ffe7ad;border:1px solid #d79b28;font-size:12px}.alert-badge{display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:4px 7px;border-radius:999px;background:#fff0c7;border:1px solid #e3b65e;color:#855700;font-size:9px;font-weight:800;letter-spacing:.15px}.blank-m-note{display:block;margin-top:3px;font-size:9px;color:#8a6a2d;font-weight:650}.status-tag{display:inline-flex;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:760;background:#edf2f5;color:#53616f;white-space:nowrap}.status-tag.en-curso{background:#eaf2ff;color:#24539b}.status-tag.terminado{background:#e8f7ef;color:#13704d}.status-tag.rechazado{background:#ffeceb;color:#a42a22}.status-tag.sin-gestion{background:#fff4d9;color:#855700}.rain-detail td{background:#fafcfd!important;padding:0!important}.rain-detail-box{padding:12px 14px;border-left:3px solid #b9c8d4;margin:4px 8px 10px;border-radius:7px;background:#f5f8fa}.rain-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.rain-detail-item{font-size:10px;color:#52606e;line-height:1.45}.rain-detail-item b{display:block;color:var(--navy);margin-bottom:2px}.viewer-note{font-size:10px;color:var(--muted);margin-top:4px}.rain-alert-summary{margin:0 15px 10px;padding:9px 11px;border:1px solid #e3b65e;background:#fff8e6;border-radius:8px;color:#7b560c;font-size:10px;line-height:1.45}.rain-alert-summary b{color:#684600}@media(max-width:760px){.rain-detail-grid{grid-template-columns:1fr}}
+
 .table-card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)}.table-toolbar h2{font-size:14px;margin:0;color:var(--navy)}.table-wrap{overflow:auto;max-height:620px}.data-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1380px;font-size:11px}.data-table th{position:sticky;top:0;z-index:4;background:#eef3f7;color:#465565;padding:9px 8px;text-align:left;border-bottom:1px solid #ccd7df;font-size:10px;text-transform:uppercase;letter-spacing:.35px;white-space:nowrap;cursor:pointer}.data-table td{padding:9px 8px;border-bottom:1px solid #edf1f3;vertical-align:top}.data-table tr:hover td{background:#f8fbfc}.data-table td.money{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}.ellipsis{max-width:360px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tag{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:760;white-space:nowrap}.tag.confirm{background:#e8f7ef;color:#13704d}.tag.prob{background:#eaf2ff;color:#24539b}.tag.review{background:#fff4d9;color:#855700}.tag.no{background:#ffeceb;color:#a42a22}.tag.out{background:#edf0f2;color:#606c78}.confidence{font-size:9px;color:#687482;margin-top:3px}.linkbtn{border:0;background:#eaf1f5;color:var(--navy);border-radius:6px;padding:5px 7px;font-size:10px;font-weight:650}
 .pdf-link{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--navy);background:#f0f7fa;border:1px solid #cfe2e8;border-radius:8px;padding:6px 8px;min-width:118px;transition:.15s}.pdf-link:hover{background:#e5f2f6;border-color:#9fc6d1;transform:translateY(-1px)}.pdf-badge{display:inline-flex;align-items:center;justify-content:center;background:#b42318;color:white;border-radius:5px;padding:4px 5px;font-size:8px;font-weight:800;letter-spacing:.35px;line-height:1}.pdf-meta{display:flex;flex-direction:column;min-width:0}.pdf-doc{font-size:10px;font-weight:760;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:145px}.pdf-action{font-size:9px;color:var(--teal);font-weight:700;margin-top:2px}.no-pdf-doc{display:flex;flex-direction:column}.no-pdf-doc .doc-number{font-weight:650}.no-pdf-doc .doc-status{font-size:9px;color:#8a959f;margin-top:2px}.invoice-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #cfe2e8;background:#f2f9fb;border-radius:10px;padding:12px 14px;margin-bottom:14px}.invoice-hero .invoice-copy{min-width:0}.invoice-hero .invoice-copy b{display:block;color:var(--navy);font-size:12px}.invoice-hero .invoice-copy span{display:block;color:var(--muted);font-size:10px;margin-top:3px;overflow-wrap:anywhere}.invoice-hero a{text-decoration:none;background:var(--navy);color:white;border-radius:8px;padding:9px 12px;font-size:10px;font-weight:700;white-space:nowrap}.empty{padding:35px;text-align:center;color:var(--muted);font-size:13px}
 .modal{position:fixed;inset:0;background:rgba(15,27,41,.52);display:none;align-items:center;justify-content:center;z-index:50;padding:22px}.modal.open{display:flex}.modal-box{width:min(920px,96vw);max-height:90vh;overflow:auto;background:white;border-radius:14px;box-shadow:0 20px 70px rgba(0,0,0,.28)}.modal-head{position:sticky;top:0;z-index:2;background:white;border-bottom:1px solid var(--line);padding:15px 18px;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;font-size:16px;color:var(--navy)}.close{border:0;background:#eef2f5;border-radius:8px;width:32px;height:32px;font-size:18px}.modal-body{padding:18px}.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.detail{border:1px solid #e1e8ed;border-radius:9px;padding:10px;background:#fafcfd}.detail .k{font-size:9px;text-transform:uppercase;color:#6c7884;font-weight:760;letter-spacing:.4px}.detail .v{font-size:12px;margin-top:5px;overflow-wrap:anywhere}.section-title{font-size:12px;color:var(--navy);margin:20px 0 8px;font-weight:780;text-transform:uppercase;letter-spacing:.4px}.evidence{border:1px solid #dce5ea;border-left:4px solid var(--teal);border-radius:8px;padding:11px;margin:8px 0;background:#fbfdfe;font-size:11px;line-height:1.5}.evidence.no{border-left-color:var(--red)}.raw{white-space:pre-wrap;background:#f5f7f9;border:1px solid #e0e6ea;border-radius:8px;padding:10px;font-size:10px;line-height:1.45;color:#3d4b58}.doc-actions{display:flex;gap:8px;flex-wrap:wrap}.doc-actions a{text-decoration:none;background:var(--navy);color:white;border-radius:7px;padding:7px 10px;font-size:10px;font-weight:650}
@@ -82,29 +84,45 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="notice" id="traceNotice">La fuente de control es la hoja <b>“resumen”</b>. El tablero replica su lógica: Libro Mayor con <b>AB = AALL 2026</b> y clasificación de <b>AC = AALL / Mandante / OBRA</b>. Además, la <b>clasificación de gasto</b> se toma de <b>Descripción Cuenta (columna K)</b>. <b>Subcontratos</b> y <b>Subcontratos mano de obra</b> se consolidan en una sola categoría: <b>Subcontratos</b>. Los movimientos con AB marcado pero AC vacío quedan como <b>Pendiente clasificar</b> y no se suman al total oficial.</div>
+  <div class="notice" id="traceNotice">La fuente de control es la hoja <b>“resumen”</b>. El tablero se actualiza automáticamente al publicar una nueva planilla.</div>
   <div id="messages"></div>
 
-  <section class="kpis">
-    <div class="kpi"><div class="label">Total Resumen oficial</div><div class="value" id="kpiUniverse">$0</div><div class="sub" id="kpiUniverseSub">0 movimientos</div></div>
+  <section class="kpis" id="kpiSection">
+    <div class="kpi private-summary"><div class="label">Total Resumen oficial</div><div class="value" id="kpiUniverse">$0</div><div class="sub" id="kpiUniverseSub">0 movimientos</div></div>
     <div class="kpi emph"><div class="label">AALL</div><div class="value" id="kpiConfirmed">$0</div><div class="sub" id="kpiConfirmedSub">0 movimientos</div></div>
-    <div class="kpi"><div class="label">Mandante</div><div class="value" id="kpiProbable">$0</div><div class="sub" id="kpiProbableSub">0 movimientos</div></div>
-    <div class="kpi"><div class="label">OBRA</div><div class="value" id="kpiReview">$0</div><div class="sub" id="kpiReviewSub">0 movimientos</div></div>
-    <div class="kpi warn"><div class="label">Pendiente clasificar</div><div class="value" id="kpiNo">$0</div><div class="sub" id="kpiNoSub">0 movimientos</div></div>
+    <div class="kpi private-summary"><div class="label">Mandante</div><div class="value" id="kpiProbable">$0</div><div class="sub" id="kpiProbableSub">0 movimientos</div></div>
+    <div class="kpi private-summary"><div class="label">OBRA</div><div class="value" id="kpiReview">$0</div><div class="sub" id="kpiReviewSub">0 movimientos</div></div>
+    <div class="kpi warn private-summary"><div class="label">Pendiente clasificar</div><div class="value" id="kpiNo">$0</div><div class="sub" id="kpiNoSub">0 movimientos</div></div>
   </section>
 
   <section class="filters">
     <div class="filters-grid">
-      <div class="field"><label>Universo</label><select id="fUniverse"><option value="summary">Resumen oficial</option><option value="aall">AALL 2026 + pendientes</option><option value="all">Todo el libro mayor</option></select></div>
+      <div class="field private-control"><label>Universo</label><select id="fUniverse"><option value="summary">Resumen oficial</option><option value="aall">AALL 2026 + pendientes</option><option value="all">Todo el libro mayor</option></select></div>
       <div class="field"><label>Obra</label><select id="fObra"><option value="">Todas</option></select></div>
       <div class="field"><label>Gerente proyecto</label><select id="fGP"><option value="">Todos</option></select></div>
       <div class="field"><label>Supervisor obra</label><select id="fSupObra"><option value="">Todos</option></select></div>
       <div class="field"><label>Supervisor costo (LM)</label><select id="fSupCosto"><option value="">Todos</option></select></div>
-      <div class="field"><label>Clasificación Resumen</label><select id="fClass"><option value="">Todas</option></select></div>
+      <div class="field private-control"><label>Clasificación Resumen</label><select id="fClass"><option value="">Todas</option></select></div>
       <div class="field"><label>Clasificación de gasto</label><select id="fAccount"><option value="">Todos</option></select></div>
       <div class="field"><label>Periodo</label><select id="fPeriod"><option value="">Todos</option></select></div>
       <div class="field"><label>Proveedor</label><select id="fProvider"><option value="">Todos</option></select></div>
-      <div class="field search"><label>Buscar</label><input id="fSearch" placeholder="OC, factura, proveedor, glosa, obra…" /></div>
+      <div class="field"><label>Estado obra</label><select id="fStatus"><option value="">Todos</option></select></div>
+      <div class="field"><label>Gestionado por</label><select id="fMedio"><option value="">Todos</option></select></div>
+      <div class="field search"><label>Buscar</label><input id="fSearch" placeholder="OC, factura, proveedor, glosa, obra, estado…" /></div>
+    </div>
+  </section>
+
+  <section class="card rain-card" id="rainWorksSection">
+    <div class="card-head">
+      <div><h2>Estado de obras con filtraciones 2026</h2><div class="viewer-note">Fuente directa: hoja “resumen”, cuadro H:P. <b>I = nombre de obra · L = estatus · M = costo · N = gestionado por.</b> Las obras con M vacía se mantienen visibles y se marcan con alerta.</div></div>
+      <div class="rain-summary"><span class="rain-pill" id="rainWorksTotal">0 obras</span><span class="rain-pill" id="rainWorksWithCost">0 con costo</span><span class="rain-pill alert" id="rainWorksZero">0 alertas · columna M vacía</span></div>
+    </div>
+    <div id="rainAlertSummary" class="rain-alert-summary hidden"></div>
+    <div class="rain-table-wrap">
+      <table class="rain-table">
+        <thead><tr><th>Obra / Nombre (I)</th><th>Supervisor</th><th>Estatus (L)</th><th>Costo (M)</th><th>Gestionado por (N)</th><th>Observaciones</th></tr></thead>
+        <tbody id="rainWorksBody"><tr><td colspan="6"><div class="empty">Carga un Excel para ver el estado de las obras.</div></td></tr></tbody>
+      </table>
     </div>
   </section>
 
@@ -134,7 +152,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 7 · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 12 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -163,7 +181,7 @@ button,input,select{font:inherit} button{cursor:pointer}
   <div class="modal-box" style="width:min(1000px,97vw)">
     <div class="modal-head"><h2>Panel administrador</h2><button class="close" id="adminClose">×</button></div>
     <div class="modal-body">
-      <div class="admin-only-note"><b>Acceso exclusivo administrador.</b> Este panel no se entrega a visores ni al usuario actualizador y sus rutas están protegidas también en el servidor.</div>
+      <div class="admin-only-note"><b>Acceso exclusivo administrador.</b> Este panel de bloqueo es exclusivo del administrador general. El actualizador puede cargar planillas y ver el dashboard completo, pero no puede acceder a este panel ni bloquear la página.</div>
       <div class="admin-grid" id="adminStats"></div>
       <div class="admin-section">
         <h3>Bloqueo general de la página</h3>
@@ -177,7 +195,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 </div>
 
 <div class="lock-overlay" id="lockOverlay">
-  <div class="lock-card"><div class="lock-icon">🔒</div><h2>Control de costo de aguas lluvias 2026</h2><p id="lockMessage">Sistema temporalmente bloqueado por administración.</p><button class="btn" id="lockLoginBtn">Ingreso administrador</button><div class="server-badge">Los visores y el actualizador no pueden acceder mientras el administrador mantenga el bloqueo.</div></div>
+  <div class="lock-card"><div class="lock-icon">🔒</div><h2>Control de costo de aguas lluvias 2026</h2><p id="lockMessage">Sistema temporalmente bloqueado por administración.</p><button class="btn" id="lockLoginBtn">Ingreso administrador</button><div class="server-badge">Los visores y el actualizador no pueden acceder mientras el administrador general mantenga el bloqueo.</div></div>
 </div>
 
 <script>
@@ -185,7 +203,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 
 const state = {
   rows: [], filtered: [], obraMeta: new Map(), mainSheet: "", sourceSheets: [], fileName: "",
-  sortKey: "dateKey", sortDir: -1, formMap: new Map(), excelMap: new Map(), infoCases: new Map(), sheetSummary: null, lmSummary: null, session: null, datasetMeta: null, serverSettings: null, chartExpandedObra: ""
+  sortKey: "dateKey", sortDir: -1, formMap: new Map(), excelMap: new Map(), infoCases: new Map(), sheetSummary: null, lmSummary: null, summaryObras: [], rainWorks: [], summaryCheck: null, session: null, datasetMeta: null, serverSettings: null, chartExpandedObra: "", rainExpandedObra: ""
 };
 
 const $ = id => document.getElementById(id);
@@ -282,8 +300,51 @@ function cellValue(cell,shared){
   if(v==="") return "";
   const n=Number(v); return Number.isFinite(n)?n:v;
 }
+function decodeXmlText(v){
+  return String(v??"")
+    .replace(/&#x([0-9a-f]+);/gi,(_,h)=>String.fromCodePoint(parseInt(h,16)))
+    .replace(/&#(\d+);/g,(_,d)=>String.fromCodePoint(parseInt(d,10)))
+    .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,"&");
+}
+function rawAttr(attrs,name){
+  const m=String(attrs||"").match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`)); return m?m[1]:"";
+}
+function rawCellValue(attrs,body,shared){
+  const t=rawAttr(attrs,"t");
+  const vm=String(body||"").match(/<v(?:\s[^>]*)?>([\s\S]*?)<\/v>/i); const v=vm?decodeXmlText(vm[1]):"";
+  if(t==="s") return shared[Number(v)] ?? "";
+  if(t==="inlineStr"){
+    let out="",m; const re=/<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/gi; while((m=re.exec(body))) out+=decodeXmlText(m[1]); return out;
+  }
+  if(t==="b") return v==="1"?"Sí":"No";
+  if(t==="str"||t==="e") return v;
+  if(v==="") return "";
+  const n=Number(v); return Number.isFinite(n)?n:v;
+}
+function readSheetLargeXml(text,shared,maxRows=Infinity){
+  /* Algunos libros llegan con formato/constantes copiadas hasta la fila 1.048.576.
+     No construimos un DOM de millones de filas: recorremos XML en forma liviana y,
+     una vez terminados los datos reales, cortamos las filas residuales (ej. sólo AD). */
+  const rows=[]; let m, meaningfulSeen=false, trailingNoise=0; const rowRe=/<row\b([^>]*)>([\s\S]*?)<\/row>/gi;
+  while((m=rowRe.exec(text))){
+    const attrs=m[1]||"", body=m[2]||""; const rn=Number(rawAttr(attrs,"r")||rows.length+1); if(rn>maxRows) break;
+    const vals=[]; let c, meaningful=false; const cellRe=/<c\b([^>]*)>([\s\S]*?)<\/c>/gi;
+    while((c=cellRe.exec(body))){
+      const ref=rawAttr(c[1],"r"), col=cellCol(ref), value=rawCellValue(c[1],c[2],shared); vals[col]=value;
+      /* AD (índice 29) puede venir rellenada hasta el final de Excel; por sí sola no define una fila del Libro Mayor. */
+      if(col!==29 && String(value??"").trim()!=="") meaningful=true;
+    }
+    if(meaningful){ rows.push({rn,vals}); meaningfulSeen=true; trailingNoise=0; }
+    else if(!meaningfulSeen && rn<=10){ rows.push({rn,vals}); }
+    else if(meaningfulSeen){ trailingNoise++; if(trailingNoise>=2000) break; }
+  }
+  return rows;
+}
 async function readSheet(zip,path,shared,maxRows=Infinity){
-  const doc=xml(await zip.text(path)); const rows=[];
+  const text=await zip.text(path);
+  /* DOMParser sobre hojas de 100+ MB puede congelar el navegador. Usamos lector liviano para esas hojas. */
+  if(text.length>20*1024*1024) return readSheetLargeXml(text,shared,maxRows);
+  const doc=xml(text); const rows=[];
   for(const row of els(doc,"row")){
     const rn=Number(row.getAttribute("r")||rows.length+1); if(rn>maxRows) break; const vals=[];
     for(const c of Array.from(row.children).filter(x=>x.localName==="c")){ vals[cellCol(c.getAttribute("r"))]=cellValue(c,shared); }
@@ -344,6 +405,15 @@ async function parseExcel(file){
     setLoader("Leyendo textos compartidos…"); const sd=xml(await zip.text("xl/sharedStrings.xml")); shared=els(sd,"si").map(si=>els(si,"t").map(t=>t.textContent||"").join(""));
   }
 
+  /* Primero leemos la hoja Resumen. Es la fuente oficial del control y permite
+     validar el formato antes de procesar el Libro Mayor, que puede ser muy grande. */
+  let summaryRaw=null;
+  if(summary){
+    setLoader(`Leyendo hoja oficial ${summary.name}…`);
+    summaryRaw=await readSheet(zip,summary.path,shared);
+    if(!extractSummaryTotals(summaryRaw)) throw new Error(`La hoja “${summary.name}” existe, pero no pude localizar la tabla Resumen esperada (AALL / Mandante / OBRA / Total general).`);
+  }
+
   /* Si cambia el nombre de alguna hoja, sólo inspeccionamos hojas razonables (< 25 MB sin comprimir). */
   if(!main || !obras || !info || !form || !ocex){
     setLoader("Detectando hojas y columnas…"); const previews=[];
@@ -364,8 +434,6 @@ async function parseExcel(file){
   for(const s of uniq){ count++; setLoader(`Leyendo ${s.name} (${count}/${uniq.length})…`); full.set(s.path,makeTable(await readSheet(zip,s.path,shared))); }
   main={...main,table:full.get(main.path)};
   if(headerScore(main.table.headers,["PROVEEDOR","MONTO","PARTIDA","OC"])<4) throw new Error(`La hoja “${main.name}” no parece contener el Libro Mayor esperado (Proveedor, Monto, Partida y OC).`);
-  let summaryRaw=null;
-  if(summary){ setLoader(`Leyendo ${summary.name}…`); summaryRaw=await readSheet(zip,summary.path,shared); }
   return {sheets, main, obras:obras?{...obras,table:full.get(obras.path)}:null, info:info?{...info,table:full.get(info.path)}:null, form:form?{...form,table:full.get(form.path)}:null, ocex:ocex?{...ocex,table:full.get(ocex.path)}:null, summary:summary?{...summary,raw:summaryRaw}:null};
 }
 
@@ -382,7 +450,101 @@ function extractSummaryTotals(summaryRaw){
   const idx={}; (header.vals||[]).forEach((v,i)=>idx[norm(v)]=i);
   const AALL=num(total.vals[idx["AALL"]]), Mandante=num(total.vals[idx["MANDANTE"]]), OBRA=num(total.vals[idx["OBRA"]]);
   const Total=idx["TOTAL GENERAL"]!==undefined?num(total.vals[idx["TOTAL GENERAL"]]):AALL+Mandante+OBRA;
-  return {AALL,Mandante,OBRA,Total,row:total.rn};
+  return {AALL,Mandante,OBRA,Total,row:total.rn,headerRow:header.rn};
+}
+
+/* La hoja Resumen es la fuente oficial. Además del total general, leemos cada obra
+   de la tabla dinámica A:E. Así podemos validar que el Libro Mayor reconstruido
+   coincide obra por obra, sin depender de la lista auxiliar que existe a la derecha. */
+function extractSummaryByObra(summaryRaw){
+  if(!summaryRaw)return [];
+  let header=null, idx={};
+  for(const r of summaryRaw){
+    const ns=(r.vals||[]).map(norm);
+    if(ns.includes("ETIQUETAS DE FILA") && ns.includes("AALL") && ns.includes("MANDANTE") && ns.includes("OBRA")){ header=r; break; }
+  }
+  if(!header)return [];
+  (header.vals||[]).forEach((v,i)=>idx[norm(v)]=i);
+  const out=[];
+  for(const r of summaryRaw){
+    if(r.rn<=header.rn)continue;
+    const first=norm(r.vals?.[0]);
+    if(first==="TOTAL GENERAL")break;
+    const obra=normCode(r.vals?.[0]);
+    if(!obra || !/^\d+$/.test(obra))continue;
+    const AALL=num(r.vals?.[idx["AALL"]]), Mandante=num(r.vals?.[idx["MANDANTE"]]), OBRA=num(r.vals?.[idx["OBRA"]]);
+    const Total=idx["TOTAL GENERAL"]!==undefined?num(r.vals?.[idx["TOTAL GENERAL"]]):AALL+Mandante+OBRA;
+    out.push({obra,AALL,Mandante,OBRA,Total,row:r.rn});
+  }
+  return out;
+}
+
+/* Registro operativo de edificios con filtraciones. Se lee directamente de la
+   tabla ubicada en la hoja resumen (encabezados Obra...Obs2, actualmente H:P).
+   Se detecta por nombre de encabezado para tolerar cambios de fila o posición. */
+function extractRainWorks(summaryRaw){
+  if(!summaryRaw)return [];
+
+  /* v14: esta tabla se lee por POSICIÓN REAL en la hoja resumen.
+     H=Obra, I=Nombre obra, J=Supervisor, K=AALL 2026,
+     L=Status, M=Costo, N=Gestionado por/Medio, O=Obs1, P=Obs2.
+     Así las filas con M vacía NO desaparecen: siguen existiendo porque H/I/L/N tienen datos. */
+  const COL={H:7,I:8,J:9,K:10,L:11,M:12,N:13,O:14,P:15};
+  let header=null;
+  for(const r of summaryRaw){
+    if(norm(r.vals?.[COL.H])==="OBRA" && norm(r.vals?.[COL.I])==="NOMBRE DE OBRA" &&
+       (norm(r.vals?.[COL.L])==="STATUS" || norm(r.vals?.[COL.L])==="ESTATUS") &&
+       norm(r.vals?.[COL.M])==="TOTAL" && (norm(r.vals?.[COL.N])==="MEDIO" || norm(r.vals?.[COL.N]).includes("GESTION"))){
+      header=r; break;
+    }
+  }
+  if(!header)return [];
+
+  const out=[];
+  for(const r of summaryRaw){
+    if(r.rn<=header.rn)continue;
+    const obra=normCode(r.vals?.[COL.H]);
+    const name=String(r.vals?.[COL.I]??"").trim();
+    if(!obra || !/^\d+$/.test(obra) || !name)continue;
+
+    const supervisor=String(r.vals?.[COL.J]??"").trim();
+    const aallFlag=String(r.vals?.[COL.K]??"").trim();
+    const status=String(r.vals?.[COL.L]??"").trim();
+    const amountRaw=r.vals?.[COL.M];
+    const amountBlank=amountRaw===undefined || amountRaw===null || String(amountRaw).trim()==="";
+    const amount=num(amountRaw);
+    const amountZero=!amountBlank && Math.abs(amount)<0.005;
+    const noCostAlert=amountBlank || amountZero;
+    const medio=String(r.vals?.[COL.N]??"").trim();
+    const obs1=String(r.vals?.[COL.O]??"").trim();
+    const obs2=String(r.vals?.[COL.P]??"").trim();
+
+    out.push({
+      obra,name,supervisor,aallFlag,status,
+      amount,amountBlank,amountZero,noCostAlert,
+      medio,obs1,obs2,row:r.rn,hasCost:!noCostAlert,
+      sourceColumns:{obra:"H",name:"I",status:"L",amount:"M",medio:"N",obs1:"O",obs2:"P"}
+    });
+  }
+  return out;
+}
+
+function validateSummaryByObra(rows, summaryObras){
+  const lm=new Map();
+  for(const r of rows){
+    if(!r.isInSummary)continue;
+    if(!lm.has(r.obra))lm.set(r.obra,{AALL:0,Mandante:0,OBRA:0,Total:0});
+    const x=lm.get(r.obra);
+    if(x[r.classification]!==undefined)x[r.classification]+=r.amount;
+    x.Total+=r.amount;
+  }
+  const diffs=[];
+  for(const s of summaryObras||[]){
+    const x=lm.get(s.obra)||{AALL:0,Mandante:0,OBRA:0,Total:0};
+    const d=x.Total-s.Total;
+    if(Math.abs(d)>=1)diffs.push({obra:s.obra,resumen:s.Total,libroMayor:x.Total,diferencia:d});
+  }
+  return {ok:diffs.length===0,diffs};
 }
 
 function canonicalResumen(v){ const n=norm(v); if(n==="AALL")return "AALL"; if(n==="MANDANTE")return "Mandante"; if(n==="OBRA")return "OBRA"; return String(v??"").trim(); }
@@ -402,6 +564,7 @@ function buildData(parsed){
   if(parsed.ocex){
     source.push(parsed.ocex.name); for(const r of parsed.ocex.table.rows){ const oc=normOC(get(r,["OC"])); if(!oc)continue; state.excelMap.set(oc,{oc,date:get(r,["FECHA","Fecha"]),provider:String(get(r,["PROVEEDOR","Proveedor"])||""),product:String(get(r,["PRODUCTO","Producto"])||""),obra:normCode(get(r,["OBRA","Obra"])),quote:String(get(r,["COTIZACION","Cotizacion"])||""),net:num(get(r,["MONTO NETO","Monto Neto"])),requestedBy:String(get(r,["SOLICITA","Solicita"])||"")}); }
   }
+  if(parsed.summary) source.push(parsed.summary.name);
   source.unshift(parsed.main.name); state.sourceSheets=[...new Set(source)]; state.mainSheet=parsed.main.name;
   const out=[];
   for(const r of parsed.main.table.rows){
@@ -430,7 +593,10 @@ function buildData(parsed){
   }
   state.rows=out;
   state.sheetSummary=extractSummaryTotals(parsed.summary?.raw||null);
+  state.summaryObras=extractSummaryByObra(parsed.summary?.raw||null);
+  state.rainWorks=extractRainWorks(parsed.summary?.raw||null);
   const inc=out.filter(r=>r.isInSummary); state.lmSummary={AALL:inc.filter(r=>r.classification==="AALL").reduce((a,r)=>a+r.amount,0),Mandante:inc.filter(r=>r.classification==="Mandante").reduce((a,r)=>a+r.amount,0),OBRA:inc.filter(r=>r.classification==="OBRA").reduce((a,r)=>a+r.amount,0)}; state.lmSummary.Total=state.lmSummary.AALL+state.lmSummary.Mandante+state.lmSummary.OBRA;
+  state.summaryCheck=validateSummaryByObra(out,state.summaryObras);
   return out;
 }
 
@@ -442,17 +608,45 @@ function clearMessage(){$("messages").innerHTML="";}
 function fillSelect(id,values,label="Todas"){
   const el=$(id), current=el.value; el.innerHTML=`<option value="">${label}</option>`+[...new Set(values.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"es",{numeric:true})).map(v=>`<option value="${safeText(v)}">${safeText(v)}</option>`).join(""); if([...el.options].some(o=>o.value===current))el.value=current;
 }
+function fillObraSelect(){
+  const el=$("fObra"), current=el.value, map=new Map();
+  for(const w of state.rainWorks||[]) if(w.obra) map.set(w.obra,w.name||w.obra);
+  for(const r of state.rows.filter(r=>r.isAALL2026)) if(r.obra&&!map.has(r.obra)) map.set(r.obra,r.obraName||r.obra);
+  const opts=[...map.entries()].sort((a,b)=>String(a[0]).localeCompare(String(b[0]),"es",{numeric:true}));
+  el.innerHTML='<option value="">Todas</option>'+opts.map(([code,name])=>`<option value="${safeText(code)}">${safeText(code)} · ${safeText(name)}</option>`).join("");
+  if([...el.options].some(o=>o.value===current))el.value=current;
+}
 function updateFilterOptions(){
   const aallRows=state.rows.filter(r=>r.isAALL2026);
-  fillSelect("fObra",aallRows.map(r=>`${r.obra} · ${r.obraName}`)); fillSelect("fGP",aallRows.map(r=>r.gp)); fillSelect("fSupObra",aallRows.map(r=>r.supervisorObra)); fillSelect("fSupCosto",aallRows.map(r=>r.supervisorCosto)); fillSelect("fClass",state.rows.map(r=>r.classification)); fillSelect("fAccount",aallRows.map(r=>r.costGroup||costGroup(r.account)),"Todos"); fillSelect("fPeriod",state.rows.map(r=>r.period).filter(Boolean).sort(),"Todos"); fillSelect("fProvider",aallRows.map(r=>r.provider));
+  fillObraSelect();
+  fillSelect("fGP",aallRows.map(r=>r.gp));
+  fillSelect("fSupObra",[...aallRows.map(r=>r.supervisorObra),...(state.rainWorks||[]).map(w=>w.supervisor)]);
+  fillSelect("fSupCosto",aallRows.map(r=>r.supervisorCosto));
+  fillSelect("fClass",state.rows.map(r=>r.classification));
+  fillSelect("fAccount",aallRows.map(r=>r.costGroup||costGroup(r.account)),"Todos");
+  fillSelect("fPeriod",state.rows.map(r=>r.period).filter(Boolean).sort(),"Todos");
+  fillSelect("fProvider",aallRows.map(r=>r.provider));
+  fillSelect("fStatus",(state.rainWorks||[]).map(w=>w.status),"Todos");
+  fillSelect("fMedio",(state.rainWorks||[]).map(w=>w.medio),"Todos");
 }
 function applyFilters(){
-  const universe=$("fUniverse").value, obra=$("fObra").value, gp=$("fGP").value, so=$("fSupObra").value, sc=$("fSupCosto").value, cl=$("fClass").value, account=$("fAccount").value, pe=$("fPeriod").value, pr=$("fProvider").value, q=norm($("fSearch").value);
+  const universe=$("fUniverse").value, obra=$("fObra").value, gp=$("fGP").value, so=$("fSupObra").value, sc=$("fSupCosto").value, cl=$("fClass").value, account=$("fAccount").value, pe=$("fPeriod").value, pr=$("fProvider").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  const workMap=new Map((state.rainWorks||[]).map(w=>[w.obra,w]));
   state.filtered=state.rows.filter(r=>{
     if(universe==="summary" && !r.isInSummary)return false;
     if(universe==="aall" && !r.isAALL2026)return false;
-    if(obra && `${r.obra} · ${r.obraName}`!==obra)return false; if(gp&&r.gp!==gp)return false; if(so&&r.supervisorObra!==so)return false; if(sc&&r.supervisorCosto!==sc)return false; if(cl&&r.classification!==cl)return false; if(account&&(r.costGroup||costGroup(r.account))!==account)return false; if(pe&&r.period!==pe)return false; if(pr&&r.provider!==pr)return false;
-    if(q){ const hay=norm([r.obra,r.obraName,r.gp,r.supervisorObra,r.supervisorCosto,r.provider,r.oc,r.document,r.description,r.account,r.costGroup||costGroup(r.account),r.ref,r.refOrigin,r.infoExcel,r.infoForm,r.infoRV,r.resumenCategory].join(" | ")); if(!hay.includes(q))return false; }
+    const w=workMap.get(r.obra);
+    if(obra && r.obra!==obra)return false;
+    if(gp&&r.gp!==gp)return false;
+    if(so&&r.supervisorObra!==so&&w?.supervisor!==so)return false;
+    if(sc&&r.supervisorCosto!==sc)return false;
+    if(cl&&r.classification!==cl)return false;
+    if(account&&(r.costGroup||costGroup(r.account))!==account)return false;
+    if(pe&&r.period!==pe)return false;
+    if(pr&&r.provider!==pr)return false;
+    if(st&&w?.status!==st)return false;
+    if(medio&&w?.medio!==medio)return false;
+    if(q){ const hay=norm([r.obra,r.obraName,r.gp,r.supervisorObra,r.supervisorCosto,r.provider,r.oc,r.document,r.description,r.account,r.costGroup||costGroup(r.account),r.ref,r.refOrigin,r.infoExcel,r.infoForm,r.infoRV,r.resumenCategory,w?.status,w?.medio,w?.obs1,w?.obs2].join(" | ")); if(!hay.includes(q))return false; }
     return true;
   });
   render();
@@ -516,9 +710,63 @@ function renderObraCostChart(){
   $("obraCostChart").querySelectorAll("[data-close-detail]").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();state.chartExpandedObra="";renderObraCostChart();}));
 }
 function renderObras(){
-  const rows=state.filtered.filter(r=>r.isAALL2026); const m=new Map(); rows.forEach(r=>{const k=`${r.obra} · ${r.obraName}`; if(!m.has(k))m.set(k,{official:0,pending:0}); const o=m.get(k); if(r.isInSummary)o.official+=r.amount; if(r.classification==="Pendiente clasificar")o.pending+=r.amount;}); const a=[...m.entries()].sort((x,y)=>Math.abs(y[1].official)-Math.abs(x[1].official)).slice(0,30);
-  $("obraList").innerHTML=a.length?a.map(([k,v])=>`<div class="obra-row"><button data-obra="${safeText(k)}">${safeText(k)}</button><div class="num" title="Total incluido en Resumen">${safeText(money(v.official))}</div><div class="num" title="Pendiente clasificar">${safeText(money(v.pending))}</div></div>`).join(""):'<div class="empty">Sin datos.</div>';
+  const rows=state.filtered.filter(r=>r.isAALL2026); const m=new Map();
+  rows.forEach(r=>{const k=r.obra; if(!m.has(k))m.set(k,{name:r.obraName,official:0,pending:0}); const o=m.get(k); if(r.isInSummary)o.official+=r.amount; if(r.classification==="Pendiente clasificar")o.pending+=r.amount;});
+  const a=[...m.entries()].sort((x,y)=>Math.abs(y[1].official)-Math.abs(x[1].official)).slice(0,30);
+  const full=canSeeOfficialClient();
+  $("obraList").innerHTML=a.length?a.map(([code,v])=>`<div class="obra-row"><button data-obra="${safeText(code)}">${safeText(code)} · ${safeText(v.name||code)}</button><div class="num" title="Costo AALL visible">${safeText(money(v.official))}</div><div class="num ${full?'':'hidden'}" title="Pendiente clasificar">${safeText(money(v.pending))}</div></div>`).join(""):'<div class="empty">Sin datos.</div>';
   $("obraList").querySelectorAll("button[data-obra]").forEach(b=>b.addEventListener("click",()=>{$("fObra").value=b.dataset.obra;applyFilters();window.scrollTo({top:document.querySelector('.filters').offsetTop-100,behavior:'smooth'});}));
+}
+function statusClass(v){ const n=norm(v); if(n==="EN CURSO")return"en-curso"; if(n==="TERMINADO")return"terminado"; if(n==="RECHAZADO")return"rechazado"; if(n==="SIN GESTION")return"sin-gestion"; return""; }
+function filteredRainWorks(){
+  const obra=$("fObra").value, so=$("fSupObra").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  return (state.rainWorks||[]).filter(w=>{
+    if(obra&&w.obra!==obra)return false;
+    if(so&&w.supervisor!==so)return false;
+    if(st&&w.status!==st)return false;
+    if(medio&&w.medio!==medio)return false;
+    if(q&&!norm([w.obra,w.name,w.supervisor,w.status,w.medio,w.obs1,w.obs2,(w.noCostAlert||!w.hasCost)?"ALERTA SIN GASTO COLUMNA M VACIA":""].join(" | ")).includes(q))return false;
+    return true;
+  });
+}
+function renderRainWorks(){
+  const isNoCost=w=>w.noCostAlert===true || w.amountBlank===true || w.amountZero===true || w.hasCost===false || Math.abs(num(w.amount))<0.005;
+  const base=filteredRainWorks();
+  /* Las alertas van PRIMERO para que nunca queden escondidas al final de la tabla. */
+  const rows=[...base].sort((a,b)=>{
+    const za=isNoCost(a)?0:1, zb=isNoCost(b)?0:1;
+    if(za!==zb)return za-zb;
+    return String(a.obra||"").localeCompare(String(b.obra||""),"es",{numeric:true});
+  });
+  const withCost=rows.filter(w=>!isNoCost(w)), zero=rows.filter(isNoCost);
+  $("rainWorksTotal").textContent=`${rows.length.toLocaleString("es-CL")} obras`;
+  $("rainWorksWithCost").textContent=`${withCost.length.toLocaleString("es-CL")} con costo`;
+  $("rainWorksZero").textContent=`⚠ ${zero.length.toLocaleString("es-CL")} sin gasto en M`;
+
+  const alertBox=$("rainAlertSummary");
+  if(zero.length){
+    alertBox.classList.remove("hidden");
+    alertBox.innerHTML=`<b>⚠ ${zero.length.toLocaleString("es-CL")} obras registran filtraciones/AALL 2026 pero no tienen costo asociado en la columna M.</b> Se muestran primero en la tabla. Para cada una se informa el <b>estatus de L</b> y <b>gestionado por de N</b>.`;
+  }else{
+    alertBox.classList.add("hidden"); alertBox.innerHTML="";
+  }
+
+  if(state.rainExpandedObra && !rows.some(w=>w.obra===state.rainExpandedObra)) state.rainExpandedObra="";
+  $("rainWorksBody").innerHTML=rows.length?rows.map(w=>{
+    const expanded=state.rainExpandedObra===w.obra;
+    const noCost=isNoCost(w);
+    const obs=[w.obs1,w.obs2].filter(x=>x&&!isNA(x)&&norm(x)!=="0");
+    const cost=noCost
+      ?`<span class="rain-money">$0</span><span class="zero-cost" title="La obra está en el cuadro H:P de la hoja resumen, pero no tiene costo asociado en la columna M."><span class="qmark">!</span> SIN GASTO REGISTRADO</span><span class="blank-m-note">${w.amountBlank?'Columna M vacía':'Columna M = $0'}</span>`
+      :`<span class="rain-money">${safeText(money(w.amount))}</span>`;
+    const obraAlert=noCost?`<span class="alert-badge">⚠ AALL / FILTRACIÓN SIN COSTO</span>`:"";
+    const shortObs=obs.length?safeText(obs.join(" · ")):'<span class="mini">Sin observación</span>';
+    const statusText=safeText(w.status||"Sin estatus");
+    const medioText=safeText(w.medio||"Sin gestión informada");
+    const detail=expanded?`<tr class="rain-detail"><td colspan="6"><div class="rain-detail-box"><div class="rain-detail-grid"><div class="rain-detail-item"><b>Nombre de obra · columna I</b>${safeText(w.name||"—")}</div><div class="rain-detail-item"><b>Estatus · columna L</b>${statusText}</div><div class="rain-detail-item"><b>Costo · columna M</b>${noCost?'$0 · SIN GASTO REGISTRADO':safeText(money(w.amount))}</div><div class="rain-detail-item"><b>Gestionado por · columna N</b>${medioText}</div><div class="rain-detail-item"><b>Observación 1 · O</b>${safeText(w.obs1&&!isNA(w.obs1)&&norm(w.obs1)!=="0"?w.obs1:"Sin observación")}</div><div class="rain-detail-item"><b>Observación 2 · P</b>${safeText(w.obs2&&!isNA(w.obs2)&&norm(w.obs2)!=="0"?w.obs2:"Sin observación")}</div><div class="rain-detail-item"><b>Fuente</b>Hoja resumen · fila ${w.row} · cuadro H:P</div><div class="rain-detail-item"><b>Condición</b>${noCost?'⚠ Edificio registrado con filtración/AALL 2026, pero la columna M está vacía o en $0. No figura costo asociado.':`Costo asociado: ${safeText(money(w.amount))}`}</div></div></div></td></tr>`:"";
+    return `<tr class="rain-row ${noCost?'no-cost-alert':''}" data-rain-obra="${safeText(w.obra)}" aria-expanded="${expanded}"><td><b>${safeText(w.obra)} · ${safeText(w.name||"—")}</b><br>${obraAlert}</td><td>${safeText(w.supervisor||"—")}</td><td><span class="status-tag ${statusClass(w.status)}">${statusText}</span>${noCost?`<div class="blank-m-note">L · ${statusText}</div>`:""}</td><td>${cost}</td><td><b>${medioText}</b>${noCost?`<div class="blank-m-note">N · ${medioText}</div>`:""}</td><td class="ellipsis" title="${safeText(obs.join(' · '))}">${shortObs}</td></tr>${detail}`;
+  }).join(""):'<tr><td colspan="6"><div class="empty">No hay obras con los filtros actuales.</div></td></tr>';
+  $("rainWorksBody").querySelectorAll("tr[data-rain-obra]").forEach(tr=>tr.addEventListener("click",()=>{state.rainExpandedObra=state.rainExpandedObra===tr.dataset.rainObra?"":tr.dataset.rainObra;renderRainWorks();}));
 }
 function sortRows(rows){ const k=state.sortKey,d=state.sortDir; return [...rows].sort((a,b)=>{let x=a[k],y=b[k]; if(typeof x==="number"&&typeof y==="number")return (x-y)*d; return String(x??"").localeCompare(String(y??""),"es",{numeric:true})*d;}); }
 function renderTable(){
@@ -528,7 +776,7 @@ function renderTable(){
   </tr>`).join(""):'<tr><td colspan="13"><div class="empty">No hay registros con los filtros actuales.</div></td></tr>';
   $("tbody").querySelectorAll("button[data-id]").forEach(b=>b.addEventListener("click",()=>openDetail(b.dataset.id)));
 }
-function render(){ renderKpis();renderObraCostChart();renderObras();renderTable(); }
+function render(){ renderKpis();renderRainWorks();renderObraCostChart();renderObras();renderTable(); }
 function detailItem(k,v){return `<div class="detail"><div class="k">${safeText(k)}</div><div class="v">${safeText(v||"—")}</div></div>`;}
 function openDetail(id){
   const r=state.rows.find(x=>x.id===id); if(!r)return; $("modalTitle").textContent=`${r.obra} · ${r.obraName} · ${money(r.amount)}`;
@@ -551,7 +799,7 @@ AC Resumen: ${safeText(r.resumenCategory||"—")}</div>
     <div class="section-title">Fila original del Libro Mayor</div><div class="raw">${safeText(raw)}</div>`;
   $("modal").classList.add("open");
 }
-function resetFilters(){ ["fObra","fGP","fSupObra","fSupCosto","fClass","fAccount","fPeriod","fProvider"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
+function resetFilters(){ ["fObra","fGP","fSupObra","fSupCosto","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
 function csvCell(v){const s=String(v??"");return `"${s.replace(/"/g,'""')}"`;}
 function exportCSV(){
   const headers=["Fecha","Periodo","Obra","Nombre obra","GP","Supervisor obra","Supervisor costo LM","Proveedor","RUT","OC","Documento","Descripción","Clasificación gasto","Descripción Cuenta original (K)","Monto","Clasificación Resumen","Incluido Resumen","Motivo","Hoja origen","Fila origen","PDF"];
@@ -565,18 +813,20 @@ async function loadFile(file){
     const missing=[]; if(!parsed.obras)missing.push("Obras con AALL"); if(!parsed.info)missing.push("Info BD AALL"); if(!parsed.form)missing.push("OC Formulario"); if(!parsed.ocex)missing.push("OCExcell"); if(!parsed.summary)missing.push("resumen");
     const pending=state.rows.filter(r=>r.classification==="Pendiente clasificar"); const lm=state.lmSummary; const sh=state.sheetSummary; const diff=sh?lm.Total-sh.Total:0;
     const square=sh&&Math.abs(diff)<1;
-    message(`Carga y publicación completadas. <b>Resumen reconstruido desde Libro Mayor: ${money(lm.Total)}</b> · AALL ${money(lm.AALL)} · Mandante ${money(lm.Mandante)} · OBRA ${money(lm.OBRA)}.${sh?`<br>Hoja “resumen”: <b>${money(sh.Total)}</b> · diferencia: <b>${money(diff)}</b> ${square?"✓ CUADRA":"⚠ REVISAR"}.`:"<br>No se pudo leer el total cacheado de la hoja “resumen”."}<br>Movimientos AB=AALL 2026 todavía sin AC Resumen: <b>${pending.length.toLocaleString("es-CL")}</b> (${money(pending.reduce((a,r)=>a+r.amount,0))}).${missing.length?`<br><b>Atención:</b> no se identificaron: ${missing.join(", ")}.`:""}`,square&&!missing.length?"good":(sh&&!square?"error":""));
+    const obrasResumen=state.summaryObras?.length||0; const obraCheck=state.summaryCheck; const rain=state.rainWorks||[]; const rainZero=rain.filter(w=>!w.hasCost).length;
+    message(`Carga y publicación completadas. <b>Hoja “resumen” leída directamente: ${money(sh?.Total||0)}</b> · ${obrasResumen.toLocaleString("es-CL")} obras con costo en tabla dinámica.<br><b>Edificios con filtraciones H:P: ${rain.length.toLocaleString("es-CL")}</b> · <b>${rainZero.toLocaleString("es-CL")}</b> sin costo AALL asociado.<br><b>Libro Mayor reconstruido: ${money(lm.Total)}</b> · AALL ${money(lm.AALL)} · Mandante ${money(lm.Mandante)} · OBRA ${money(lm.OBRA)} · diferencia general: <b>${money(diff)}</b> ${square?"✓ CUADRA":"⚠ REVISAR"}.${obraCheck?`<br>Validación obra por obra: <b>${obraCheck.ok?"✓ CUADRA":"⚠ "+obraCheck.diffs.length+" obra(s) con diferencia"}</b>.`:""}<br>Movimientos AB=AALL 2026 todavía sin AC Resumen: <b>${pending.length.toLocaleString("es-CL")}</b> (${money(pending.reduce((a,r)=>a+r.amount,0))}).${missing.length?`<br><b>Atención:</b> no se identificaron: ${missing.join(", ")}.`:""}`,square&&obraCheck?.ok&&!missing.length?"good":(sh&&!square?"error":""));
   }catch(e){ console.error(e); message(`<b>No pude procesar el archivo.</b> ${safeText(e.message||e)}`,"error"); $("infoMain").textContent="Error"; $("infoRows").textContent="—"; }
   finally{stopLoader();}
 }
 
 const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});
 ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)loadFile(f);});
-["fUniverse","fObra","fGP","fSupObra","fSupCosto","fClass","fAccount","fPeriod","fProvider"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
+["fUniverse","fObra","fGP","fSupObra","fSupCosto","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=k==="amount"||k==="dateKey"?-1:1;}renderTable();}));
 $("modalClose").addEventListener("click",()=>$("modal").classList.remove("open"));$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
 
 function canUpdateClient(){ return state.session?.role==="admin" || state.session?.role==="updater"; }
+function canSeeOfficialClient(){ return state.session?.role==="admin" || state.session?.role==="updater"; }
 function isAdminClient(){ return state.session?.role==="admin"; }
 async function api(path,options={}){
   const res=await fetch(path,{credentials:"same-origin",headers:{"Content-Type":"application/json",...(options.headers||{})},...options});
@@ -585,7 +835,8 @@ async function api(path,options={}){
   return data;
 }
 function datasetForServer(){
-  return {meta:{fileName:state.fileName,mainSheet:state.mainSheet,sourceSheets:state.sourceSheets},sheetSummary:state.sheetSummary,lmSummary:state.lmSummary,rows:state.rows.map(r=>({...r,costGroup:r.costGroup||costGroup(r.account)}))};
+  const rows=state.rows.map(r=>{ const {raw,...rest}=r; return {...rest,costGroup:r.costGroup||costGroup(r.account)}; });
+  return {meta:{fileName:state.fileName,mainSheet:state.mainSheet,sourceSheets:state.sourceSheets},sheetSummary:state.sheetSummary,lmSummary:state.lmSummary,summaryObras:state.summaryObras,rainWorks:state.rainWorks,summaryCheck:state.summaryCheck,rows};
 }
 async function publishCurrentDataset(){
   const p=$("publishState"); p.className="publish-state";p.textContent="Publicando actualización para todos los visores…";
@@ -593,14 +844,21 @@ async function publishCurrentDataset(){
   catch(e){p.className="publish-state err";p.textContent=`No se pudo publicar: ${e.message}`;throw e;}
 }
 function hydrateDataset(d){
-  if(!d)return false; state.rows=(d.rows||[]).map(r=>({...r,costGroup:r.costGroup||costGroup(r.account)})); state.fileName=d.meta?.fileName||"Dataset publicado";state.mainSheet=d.meta?.mainSheet||"";state.sourceSheets=d.meta?.sourceSheets||[];state.datasetMeta=d.meta||null;state.sheetSummary=d.sheetSummary||null;state.lmSummary=d.lmSummary||null;
+  if(!d)return false; state.rows=(d.rows||[]).map(r=>({...r,costGroup:r.costGroup||costGroup(r.account)})); state.fileName=d.meta?.fileName||"Dataset publicado";state.mainSheet=d.meta?.mainSheet||"";state.sourceSheets=d.meta?.sourceSheets||[];state.datasetMeta=d.meta||null;state.sheetSummary=d.sheetSummary||null;state.lmSummary=d.lmSummary||null;state.summaryObras=d.summaryObras||[];state.rainWorks=(d.rainWorks||[]).map(w=>{const amount=num(w.amount), amountBlank=w.amountBlank===true; const noCostAlert=w.noCostAlert===true||amountBlank||w.hasCost===false||Math.abs(amount)<0.005; return {...w,amount,amountBlank,noCostAlert,hasCost:!noCostAlert};});state.summaryCheck=d.summaryCheck||null;
   $("infoFile").textContent=state.fileName;$("infoMain").textContent=state.mainSheet||"—";$("infoRows").textContent=state.rows.length.toLocaleString('es-CL');$("infoSheets").textContent=state.sourceSheets.join(' · ')||"—";updateFilterOptions();$("exportBtn").disabled=!state.rows.length;$("resetBtn").disabled=!state.rows.length;resetFilters();
   if(state.datasetMeta?.updatedAt) message(`Versión publicada: <b>${safeText(state.fileName)}</b> · actualizada ${safeText(new Date(state.datasetMeta.updatedAt).toLocaleString('es-CL'))} por ${safeText(state.datasetMeta.updatedBy||'—')}.`,"good");
   return true;
 }
 function renderRole(){
-  const role=state.session?.role||'viewer', email=state.session?.email||''; const chip=$("roleChip");chip.className=`role-chip ${role}`;$("roleText").textContent=role==='admin'?'Administrador':role==='updater'?'Actualizador':'Visor';
+  const role=state.session?.role||'viewer', email=state.session?.email||'', full=canSeeOfficialClient();
+  const chip=$("roleChip");chip.className=`role-chip ${role}`;$("roleText").textContent=role==='admin'?'Administrador general':role==='updater'?'Actualizador':'Visor';
   $("loginBtn").classList.toggle('hidden',!!state.session);$("logoutBtn").classList.toggle('hidden',!state.session);$("adminBtn").classList.toggle('hidden',!isAdminClient());$("uploadSection").classList.toggle('hidden',!canUpdateClient());
+  document.querySelectorAll('.private-summary,.private-control').forEach(el=>el.classList.toggle('hidden',!full));
+  $("kpiSection").classList.toggle('viewer-mode',!full);
+  if(!full){ $("fUniverse").value='summary'; $("fClass").value=''; }
+  $("traceNotice").innerHTML=full
+    ? 'La fuente oficial es la hoja <b>“resumen”</b>. El tablero mantiene la cuadratura de <b>AALL / Mandante / OBRA</b> y muestra aparte los pendientes. El estado de edificios con filtraciones se lee directamente desde <b>H:P</b> de la misma hoja.'
+    : 'Vista de consulta de <b>Aguas Lluvias</b>. Se muestran únicamente los costos clasificados como <b>AALL</b> y el estado de los edificios con filtraciones informado en la hoja <b>“resumen”</b>.';
   if(state.session) chip.title=email; else chip.title='Acceso de solo lectura';
 }
 function showLocked(message){$("lockMessage").textContent=message||'Sistema temporalmente bloqueado por administración.';$("lockOverlay").classList.add('show');}
