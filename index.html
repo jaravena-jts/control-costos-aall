@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Control de costo de aguas lluvias 2026</title>
+<style>
+:root{
+  --navy:#13243a; --navy2:#1d3552; --ink:#1c2733; --muted:#657180;
+  --bg:#f3f6f8; --card:#ffffff; --line:#dde4ea; --teal:#0b7285;
+  --green:#17845b; --amber:#b36b00; --red:#b42318; --blue:#2855a6; --slate:#586574;
+  --shadow:0 10px 30px rgba(18,37,58,.08);
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+button,input,select{font:inherit} button{cursor:pointer}
+.topbar{background:linear-gradient(120deg,var(--navy),var(--navy2));color:white;padding:24px 28px 20px;position:sticky;top:0;z-index:20;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+.topbar-inner{max-width:1500px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand h1{margin:0;font-size:22px;letter-spacing:.2px}.brand p{margin:5px 0 0;color:#cbd7e4;font-size:13px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid transparent;border-radius:9px;padding:9px 13px;background:#fff;color:var(--navy);font-weight:650}.btn:hover{filter:brightness(.98)}
+.btn.secondary{background:transparent;color:white;border-color:#6d8299}.btn.ghost{background:#eef3f7;color:var(--navy);border-color:#d8e1e8}.btn.danger{color:#9b1c1c;background:#fff0f0;border-color:#ffd0d0}.btn:disabled{opacity:.45;cursor:not-allowed}
+.container{max-width:1500px;margin:0 auto;padding:24px 28px 40px}
+.import-card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+.import-grid{display:grid;grid-template-columns:minmax(300px,1.1fr) minmax(280px,.9fr);gap:18px;align-items:stretch}
+.drop{min-height:150px;border:2px dashed #aebdca;border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#f9fbfc;transition:.15s}.drop.drag{border-color:var(--teal);background:#edf9fb}.drop strong{font-size:16px}.drop span{font-size:12px;color:var(--muted);margin-top:7px}.drop input{display:none}.upload-label{margin-top:14px;display:inline-block;background:var(--navy);color:white;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer}
+.info-panel{border:1px solid #dce7ee;border-radius:12px;background:#f7fafc;padding:16px}.info-panel h3{margin:0 0 10px;font-size:14px}.info-line{display:grid;grid-template-columns:130px 1fr;gap:8px;font-size:12px;margin:6px 0}.info-line b{color:#435263}.privacy{margin-top:12px;color:#506070;font-size:11px;line-height:1.5}
+.notice{border-left:4px solid var(--amber);background:#fff8e8;color:#694600;padding:11px 14px;border-radius:8px;margin:0 0 18px;font-size:12px;line-height:1.45}.notice.good{border-left-color:var(--green);background:#eefaf4;color:#155f43}.notice.error{border-left-color:var(--red);background:#fff0ef;color:#8c2018}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px;margin-bottom:18px}.kpis.viewer-mode{grid-template-columns:minmax(220px,360px)}.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow)}.kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);font-weight:700}.kpi .value{font-size:23px;margin-top:8px;font-weight:760;color:var(--navy)}.kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}.kpi.emph .value{color:var(--green)}.kpi.warn .value{color:var(--amber)}.kpi.no .value{color:var(--red)}
+.filters{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);margin-bottom:18px}.filters-grid{display:grid;grid-template-columns:repeat(7,minmax(135px,1fr));gap:10px}.field label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:760;letter-spacing:.45px;display:block;margin:0 0 5px}.field select,.field input{width:100%;border:1px solid #ccd7df;border-radius:8px;background:white;padding:8px 9px;color:var(--ink);min-height:38px}.field.search{grid-column:span 2}
+.grid2{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr);gap:18px;margin-bottom:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}.card-head h2{font-size:14px;margin:0;color:var(--navy)}.card-body{padding:14px 16px}.mini{font-size:11px;color:var(--muted)}
+.obra-chart{max-height:520px;overflow:auto;padding:4px 2px 6px}.obra-chart-row{display:grid;grid-template-columns:minmax(145px,210px) minmax(260px,1fr) 94px;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px solid #eef2f4;transition:.15s;border-radius:8px}.obra-chart-row:last-child{border-bottom:0}.obra-chart-row.is-expanded{background:#f4f8fb}.obra-chart-name{border:0;background:transparent;text-align:left;color:var(--navy);font-size:10px;font-weight:700;padding:0;line-height:1.25}.obra-chart-name:hover{text-decoration:underline}.stack-track{height:20px;background:#edf2f5;border-radius:6px;display:flex;overflow:hidden;min-width:0;cursor:pointer}.stack-track:hover{outline:1px solid #c7d7e2}.stack-seg{height:100%;position:relative;transition:.15s;min-width:0}.stack-seg:hover{filter:brightness(.93)}.obra-chart-total{text-align:right;font-variant-numeric:tabular-nums;font-size:10px;font-weight:700;color:var(--navy)}.chart-legend{display:flex;gap:10px;flex-wrap:wrap;padding:0 0 8px}.legend-item{display:inline-flex;align-items:center;gap:5px;font-size:9px;color:#5d6875}.legend-dot{width:9px;height:9px;border-radius:3px;display:inline-block}.chart-hint{font-size:10px;color:var(--muted);margin:0 0 10px}.chart-empty{padding:35px;text-align:center;color:var(--muted);font-size:13px}.obra-breakdown{margin:0 4px 10px;padding:12px 14px;background:#f8fbfd;border:1px solid #dbe6ed;border-radius:10px}.obra-breakdown-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.obra-breakdown-head b{font-size:11px;color:var(--navy)}.obra-breakdown-head button{border:0;background:#e8eef3;color:var(--navy);border-radius:7px;padding:5px 8px;font-size:9px;font-weight:700}.breakdown-row{display:grid;grid-template-columns:minmax(155px,210px) minmax(220px,1fr) 110px 52px;gap:10px;align-items:center;padding:6px 0}.breakdown-label{font-size:10px;font-weight:700;color:#3c4d5e}.breakdown-track{height:12px;background:#e9eff3;border-radius:999px;overflow:hidden}.breakdown-fill{height:100%;border-radius:999px}.breakdown-value{text-align:right;font-size:10px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}.breakdown-pct{text-align:right;font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums}@media(max-width:720px){.breakdown-row{grid-template-columns:1fr 90px}.breakdown-track{grid-column:1/-1;order:3}.breakdown-pct{display:none}}
+.obra-list{max-height:275px;overflow:auto}.obra-row{display:grid;grid-template-columns:minmax(120px,1fr) 90px 90px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #eef2f4;font-size:11px}.obra-row:last-child{border-bottom:0}.obra-row button{border:0;background:transparent;text-align:left;padding:0;color:var(--navy);font-weight:650}.obra-row button:hover{text-decoration:underline}.num{text-align:right;font-variant-numeric:tabular-nums}.kpis.viewer-mode .kpi{max-width:360px}
+.rain-card{margin-bottom:18px}.rain-summary{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.rain-pill{display:inline-flex;gap:5px;align-items:center;border-radius:999px;padding:5px 8px;background:#eef3f7;color:#455565;font-size:9px;font-weight:760}.rain-pill.alert{background:#fff3db;color:#8a5a00}.rain-table-wrap{overflow:auto;max-height:560px}.rain-table{width:100%;border-collapse:separate;border-spacing:0;min-width:1050px;font-size:11px}.rain-table th{position:sticky;top:0;z-index:3;background:#eef3f7;color:#465565;padding:9px 8px;text-align:left;border-bottom:1px solid #ccd7df;font-size:10px;text-transform:uppercase;letter-spacing:.35px}.rain-table td{padding:9px 8px;border-bottom:1px solid #edf1f3;vertical-align:top}.rain-table tr.rain-row{cursor:pointer}.rain-table tr.rain-row:hover td{background:#f8fbfc}.rain-money{font-weight:760;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}.zero-cost{display:inline-flex;align-items:center;gap:7px;font-weight:760;color:#9b5e00}.zero-cost .qmark{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#fff0c7;border:1px solid #e3b65e;font-size:12px}.status-tag{display:inline-flex;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:760;background:#edf2f5;color:#53616f;white-space:nowrap}.status-tag.en-curso{background:#eaf2ff;color:#24539b}.status-tag.terminado{background:#e8f7ef;color:#13704d}.status-tag.rechazado{background:#ffeceb;color:#a42a22}.status-tag.sin-gestion{background:#fff4d9;color:#855700}.rain-detail td{background:#fafcfd!important;padding:0!important}.rain-detail-box{padding:12px 14px;border-left:3px solid #b9c8d4;margin:4px 8px 10px;border-radius:7px;background:#f5f8fa}.rain-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.rain-detail-item{font-size:10px;color:#52606e;line-height:1.45}.rain-detail-item b{display:block;color:var(--navy);margin-bottom:2px}.viewer-note{font-size:10px;color:var(--muted);margin-top:4px}@media(max-width:760px){.rain-detail-grid{grid-template-columns:1fr}}
+
+.table-card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)}.table-toolbar h2{font-size:14px;margin:0;color:var(--navy)}.table-wrap{overflow:auto;max-height:620px}.data-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1380px;font-size:11px}.data-table th{position:sticky;top:0;z-index:4;background:#eef3f7;color:#465565;padding:9px 8px;text-align:left;border-bottom:1px solid #ccd7df;font-size:10px;text-transform:uppercase;letter-spacing:.35px;white-space:nowrap;cursor:pointer}.data-table td{padding:9px 8px;border-bottom:1px solid #edf1f3;vertical-align:top}.data-table tr:hover td{background:#f8fbfc}.data-table td.money{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}.ellipsis{max-width:360px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tag{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:760;white-space:nowrap}.tag.confirm{background:#e8f7ef;color:#13704d}.tag.prob{background:#eaf2ff;color:#24539b}.tag.review{background:#fff4d9;color:#855700}.tag.no{background:#ffeceb;color:#a42a22}.tag.out{background:#edf0f2;color:#606c78}.confidence{font-size:9px;color:#687482;margin-top:3px}.linkbtn{border:0;background:#eaf1f5;color:var(--navy);border-radius:6px;padding:5px 7px;font-size:10px;font-weight:650}
+.pdf-link{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--navy);background:#f0f7fa;border:1px solid #cfe2e8;border-radius:8px;padding:6px 8px;min-width:118px;transition:.15s}.pdf-link:hover{background:#e5f2f6;border-color:#9fc6d1;transform:translateY(-1px)}.pdf-badge{display:inline-flex;align-items:center;justify-content:center;background:#b42318;color:white;border-radius:5px;padding:4px 5px;font-size:8px;font-weight:800;letter-spacing:.35px;line-height:1}.pdf-meta{display:flex;flex-direction:column;min-width:0}.pdf-doc{font-size:10px;font-weight:760;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:145px}.pdf-action{font-size:9px;color:var(--teal);font-weight:700;margin-top:2px}.no-pdf-doc{display:flex;flex-direction:column}.no-pdf-doc .doc-number{font-weight:650}.no-pdf-doc .doc-status{font-size:9px;color:#8a959f;margin-top:2px}.invoice-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #cfe2e8;background:#f2f9fb;border-radius:10px;padding:12px 14px;margin-bottom:14px}.invoice-hero .invoice-copy{min-width:0}.invoice-hero .invoice-copy b{display:block;color:var(--navy);font-size:12px}.invoice-hero .invoice-copy span{display:block;color:var(--muted);font-size:10px;margin-top:3px;overflow-wrap:anywhere}.invoice-hero a{text-decoration:none;background:var(--navy);color:white;border-radius:8px;padding:9px 12px;font-size:10px;font-weight:700;white-space:nowrap}.empty{padding:35px;text-align:center;color:var(--muted);font-size:13px}
+.modal{position:fixed;inset:0;background:rgba(15,27,41,.52);display:none;align-items:center;justify-content:center;z-index:50;padding:22px}.modal.open{display:flex}.modal-box{width:min(920px,96vw);max-height:90vh;overflow:auto;background:white;border-radius:14px;box-shadow:0 20px 70px rgba(0,0,0,.28)}.modal-head{position:sticky;top:0;z-index:2;background:white;border-bottom:1px solid var(--line);padding:15px 18px;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;font-size:16px;color:var(--navy)}.close{border:0;background:#eef2f5;border-radius:8px;width:32px;height:32px;font-size:18px}.modal-body{padding:18px}.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.detail{border:1px solid #e1e8ed;border-radius:9px;padding:10px;background:#fafcfd}.detail .k{font-size:9px;text-transform:uppercase;color:#6c7884;font-weight:760;letter-spacing:.4px}.detail .v{font-size:12px;margin-top:5px;overflow-wrap:anywhere}.section-title{font-size:12px;color:var(--navy);margin:20px 0 8px;font-weight:780;text-transform:uppercase;letter-spacing:.4px}.evidence{border:1px solid #dce5ea;border-left:4px solid var(--teal);border-radius:8px;padding:11px;margin:8px 0;background:#fbfdfe;font-size:11px;line-height:1.5}.evidence.no{border-left-color:var(--red)}.raw{white-space:pre-wrap;background:#f5f7f9;border:1px solid #e0e6ea;border-radius:8px;padding:10px;font-size:10px;line-height:1.45;color:#3d4b58}.doc-actions{display:flex;gap:8px;flex-wrap:wrap}.doc-actions a{text-decoration:none;background:var(--navy);color:white;border-radius:7px;padding:7px 10px;font-size:10px;font-weight:650}
+.loader{display:none;align-items:center;gap:8px;font-size:12px;color:#435263}.loader.show{display:flex}.spin{width:15px;height:15px;border:2px solid #cfd9e0;border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.footer{font-size:10px;color:#78838e;text-align:center;padding:20px}
+@media(max-width:1150px){.kpis{grid-template-columns:repeat(3,1fr)}.filters-grid{grid-template-columns:repeat(4,1fr)}.grid2{grid-template-columns:1fr}.import-grid{grid-template-columns:1fr}.field.search{grid-column:span 2}}
+@media(max-width:720px){.topbar{padding:17px 14px}.container{padding:16px 12px}.topbar-inner{align-items:flex-start;flex-direction:column}.kpis{grid-template-columns:1fr 1fr}.filters-grid{grid-template-columns:1fr 1fr}.field.search{grid-column:span 2}.detail-grid{grid-template-columns:1fr}.brand h1{font-size:18px}}
+
+/* v7 · roles, publicación central y administración */
+.hidden{display:none!important}.role-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:7px 10px;color:#dce7f2;font-size:11px}.role-dot{width:7px;height:7px;border-radius:50%;background:#8fb3cc}.role-chip.admin .role-dot{background:#4bd99f}.role-chip.updater .role-dot{background:#ffc857}.auth-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.admin-only-note{border-left:4px solid #6b46c1;background:#f6f1ff;color:#4b3480;padding:10px 13px;border-radius:8px;margin:0 0 18px;font-size:11px}.login-grid{display:grid;gap:12px}.login-grid label{font-size:10px;color:var(--muted);font-weight:760;text-transform:uppercase}.login-grid input,.login-grid select,.admin-input{width:100%;border:1px solid #ccd7df;border-radius:8px;padding:9px 10px}.login-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.admin-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}.admin-stat{border:1px solid var(--line);border-radius:10px;padding:12px;background:#f8fafb}.admin-stat .k{font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:760}.admin-stat .v{font-size:16px;font-weight:760;color:var(--navy);margin-top:5px}.admin-section{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}.admin-section h3{font-size:12px;margin:0 0 9px;color:var(--navy)}.admin-users{display:grid;gap:7px}.admin-user{display:flex;justify-content:space-between;gap:10px;border:1px solid #e4e9ee;border-radius:8px;padding:9px 10px;font-size:11px}.history-row{display:grid;grid-template-columns:150px minmax(180px,1fr) 90px 110px;gap:8px;padding:7px 0;border-bottom:1px solid #edf1f3;font-size:10px}.status-pill{display:inline-flex;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:760}.status-pill.on{background:#e9f8f1;color:#166b4b}.status-pill.off{background:#ffeceb;color:#9f2c25}.lock-overlay{position:fixed;inset:0;z-index:100;background:linear-gradient(145deg,#112236,#213a57);display:none;align-items:center;justify-content:center;padding:24px}.lock-overlay.show{display:flex}.lock-card{width:min(520px,94vw);background:#fff;border-radius:16px;padding:28px;box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}.lock-icon{font-size:38px}.lock-card h2{color:var(--navy);margin:10px 0 6px}.lock-card p{color:var(--muted);line-height:1.5}.server-badge{font-size:10px;color:#637182;margin-top:7px}.publish-state{font-size:10px;color:var(--muted);margin-top:8px}.publish-state.ok{color:var(--green)}.publish-state.err{color:var(--red)}
+@media(max-width:850px){.admin-grid{grid-template-columns:1fr}.history-row{grid-template-columns:1fr}.topbar-inner{align-items:flex-start;flex-direction:column}}
+
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <h1>Control de costo de aguas lluvias 2026</h1>
+      <p>Libro mayor + trazabilidad de OC, facturas, obras y gastos asociados a aguas lluvias</p>
+    </div>
+    <div class="top-actions auth-row">
+      <span class="role-chip" id="roleChip"><span class="role-dot"></span><span id="roleText">Visor</span></span>
+      <button class="btn secondary" id="loginBtn">Ingresar</button>
+      <button class="btn secondary hidden" id="adminBtn">Panel administrador</button>
+      <button class="btn secondary hidden" id="logoutBtn">Salir</button>
+      <button class="btn secondary" id="exportBtn" disabled>Exportar vista CSV</button>
+      <button class="btn secondary" id="resetBtn" disabled>Limpiar filtros</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="import-card hidden" id="uploadSection">
+    <div class="import-grid">
+      <div id="dropZone" class="drop">
+        <strong>Sube el Excel actualizado de Gastos AALL</strong>
+        <span>Solo administrador y actualizador pueden publicar una nueva planilla. El Excel se analiza en el navegador y el resultado se guarda en el servidor.</span>
+        <label class="upload-label" for="fileInput">Seleccionar Excel</label>
+        <input id="fileInput" type="file" accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+      </div>
+      <div class="info-panel">
+        <h3>Estado de la carga</h3>
+        <div class="info-line"><b>Archivo</b><span id="infoFile">Sin cargar</span></div>
+        <div class="info-line"><b>Libro mayor</b><span id="infoMain">—</span></div>
+        <div class="info-line"><b>Registros LM</b><span id="infoRows">—</span></div>
+        <div class="info-line"><b>Hojas enlazadas</b><span id="infoSheets">—</span></div>
+        <div class="loader" id="loader"><span class="spin"></span><span id="loaderText">Procesando…</span></div>
+        <div class="privacy">La planilla se procesa en el navegador; luego se publica el dataset normalizado para que todos los visores vean la misma versión. La contraseña nunca se guarda dentro del HTML ni del repositorio.</div><div class="publish-state" id="publishState"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="notice" id="traceNotice">La fuente de control es la hoja <b>“resumen”</b>. El tablero se actualiza automáticamente al publicar una nueva planilla.</div>
+  <div id="messages"></div>
+
+  <section class="kpis" id="kpiSection">
+    <div class="kpi private-summary"><div class="label">Total Resumen oficial</div><div class="value" id="kpiUniverse">$0</div><div class="sub" id="kpiUniverseSub">0 movimientos</div></div>
+    <div class="kpi emph"><div class="label">AALL</div><div class="value" id="kpiConfirmed">$0</div><div class="sub" id="kpiConfirmedSub">0 movimientos</div></div>
+    <div class="kpi private-summary"><div class="label">Mandante</div><div class="value" id="kpiProbable">$0</div><div class="sub" id="kpiProbableSub">0 movimientos</div></div>
+    <div class="kpi private-summary"><div class="label">OBRA</div><div class="value" id="kpiReview">$0</div><div class="sub" id="kpiReviewSub">0 movimientos</div></div>
+    <div class="kpi warn private-summary"><div class="label">Pendiente clasificar</div><div class="value" id="kpiNo">$0</div><div class="sub" id="kpiNoSub">0 movimientos</div></div>
+  </section>
+
+  <section class="filters">
+    <div class="filters-grid">
+      <div class="field private-control"><label>Universo</label><select id="fUniverse"><option value="summary">Resumen oficial</option><option value="aall">AALL 2026 + pendientes</option><option value="all">Todo el libro mayor</option></select></div>
+      <div class="field"><label>Obra</label><select id="fObra"><option value="">Todas</option></select></div>
+      <div class="field"><label>Gerente proyecto</label><select id="fGP"><option value="">Todos</option></select></div>
+      <div class="field"><label>Supervisor obra</label><select id="fSupObra"><option value="">Todos</option></select></div>
+      <div class="field"><label>Supervisor costo (LM)</label><select id="fSupCosto"><option value="">Todos</option></select></div>
+      <div class="field private-control"><label>Clasificación Resumen</label><select id="fClass"><option value="">Todas</option></select></div>
+      <div class="field"><label>Clasificación de gasto</label><select id="fAccount"><option value="">Todos</option></select></div>
+      <div class="field"><label>Periodo</label><select id="fPeriod"><option value="">Todos</option></select></div>
+      <div class="field"><label>Proveedor</label><select id="fProvider"><option value="">Todos</option></select></div>
+      <div class="field"><label>Estado obra</label><select id="fStatus"><option value="">Todos</option></select></div>
+      <div class="field"><label>Gestionado por</label><select id="fMedio"><option value="">Todos</option></select></div>
+      <div class="field search"><label>Buscar</label><input id="fSearch" placeholder="OC, factura, proveedor, glosa, obra, estado…" /></div>
+    </div>
+  </section>
+
+  <section class="card rain-card" id="rainWorksSection">
+    <div class="card-head">
+      <div><h2>Estado de obras con filtraciones 2026</h2><div class="viewer-note">Fuente directa: hoja “resumen”, columnas H:P. Haz clic en una obra para revisar sus observaciones.</div></div>
+      <div class="rain-summary"><span class="rain-pill" id="rainWorksTotal">0 obras</span><span class="rain-pill" id="rainWorksWithCost">0 con costo</span><span class="rain-pill alert" id="rainWorksZero">0 sin costo asociado</span></div>
+    </div>
+    <div class="rain-table-wrap">
+      <table class="rain-table">
+        <thead><tr><th>Obra</th><th>Supervisor</th><th>Estado</th><th>Costo AALL</th><th>Gestionado por</th><th>Observaciones</th></tr></thead>
+        <tbody id="rainWorksBody"><tr><td colspan="6"><div class="empty">Carga un Excel para ver el estado de las obras.</div></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-head"><h2>Costos por obra — clasificación de gastos</h2><span class="mini" id="obraChartTotal">$0</span></div>
+      <div class="card-body">
+        <div id="accountLegend" class="chart-legend"></div>
+        <div class="chart-hint">Haz clic en una obra o en su barra para ver el desglose exacto por tipo de costo. Haz clic nuevamente o usa “Cerrar detalle” para volver al gráfico completo.</div>
+        <div id="obraCostChart" class="obra-chart"><div class="chart-empty">Carga el Excel para ver los costos por obra.</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Resumen por obra</h2><span class="mini">clic para filtrar</span></div>
+      <div class="card-body"><div id="obraList" class="obra-list"><div class="empty">Sin datos.</div></div></div>
+    </div>
+  </section>
+
+  <section class="table-card">
+    <div class="table-toolbar"><h2>Detalle de gastos</h2><div class="mini" id="tableCount">0 registros</div></div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr>
+          <th data-sort="dateKey">Fecha</th><th data-sort="period">Periodo</th><th data-sort="obraName">Obra</th><th data-sort="gp">GP</th><th data-sort="supervisorObra">Supervisor obra</th><th data-sort="provider">Proveedor</th><th data-sort="oc">OC</th><th data-sort="document">Factura / PDF</th><th data-sort="description">Trabajo / glosa</th><th data-sort="account">Tipo costo (K)</th><th data-sort="amount">Monto</th><th data-sort="classification">Clasificación Resumen</th><th>Detalle</th>
+        </tr></thead>
+        <tbody id="tbody"><tr><td colspan="13"><div class="empty">Carga un Excel para comenzar.</div></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 12 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+</main>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-head"><h2 id="modalTitle">Detalle del gasto</h2><button class="close" id="modalClose">×</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+
+<div class="modal" id="loginModal">
+  <div class="modal-box" style="width:min(470px,96vw)">
+    <div class="modal-head"><h2>Ingreso al sistema</h2><button class="close" id="loginClose">×</button></div>
+    <div class="modal-body">
+      <div class="login-grid">
+        <div><label>Correo</label><input id="loginEmail" type="email" autocomplete="username" placeholder="correo@empresa.cl"></div>
+        <div><label>Clave</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+      </div>
+      <div class="mini" id="loginError" style="color:var(--red);margin-top:10px"></div>
+      <div class="login-actions"><button class="btn ghost" id="loginCancel">Cancelar</button><button class="btn" id="loginSubmit">Ingresar</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="adminModal">
+  <div class="modal-box" style="width:min(1000px,97vw)">
+    <div class="modal-head"><h2>Panel administrador</h2><button class="close" id="adminClose">×</button></div>
+    <div class="modal-body">
+      <div class="admin-only-note"><b>Acceso exclusivo administrador.</b> Este panel de bloqueo es exclusivo del administrador general. El actualizador puede cargar planillas y ver el dashboard completo, pero no puede acceder a este panel ni bloquear la página.</div>
+      <div class="admin-grid" id="adminStats"></div>
+      <div class="admin-section">
+        <h3>Bloqueo general de la página</h3>
+        <input class="admin-input" id="blockMessage" maxlength="300" placeholder="Mensaje que verán los usuarios cuando la página esté bloqueada">
+        <div class="login-actions" style="justify-content:flex-start"><button class="btn danger" id="toggleBlockBtn">Bloquear página</button></div>
+      </div>
+      <div class="admin-section"><h3>Usuarios configurados</h3><div class="admin-users" id="adminUsers"></div></div>
+      <div class="admin-section"><h3>Últimas actualizaciones</h3><div id="adminHistory"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="lock-overlay" id="lockOverlay">
+  <div class="lock-card"><div class="lock-icon">🔒</div><h2>Control de costo de aguas lluvias 2026</h2><p id="lockMessage">Sistema temporalmente bloqueado por administración.</p><button class="btn" id="lockLoginBtn">Ingreso administrador</button><div class="server-badge">Los visores y el actualizador no pueden acceder mientras el administrador general mantenga el bloqueo.</div></div>
+</div>
+
+<script>
+"use strict";
+
+const state = {
+  rows: [], filtered: [], obraMeta: new Map(), mainSheet: "", sourceSheets: [], fileName: "",
+  sortKey: "dateKey", sortDir: -1, formMap: new Map(), excelMap: new Map(), infoCases: new Map(), sheetSummary: null, lmSummary: null, summaryObras: [], rainWorks: [], summaryCheck: null, session: null, datasetMeta: null, serverSettings: null, chartExpandedObra: "", rainExpandedObra: ""
+};
+
+const $ = id => document.getElementById(id);
+const REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+const AALL_STRONG = ["AALL","AGUA LLUVIA","AGUAS LLUVIA","AGUA-LLUVIA","AGUAS-LLUVIA"];
+const AALL_MEDIUM = ["HOJALATER","TECHUMBR","CUBIERTA","CANAL","IMPERMEABIL","FILTRAC","TRONERA","SUMIDERO","GARGOLA","GÁRGOLA","EMBOQUILL","SELLADO CUBIERTA","BAJADA DE AGUA"];
+
+function norm(v){
+  return String(v ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9%#]+/g," ").trim().replace(/\s+/g," ");
+}
+function normCode(v){
+  let s=String(v ?? "").trim(); if(!s) return "";
+  if(/^\d+(\.0+)?$/.test(s)) return String(parseInt(s,10));
+  return s.replace(/^0+(?=\d)/,"");
+}
+function normOC(v){
+  let s=String(v ?? "").trim().replace(/\s+/g,"").replace(/\.0+$/,"");
+  return s;
+}
+function safeText(v){ return String(v ?? "").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+function money(v){
+  const n=Number(v)||0; return new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP",maximumFractionDigits:0}).format(n);
+}
+function num(v){
+  if(typeof v === "number" && Number.isFinite(v)) return v;
+  let s=String(v??"").trim(); if(!s) return 0;
+  s=s.replace(/\s/g,"").replace(/\$/g,"");
+  if(/^[-+]?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s=s.replace(/\./g,"").replace(",",".");
+  else if(/^[-+]?\d+(,\d+)$/.test(s)) s=s.replace(",",".");
+  else s=s.replace(/,/g,"");
+  const n=Number(s); return Number.isFinite(n)?n:0;
+}
+function excelDate(v){
+  if(v instanceof Date && !isNaN(v)) return v;
+  if(typeof v === "number" && v>20000 && v<80000){ const ms=Math.round((v-25569)*86400*1000); return new Date(ms); }
+  const s=String(v??"").trim(); if(!s) return null;
+  let m=s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})$/); if(m){ let y=+m[3]; if(y<100)y+=2000; return new Date(y,+m[2]-1,+m[1]); }
+  m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  const d=new Date(s); return isNaN(d)?null:d;
+}
+function dateDisplay(v){ const d=excelDate(v); return d?new Intl.DateTimeFormat("es-CL").format(d):String(v??""); }
+function periodFrom(rowDate, period){
+  let p=String(period??"").replace(/\D/g,""); if(p.length>=6) return p.slice(0,6);
+  const d=excelDate(rowDate); return d?`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}`:"";
+}
+function periodLabel(p){ if(!p||p.length<6)return p||"—"; const m=+p.slice(4,6), y=p.slice(0,4); const names=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]; return `${names[m-1]||m} ${y}`; }
+function mostCommon(a){ const m=new Map(); a.filter(Boolean).forEach(x=>m.set(x,(m.get(x)||0)+1)); return [...m.entries()].sort((x,y)=>y[1]-x[1])[0]?.[0]||""; }
+function isNA(v){ const s=norm(v); return !s || s==="#N A" || s==="N A" || s==="#N/A" || s==="N/A"; }
+function hasAny(text, arr){ const n=norm(text); return arr.some(k=>n.includes(norm(k))); }
+function resolvePath(base,target){
+  if(target.startsWith("/")) return target.slice(1);
+  const parts=base.split("/"); parts.pop();
+  for(const p of target.split("/")){ if(p==="..") parts.pop(); else if(p!=="."&&p) parts.push(p); }
+  return parts.join("/");
+}
+
+class ZipReader{
+  constructor(buffer){ this.buffer=buffer; this.dv=new DataView(buffer); this.entries=new Map(); this.parseCentral(); }
+  u16(o){return this.dv.getUint16(o,true)} u32(o){return this.dv.getUint32(o,true)}
+  parseCentral(){
+    const sig=0x06054b50; let eocd=-1; const start=Math.max(0,this.buffer.byteLength-0x10000-22);
+    for(let i=this.buffer.byteLength-22;i>=start;i--){ if(this.u32(i)===sig){eocd=i;break;} }
+    if(eocd<0) throw new Error("No se encontró el directorio ZIP del archivo Excel.");
+    const total=this.u16(eocd+10), cdOffset=this.u32(eocd+16); let p=cdOffset; const td=new TextDecoder("utf-8");
+    for(let i=0;i<total;i++){
+      if(this.u32(p)!==0x02014b50) throw new Error("ZIP Excel inválido (directorio central).");
+      const method=this.u16(p+10), comp=this.u32(p+20), uncomp=this.u32(p+24), nlen=this.u16(p+28), xlen=this.u16(p+30), clen=this.u16(p+32), local=this.u32(p+42);
+      const name=td.decode(new Uint8Array(this.buffer,p+46,nlen)); this.entries.set(name,{method,comp,uncomp,local,name}); p+=46+nlen+xlen+clen;
+    }
+  }
+  has(name){return this.entries.has(name)}
+  async bytes(name){
+    const e=this.entries.get(name); if(!e) throw new Error(`Parte no encontrada: ${name}`); const p=e.local;
+    if(this.u32(p)!==0x04034b50) throw new Error(`Entrada ZIP inválida: ${name}`);
+    const nlen=this.u16(p+26), xlen=this.u16(p+28), start=p+30+nlen+xlen; const raw=new Uint8Array(this.buffer,start,e.comp);
+    if(e.method===0) return raw;
+    if(e.method===8){
+      let ds; try{ds=new DecompressionStream("deflate-raw");}catch(_){throw new Error("Tu navegador no soporta la descompresión requerida. Usa Chrome o Edge actualizado.");}
+      const ab=await new Response(new Blob([raw]).stream().pipeThrough(ds)).arrayBuffer(); return new Uint8Array(ab);
+    }
+    throw new Error(`Método de compresión ZIP no soportado: ${e.method}`);
+  }
+  async text(name){ return new TextDecoder("utf-8").decode(await this.bytes(name)); }
+}
+function xml(text){ const d=new DOMParser().parseFromString(text,"application/xml"); if(d.getElementsByTagName("parsererror").length) throw new Error("Error leyendo XML interno del Excel."); return d; }
+function els(doc,local){return Array.from(doc.getElementsByTagNameNS("*",local));}
+function cellCol(ref){ const m=String(ref||"").match(/^([A-Z]+)/i); if(!m)return 0; let n=0; for(const ch of m[1].toUpperCase())n=n*26+ch.charCodeAt(0)-64; return n-1; }
+function cellValue(cell,shared){
+  const t=cell.getAttribute("t")||""; const v=els(cell,"v")[0]?.textContent??"";
+  if(t==="s") return shared[Number(v)] ?? "";
+  if(t==="inlineStr") return els(cell,"t").map(x=>x.textContent||"").join("");
+  if(t==="b") return v==="1"?"Sí":"No";
+  if(t==="str"||t==="e") return v;
+  if(v==="") return "";
+  const n=Number(v); return Number.isFinite(n)?n:v;
+}
+function decodeXmlText(v){
+  return String(v??"")
+    .replace(/&#x([0-9a-f]+);/gi,(_,h)=>String.fromCodePoint(parseInt(h,16)))
+    .replace(/&#(\d+);/g,(_,d)=>String.fromCodePoint(parseInt(d,10)))
+    .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,"&");
+}
+function rawAttr(attrs,name){
+  const m=String(attrs||"").match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`)); return m?m[1]:"";
+}
+function rawCellValue(attrs,body,shared){
+  const t=rawAttr(attrs,"t");
+  const vm=String(body||"").match(/<v(?:\s[^>]*)?>([\s\S]*?)<\/v>/i); const v=vm?decodeXmlText(vm[1]):"";
+  if(t==="s") return shared[Number(v)] ?? "";
+  if(t==="inlineStr"){
+    let out="",m; const re=/<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/gi; while((m=re.exec(body))) out+=decodeXmlText(m[1]); return out;
+  }
+  if(t==="b") return v==="1"?"Sí":"No";
+  if(t==="str"||t==="e") return v;
+  if(v==="") return "";
+  const n=Number(v); return Number.isFinite(n)?n:v;
+}
+function readSheetLargeXml(text,shared,maxRows=Infinity){
+  /* Algunos libros llegan con formato/constantes copiadas hasta la fila 1.048.576.
+     No construimos un DOM de millones de filas: recorremos XML en forma liviana y,
+     una vez terminados los datos reales, cortamos las filas residuales (ej. sólo AD). */
+  const rows=[]; let m, meaningfulSeen=false, trailingNoise=0; const rowRe=/<row\b([^>]*)>([\s\S]*?)<\/row>/gi;
+  while((m=rowRe.exec(text))){
+    const attrs=m[1]||"", body=m[2]||""; const rn=Number(rawAttr(attrs,"r")||rows.length+1); if(rn>maxRows) break;
+    const vals=[]; let c, meaningful=false; const cellRe=/<c\b([^>]*)>([\s\S]*?)<\/c>/gi;
+    while((c=cellRe.exec(body))){
+      const ref=rawAttr(c[1],"r"), col=cellCol(ref), value=rawCellValue(c[1],c[2],shared); vals[col]=value;
+      /* AD (índice 29) puede venir rellenada hasta el final de Excel; por sí sola no define una fila del Libro Mayor. */
+      if(col!==29 && String(value??"").trim()!=="") meaningful=true;
+    }
+    if(meaningful){ rows.push({rn,vals}); meaningfulSeen=true; trailingNoise=0; }
+    else if(!meaningfulSeen && rn<=10){ rows.push({rn,vals}); }
+    else if(meaningfulSeen){ trailingNoise++; if(trailingNoise>=2000) break; }
+  }
+  return rows;
+}
+async function readSheet(zip,path,shared,maxRows=Infinity){
+  const text=await zip.text(path);
+  /* DOMParser sobre hojas de 100+ MB puede congelar el navegador. Usamos lector liviano para esas hojas. */
+  if(text.length>20*1024*1024) return readSheetLargeXml(text,shared,maxRows);
+  const doc=xml(text); const rows=[];
+  for(const row of els(doc,"row")){
+    const rn=Number(row.getAttribute("r")||rows.length+1); if(rn>maxRows) break; const vals=[];
+    for(const c of Array.from(row.children).filter(x=>x.localName==="c")){ vals[cellCol(c.getAttribute("r"))]=cellValue(c,shared); }
+    rows.push({rn,vals});
+  }
+  return rows;
+}
+function hnorm(v){return norm(v).replace(/ N /g," ");}
+const HEADER_WORDS = new Set(["PROVEEDOR","MONTO","PARTIDA","DESCRIPCION PARTIDA","SUPERVISOR","OC","FECHA","PROYECTO","N OBRA","N DE OBRA","NOMBRE DE LA OBRA","NOMBRE DE OBRA","AALL 2026","AALL 2026?","DESCRIPCION","DESCRIPCION OC","RUT PROVEEDOR","SE DEBE COBRAR A","PRODUCTO","MONTO NETO","SOLICITA","GP","SUPERVISOR PVTA"]);
+function detectHeader(rows){
+  let best={idx:0,score:-1}; rows.slice(0,10).forEach((r,i)=>{let score=0; r.vals.forEach(v=>{const n=hnorm(v); if(HEADER_WORDS.has(n))score+=2; if(n.includes("PROVEEDOR")||n.includes("MONTO")||n.includes("SUPERVISOR")||n.includes("OBRA"))score++;}); if(score>best.score)best={idx:i,score};}); return best;
+}
+function uniqueHeaders(vals){ const seen=new Map(); return vals.map((v,i)=>{let h=String(v??"").trim()||`COL_${i+1}`; const n=seen.get(h)||0; seen.set(h,n+1); return n?`${h}__${n+1}`:h;}); }
+function makeTable(rows){
+  const d=detectHeader(rows); const headers=uniqueHeaders(rows[d.idx]?.vals||[]), recs=[];
+  for(let i=d.idx+1;i<rows.length;i++){ const vals=rows[i].vals; if(!vals.some(v=>String(v??"").trim()!==""))continue; const o={__row:rows[i].rn}; headers.forEach((h,j)=>o[h]=vals[j]??""); recs.push(o); }
+  return {headers,rows:recs,headerRow:rows[d.idx]?.rn||1,score:d.score};
+}
+function headerScore(headers, needles){ const hs=headers.map(hnorm); return needles.reduce((s,n)=>s+(hs.some(h=>h===n||h.includes(n))?1:0),0); }
+function pickSheet(previews, exactName, needles){
+  const exact=previews.find(x=>norm(x.name)===norm(exactName)); if(exact)return exact;
+  return previews.map(x=>({...x,_score:headerScore(x.table.headers,needles)})).sort((a,b)=>b._score-a._score)[0];
+}
+function get(row, aliases){
+  const keys=Object.keys(row); for(const a of aliases){ const na=hnorm(a); const k=keys.find(k=>hnorm(k)===na); if(k!==undefined && !isNA(row[k]))return row[k]; }
+  for(const a of aliases){ const na=hnorm(a); const k=keys.find(k=>hnorm(k).includes(na)); if(k!==undefined && !isNA(row[k]))return row[k]; }
+  return "";
+}
+function getAllPrefix(row, alias){ const a=hnorm(alias); return Object.entries(row).filter(([k,v])=>hnorm(k).startsWith(a)&&!isNA(v)).map(([,v])=>v); }
+function findUrl(row, headerHints=[]){
+  for(const h of headerHints){ const v=get(row,[h]); if(/^https?:\/\//i.test(String(v)))return String(v); }
+  for(const v of Object.values(row)){ if(/^https?:\/\//i.test(String(v)))return String(v); } return "";
+}
+function validHttp(u){ try{const x=new URL(String(u||"").trim()); return x.protocol==="http:"||x.protocol==="https:";}catch(_){return false;} }
+function invoiceCell(r){
+  const doc=safeText(r.document||"Sin N° documento");
+  if(validHttp(r.pdf)) return `<a class="pdf-link" href="${safeText(String(r.pdf).trim())}" target="_blank" rel="noopener noreferrer" title="Abrir factura/PDF ${doc}"><span class="pdf-badge">PDF</span><span class="pdf-meta"><span class="pdf-doc">${doc}</span><span class="pdf-action">Ver factura PDF ↗</span></span></a>`;
+  return `<span class="no-pdf-doc"><span class="doc-number">${doc}</span><span class="doc-status">Sin URL PDF</span></span>`;
+}
+
+async function parseExcel(file){
+  const buffer=await file.arrayBuffer(); const zip=new ZipReader(buffer);
+  const workbookDoc=xml(await zip.text("xl/workbook.xml")); const relDoc=xml(await zip.text("xl/_rels/workbook.xml.rels")); const rels=new Map();
+  els(relDoc,"Relationship").forEach(r=>rels.set(r.getAttribute("Id"),r.getAttribute("Target")));
+  const sheets=els(workbookDoc,"sheet").map(s=>{ const rid=s.getAttributeNS(REL_NS,"id")||s.getAttribute("r:id"); return {name:s.getAttribute("name"),path:resolvePath("xl/workbook.xml",rels.get(rid)||"")}; });
+
+  /* Primero elegimos por nombre. Esto evita abrir hojas auxiliares gigantes que no forman parte del control. */
+  const byNorm = test => sheets.find(s=>test(norm(s.name))) || null;
+  let main = byNorm(n=>n.startsWith("LM ")||n==="LM"||n.includes("LIBRO MAYOR"));
+  let obras = byNorm(n=>n.includes("OBRAS CON AALL"));
+  let info = byNorm(n=>n.includes("INFO BD")&&n.includes("AALL"));
+  let form = byNorm(n=>n.includes("OC FORMULARIO"));
+  let ocex = byNorm(n=>n==="OCEXCELL"||n.includes("OC EXCELL")||n.includes("OC EXCEL"));
+  let summary = byNorm(n=>n==="RESUMEN");
+
+  let shared=[];
+  if(zip.has("xl/sharedStrings.xml")){
+    setLoader("Leyendo textos compartidos…"); const sd=xml(await zip.text("xl/sharedStrings.xml")); shared=els(sd,"si").map(si=>els(si,"t").map(t=>t.textContent||"").join(""));
+  }
+
+  /* Primero leemos la hoja Resumen. Es la fuente oficial del control y permite
+     validar el formato antes de procesar el Libro Mayor, que puede ser muy grande. */
+  let summaryRaw=null;
+  if(summary){
+    setLoader(`Leyendo hoja oficial ${summary.name}…`);
+    summaryRaw=await readSheet(zip,summary.path,shared);
+    if(!extractSummaryTotals(summaryRaw)) throw new Error(`La hoja “${summary.name}” existe, pero no pude localizar la tabla Resumen esperada (AALL / Mandante / OBRA / Total general).`);
+  }
+
+  /* Si cambia el nombre de alguna hoja, sólo inspeccionamos hojas razonables (< 25 MB sin comprimir). */
+  if(!main || !obras || !info || !form || !ocex){
+    setLoader("Detectando hojas y columnas…"); const previews=[];
+    for(const s of sheets){
+      const meta=zip.entries.get(s.path); if(meta && meta.uncomp>25*1024*1024) continue;
+      const rr=await readSheet(zip,s.path,shared,10); previews.push({...s,table:makeTable(rr)});
+    }
+    if(!main) main=pickSheet(previews,"LM a Julio 2026",["PROVEEDOR","MONTO","PARTIDA","DESCRIPCION PARTIDA","SUPERVISOR","OC","DESCRIPCION OC"]);
+    if(!obras) obras=pickSheet(previews,"Obras con AALL2026",["OBRA","NOMBRE DE OBRA","SUPERVISOR","AALL 2026"]);
+    if(!info) info=pickSheet(previews,"Info BD XS AALL2026",["N OBRA","PROYECTO","SUPERVISOR PVTA","GP","CLASIFICACION"]);
+    if(!form) form=pickSheet(previews,"OC Formulario",["N DE OBRA","NOMBRE DE LA OBRA","DESCRIPCION GRAL DEL TRABAJO","N OC","SE DEBE COBRAR A"]);
+    if(!ocex) ocex=pickSheet(previews,"OCExcell",["FECHA","OC","PROVEEDOR","PRODUCTO","OBRA","MONTO NETO","SOLICITA"]);
+  }
+  if(!main) throw new Error("No pude identificar la hoja del Libro Mayor.");
+
+  const chosen=[main,obras,info,form,ocex].filter(Boolean); const uniq=[]; const seen=new Set(); chosen.forEach(x=>{if(!seen.has(x.path)){seen.add(x.path);uniq.push(x);}});
+  const full=new Map(); let count=0;
+  for(const s of uniq){ count++; setLoader(`Leyendo ${s.name} (${count}/${uniq.length})…`); full.set(s.path,makeTable(await readSheet(zip,s.path,shared))); }
+  main={...main,table:full.get(main.path)};
+  if(headerScore(main.table.headers,["PROVEEDOR","MONTO","PARTIDA","OC"])<4) throw new Error(`La hoja “${main.name}” no parece contener el Libro Mayor esperado (Proveedor, Monto, Partida y OC).`);
+  return {sheets, main, obras:obras?{...obras,table:full.get(obras.path)}:null, info:info?{...info,table:full.get(info.path)}:null, form:form?{...form,table:full.get(form.path)}:null, ocex:ocex?{...ocex,table:full.get(ocex.path)}:null, summary:summary?{...summary,raw:summaryRaw}:null};
+}
+
+function extractSummaryTotals(summaryRaw){
+  if(!summaryRaw)return null;
+  let header=null,total=null;
+  for(const r of summaryRaw){
+    const first=norm(r.vals?.[0]);
+    const ns=(r.vals||[]).map(norm);
+    if(!header && ns.includes("AALL") && ns.includes("MANDANTE") && ns.includes("OBRA")) header=r;
+    if(first==="TOTAL GENERAL") total=r;
+  }
+  if(!header||!total)return null;
+  const idx={}; (header.vals||[]).forEach((v,i)=>idx[norm(v)]=i);
+  const AALL=num(total.vals[idx["AALL"]]), Mandante=num(total.vals[idx["MANDANTE"]]), OBRA=num(total.vals[idx["OBRA"]]);
+  const Total=idx["TOTAL GENERAL"]!==undefined?num(total.vals[idx["TOTAL GENERAL"]]):AALL+Mandante+OBRA;
+  return {AALL,Mandante,OBRA,Total,row:total.rn,headerRow:header.rn};
+}
+
+/* La hoja Resumen es la fuente oficial. Además del total general, leemos cada obra
+   de la tabla dinámica A:E. Así podemos validar que el Libro Mayor reconstruido
+   coincide obra por obra, sin depender de la lista auxiliar que existe a la derecha. */
+function extractSummaryByObra(summaryRaw){
+  if(!summaryRaw)return [];
+  let header=null, idx={};
+  for(const r of summaryRaw){
+    const ns=(r.vals||[]).map(norm);
+    if(ns.includes("ETIQUETAS DE FILA") && ns.includes("AALL") && ns.includes("MANDANTE") && ns.includes("OBRA")){ header=r; break; }
+  }
+  if(!header)return [];
+  (header.vals||[]).forEach((v,i)=>idx[norm(v)]=i);
+  const out=[];
+  for(const r of summaryRaw){
+    if(r.rn<=header.rn)continue;
+    const first=norm(r.vals?.[0]);
+    if(first==="TOTAL GENERAL")break;
+    const obra=normCode(r.vals?.[0]);
+    if(!obra || !/^\d+$/.test(obra))continue;
+    const AALL=num(r.vals?.[idx["AALL"]]), Mandante=num(r.vals?.[idx["MANDANTE"]]), OBRA=num(r.vals?.[idx["OBRA"]]);
+    const Total=idx["TOTAL GENERAL"]!==undefined?num(r.vals?.[idx["TOTAL GENERAL"]]):AALL+Mandante+OBRA;
+    out.push({obra,AALL,Mandante,OBRA,Total,row:r.rn});
+  }
+  return out;
+}
+
+/* Registro operativo de edificios con filtraciones. Se lee directamente de la
+   tabla ubicada en la hoja resumen (encabezados Obra...Obs2, actualmente H:P).
+   Se detecta por nombre de encabezado para tolerar cambios de fila o posición. */
+function extractRainWorks(summaryRaw){
+  if(!summaryRaw)return [];
+  let header=null, idx={};
+  for(const r of summaryRaw){
+    const ns=(r.vals||[]).map(norm);
+    const iObra=ns.indexOf("OBRA"), iNombre=ns.indexOf("NOMBRE DE OBRA"), iStatus=ns.indexOf("STATUS"), iTotal=ns.indexOf("TOTAL"), iMedio=ns.indexOf("MEDIO");
+    if(iObra>=0 && iNombre>=0 && iStatus>=0 && iTotal>=0 && iMedio>=0){ header=r; break; }
+  }
+  if(!header)return [];
+  (header.vals||[]).forEach((v,i)=>idx[norm(v)]=i);
+  const out=[];
+  for(const r of summaryRaw){
+    if(r.rn<=header.rn)continue;
+    const obra=normCode(r.vals?.[idx["OBRA"]]);
+    if(!obra || !/^\d+$/.test(obra))continue;
+    const name=String(r.vals?.[idx["NOMBRE DE OBRA"]]??"").trim();
+    const supervisor=String(r.vals?.[idx["SUPERVISOR"]]??"").trim();
+    const aallFlag=String(r.vals?.[idx["AALL 2026"]]??"").trim();
+    const status=String(r.vals?.[idx["STATUS"]]??"").trim();
+    const amount=num(r.vals?.[idx["TOTAL"]]);
+    const medio=String(r.vals?.[idx["MEDIO"]]??"").trim();
+    const obs1=String(r.vals?.[idx["OBS1"]]??"").trim();
+    const obs2=String(r.vals?.[idx["OBS2"]]??"").trim();
+    out.push({obra,name,supervisor,aallFlag,status,amount,medio,obs1,obs2,row:r.rn,hasCost:Math.abs(amount)>=1});
+  }
+  return out;
+}
+
+function validateSummaryByObra(rows, summaryObras){
+  const lm=new Map();
+  for(const r of rows){
+    if(!r.isInSummary)continue;
+    if(!lm.has(r.obra))lm.set(r.obra,{AALL:0,Mandante:0,OBRA:0,Total:0});
+    const x=lm.get(r.obra);
+    if(x[r.classification]!==undefined)x[r.classification]+=r.amount;
+    x.Total+=r.amount;
+  }
+  const diffs=[];
+  for(const s of summaryObras||[]){
+    const x=lm.get(s.obra)||{AALL:0,Mandante:0,OBRA:0,Total:0};
+    const d=x.Total-s.Total;
+    if(Math.abs(d)>=1)diffs.push({obra:s.obra,resumen:s.Total,libroMayor:x.Total,diferencia:d});
+  }
+  return {ok:diffs.length===0,diffs};
+}
+
+function canonicalResumen(v){ const n=norm(v); if(n==="AALL")return "AALL"; if(n==="MANDANTE")return "Mandante"; if(n==="OBRA")return "OBRA"; return String(v??"").trim(); }
+function costGroup(v){ const n=norm(v); if(n==="SUBCONTRATOS"||n==="SUBCONTRATOS MANO DE OBRA")return "Subcontratos"; if(n==="MATERIALES")return "Materiales"; if(n==="SERVICIOS Y CONSUMO GENERALES")return "Servicios y consumo generales"; return String(v??"").trim()||"Sin clasificación en K"; }
+function buildData(parsed){
+  state.obraMeta=new Map(); state.formMap=new Map(); state.excelMap=new Map(); state.infoCases=new Map();
+  const source=[];
+  if(parsed.obras){ source.push(parsed.obras.name); for(const r of parsed.obras.table.rows){ const code=normCode(get(r,["Obra","N° Obra"])); if(!code)continue; state.obraMeta.set(code,{code,name:String(get(r,["Nombre de obra","Proyecto"])||code),supervisorObra:String(get(r,["Supervisor"])||""),gp:"",cases:0}); } }
+  if(parsed.info){
+    source.push(parsed.info.name); const grp=new Map();
+    for(const r of parsed.info.table.rows){ const code=normCode(get(r,["N° Obra","N Obra","Obra"])); if(!code)continue; if(!grp.has(code))grp.set(code,[]); grp.get(code).push(r); }
+    for(const [code,arr] of grp){ const meta=state.obraMeta.get(code)||{code,name:String(get(arr[0],["Proyecto"])||code),supervisorObra:"",gp:"",cases:0}; meta.gp=mostCommon(arr.map(r=>String(get(r,["GP"])||""))); if(!meta.supervisorObra)meta.supervisorObra=mostCommon(arr.map(r=>String(get(r,["Supervisor Pvta","Supervisor"])||""))); meta.cases=arr.length; meta.gd=mostCommon(arr.map(r=>String(get(r,["GD"])||""))); meta.ad=mostCommon(arr.map(r=>String(get(r,["AD"])||""))); state.obraMeta.set(code,meta); state.infoCases.set(code,arr); }
+  }
+  if(parsed.form){
+    source.push(parsed.form.name); for(const r of parsed.form.table.rows){ const oc=normOC(get(r,["N° OC","N OC","OC"])); if(!oc)continue; const charges=getAllPrefix(r,"Se debe cobrar a").map(String); const f={oc,obra:normCode(get(r,["N° de Obra","N Obra","Obra"])),obraName:String(get(r,["Nombre de la Obra","Nombre de obra"])||""),depto:String(get(r,["N° Depto","N Depto"])||""),folio:String(get(r,["N° de Folio Planok","Folio Planok"])||""),description:String(get(r,["Descripción gral. del trabajo","Descripcion gral del trabajo","Descripción"] )||""),quote:String(get(r,["N° de Cotización","N de Cotizacion","Cotización"])||""),charges,category:String(get(r,["CATEGORIA","Categoría"])||""),quoteUrl:findUrl(r,["Adjuntar cotización"]),approvalUrl:String(get(r,["Adjuntar notificación a SC, aprobación de Obra o Mandante (Según corresponda)"])||"")}; state.formMap.set(oc,f); }
+  }
+  if(parsed.ocex){
+    source.push(parsed.ocex.name); for(const r of parsed.ocex.table.rows){ const oc=normOC(get(r,["OC"])); if(!oc)continue; state.excelMap.set(oc,{oc,date:get(r,["FECHA","Fecha"]),provider:String(get(r,["PROVEEDOR","Proveedor"])||""),product:String(get(r,["PRODUCTO","Producto"])||""),obra:normCode(get(r,["OBRA","Obra"])),quote:String(get(r,["COTIZACION","Cotizacion"])||""),net:num(get(r,["MONTO NETO","Monto Neto"])),requestedBy:String(get(r,["SOLICITA","Solicita"])||"")}); }
+  }
+  if(parsed.summary) source.push(parsed.summary.name);
+  source.unshift(parsed.main.name); state.sourceSheets=[...new Set(source)]; state.mainSheet=parsed.main.name;
+  const out=[];
+  for(const r of parsed.main.table.rows){
+    const obra=normCode(get(r,["Partida","Obra","N° Obra"])); const oc=normOC(get(r,["OC"])); const form=state.formMap.get(oc)||null, ox=state.excelMap.get(oc)||null; const meta=state.obraMeta.get(obra)||{code:obra,name:String(get(r,["Descripción Partida","Descripcion Partida"])||obra||"Sin obra"),supervisorObra:"",gp:"",cases:0};
+    const amount=num(get(r,["Monto","Importe"])); const date=get(r,["Fecha"]), period=periodFrom(date,get(r,["Periodo"])); const provider=String(get(r,["Proveedor"])||""); const description=String(get(r,["Descripción OC","Descripcion OC","Descripción","Descripcion"])||""); const infoExcel=String(get(r,["Info MS Excell","Info MS Excel"])||""); const infoForm=String(get(r,["Info MS Formu","Info MS Formulario"])||""); const infoRV=String(get(r,["Info Rvivallo","Info R Vivallo"])||"");
+    const directFlag=String(get(r,["AALL 2026?","AALL 2026"] )||"");
+    const resumenRaw=String(get(r,["Resumen"])||""); const resumenCategory=canonicalResumen(resumenRaw);
+    const isObraAALL=state.obraMeta.has(obra)||norm(directFlag)==="AALL 2026";
+    const isAALL2026=norm(directFlag)==="AALL 2026";
+    const validResumen=["AALL","Mandante","OBRA"].includes(resumenCategory);
+    const isInSummary=isAALL2026 && validResumen;
+    let classification="Fuera Resumen", confidence=0, reason="Esta línea no participa en la tabla dinámica Resumen.";
+    if(isInSummary){
+      classification=resumenCategory; confidence=100;
+      const z=norm(infoForm), aa=norm(infoRV), y=norm(infoExcel);
+      if(resumenCategory==="Mandante" && z==="MANDANTE") reason="Incluido en Resumen: AC=Mandante. La columna Info MS Formu también declara Mandante.";
+      else if(resumenCategory==="OBRA" && z==="OBRA") reason="Incluido en Resumen: AC=OBRA. La columna Info MS Formu también declara Obra.";
+      else if(resumenCategory==="AALL" && z==="AALL") reason="Incluido en Resumen: AC=AALL. La columna Info MS Formu también declara AALL.";
+      else if(resumenCategory==="AALL" && (aa==="ALL"||aa==="AALL")) reason="Incluido en Resumen: AC=AALL. La columna Info Rvivallo respalda ALL/AALL.";
+      else if(resumenCategory==="AALL" && (y.includes("AALL")||y.includes("AGUAS DE LLUVIA")||y==="ALL")) reason="Incluido en Resumen: AC=AALL. Info MS Excell contiene una referencia explícita a AALL/aguas lluvia.";
+      else reason=`Incluido en Resumen porque AC=${resumenCategory}. AC no tiene fórmula: la clasificación está cargada directamente en el Libro Mayor y esta línea no muestra un respaldo categórico explícito en Y/Z/AA.`;
+    } else if(isAALL2026 && !validResumen){ classification="Pendiente clasificar"; confidence=0; reason="AB=AALL 2026, pero AC Resumen está vacío o no contiene AALL/Mandante/OBRA. Por eso no entra al total de la hoja Resumen."; }
+    const projectDesc=String(get(r,["Descripción Partida","Descripcion Partida"])||""); const obraName=meta.name||projectDesc||obra||"Sin obra";
+    const document=String(get(r,["# Documento","Documento","N° Documento"])||""); const pdf=String(get(r,["URL PDF","PDF"])||""); const photo=String(get(r,["URL Foto","Foto"])||""); const supervisorCosto=String(get(r,["Supervisor"])||""); const account=String(get(r,["Descripción Cuenta","Descripcion Cuenta"])||""); const rut=String(get(r,["RUT Proveedor","Rut Proveedor"])||""); const ref=String(get(r,["Referencia"])||""); const refOrigin=String(get(r,["Referencia Origen"])||""); const origin=String(get(r,["Origen"])||""); const insumo=String(get(r,["Insumo"])||"");
+    const d=excelDate(date); out.push({id:`${parsed.main.name}-${r.__row}`,sourceRow:r.__row,dateRaw:date,date:dateDisplay(date),dateKey:d?d.getTime():0,period,obra,obraName,gp:meta.gp||"Sin GP",supervisorObra:meta.supervisorObra||"Sin supervisor",supervisorCosto:supervisorCosto||"Sin supervisor",provider,rut,amount,oc,document,description,account,costGroup:costGroup(account),insumo,pdf,photo,ref,refOrigin,origin,classification,confidence,reason,isObraAALL,isAALL2026,isInSummary,resumenCategory,directFlag,form,ox,infoExcel,infoForm,infoRV,raw:r,cases:meta.cases||0});
+  }
+  state.rows=out;
+  state.sheetSummary=extractSummaryTotals(parsed.summary?.raw||null);
+  state.summaryObras=extractSummaryByObra(parsed.summary?.raw||null);
+  state.rainWorks=extractRainWorks(parsed.summary?.raw||null);
+  const inc=out.filter(r=>r.isInSummary); state.lmSummary={AALL:inc.filter(r=>r.classification==="AALL").reduce((a,r)=>a+r.amount,0),Mandante:inc.filter(r=>r.classification==="Mandante").reduce((a,r)=>a+r.amount,0),OBRA:inc.filter(r=>r.classification==="OBRA").reduce((a,r)=>a+r.amount,0)}; state.lmSummary.Total=state.lmSummary.AALL+state.lmSummary.Mandante+state.lmSummary.OBRA;
+  state.summaryCheck=validateSummaryByObra(out,state.summaryObras);
+  return out;
+}
+
+function tagClass(c){ if(c==="AALL")return"confirm"; if(c==="Mandante")return"prob"; if(c==="OBRA")return"out"; if(c==="Pendiente clasificar")return"review"; return"out"; }
+function setLoader(t){$("loader").classList.add("show");$("loaderText").textContent=t;}
+function stopLoader(){$("loader").classList.remove("show");}
+function message(text,type="good"){ $("messages").innerHTML=`<div class="notice ${type}">${text}</div>`; }
+function clearMessage(){$("messages").innerHTML="";}
+function fillSelect(id,values,label="Todas"){
+  const el=$(id), current=el.value; el.innerHTML=`<option value="">${label}</option>`+[...new Set(values.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"es",{numeric:true})).map(v=>`<option value="${safeText(v)}">${safeText(v)}</option>`).join(""); if([...el.options].some(o=>o.value===current))el.value=current;
+}
+function fillObraSelect(){
+  const el=$("fObra"), current=el.value, map=new Map();
+  for(const w of state.rainWorks||[]) if(w.obra) map.set(w.obra,w.name||w.obra);
+  for(const r of state.rows.filter(r=>r.isAALL2026)) if(r.obra&&!map.has(r.obra)) map.set(r.obra,r.obraName||r.obra);
+  const opts=[...map.entries()].sort((a,b)=>String(a[0]).localeCompare(String(b[0]),"es",{numeric:true}));
+  el.innerHTML='<option value="">Todas</option>'+opts.map(([code,name])=>`<option value="${safeText(code)}">${safeText(code)} · ${safeText(name)}</option>`).join("");
+  if([...el.options].some(o=>o.value===current))el.value=current;
+}
+function updateFilterOptions(){
+  const aallRows=state.rows.filter(r=>r.isAALL2026);
+  fillObraSelect();
+  fillSelect("fGP",aallRows.map(r=>r.gp));
+  fillSelect("fSupObra",[...aallRows.map(r=>r.supervisorObra),...(state.rainWorks||[]).map(w=>w.supervisor)]);
+  fillSelect("fSupCosto",aallRows.map(r=>r.supervisorCosto));
+  fillSelect("fClass",state.rows.map(r=>r.classification));
+  fillSelect("fAccount",aallRows.map(r=>r.costGroup||costGroup(r.account)),"Todos");
+  fillSelect("fPeriod",state.rows.map(r=>r.period).filter(Boolean).sort(),"Todos");
+  fillSelect("fProvider",aallRows.map(r=>r.provider));
+  fillSelect("fStatus",(state.rainWorks||[]).map(w=>w.status),"Todos");
+  fillSelect("fMedio",(state.rainWorks||[]).map(w=>w.medio),"Todos");
+}
+function applyFilters(){
+  const universe=$("fUniverse").value, obra=$("fObra").value, gp=$("fGP").value, so=$("fSupObra").value, sc=$("fSupCosto").value, cl=$("fClass").value, account=$("fAccount").value, pe=$("fPeriod").value, pr=$("fProvider").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  const workMap=new Map((state.rainWorks||[]).map(w=>[w.obra,w]));
+  state.filtered=state.rows.filter(r=>{
+    if(universe==="summary" && !r.isInSummary)return false;
+    if(universe==="aall" && !r.isAALL2026)return false;
+    const w=workMap.get(r.obra);
+    if(obra && r.obra!==obra)return false;
+    if(gp&&r.gp!==gp)return false;
+    if(so&&r.supervisorObra!==so&&w?.supervisor!==so)return false;
+    if(sc&&r.supervisorCosto!==sc)return false;
+    if(cl&&r.classification!==cl)return false;
+    if(account&&(r.costGroup||costGroup(r.account))!==account)return false;
+    if(pe&&r.period!==pe)return false;
+    if(pr&&r.provider!==pr)return false;
+    if(st&&w?.status!==st)return false;
+    if(medio&&w?.medio!==medio)return false;
+    if(q){ const hay=norm([r.obra,r.obraName,r.gp,r.supervisorObra,r.supervisorCosto,r.provider,r.oc,r.document,r.description,r.account,r.costGroup||costGroup(r.account),r.ref,r.refOrigin,r.infoExcel,r.infoForm,r.infoRV,r.resumenCategory,w?.status,w?.medio,w?.obs1,w?.obs2].join(" | ")); if(!hay.includes(q))return false; }
+    return true;
+  });
+  render();
+}
+function sumRows(rows,cls){ const rr=cls?rows.filter(r=>r.classification===cls):rows; return {sum:rr.reduce((a,r)=>a+r.amount,0),count:rr.length}; }
+function renderKpis(){
+  const all=state.filtered, a=sumRows(all,"AALL"), m=sumRows(all,"Mandante"), o=sumRows(all,"OBRA"), p=sumRows(all,"Pendiente clasificar"); const official=all.filter(r=>r.isInSummary); const u=sumRows(official);
+  $("kpiUniverse").textContent=money(u.sum);$("kpiUniverseSub").textContent=`${u.count.toLocaleString("es-CL")} movimientos`;
+  $("kpiConfirmed").textContent=money(a.sum);$("kpiConfirmedSub").textContent=`${a.count.toLocaleString("es-CL")} movimientos`;
+  $("kpiProbable").textContent=money(m.sum);$("kpiProbableSub").textContent=`${m.count.toLocaleString("es-CL")} movimientos`;
+  $("kpiReview").textContent=money(o.sum);$("kpiReviewSub").textContent=`${o.count.toLocaleString("es-CL")} movimientos`;
+  $("kpiNo").textContent=money(p.sum);$("kpiNoSub").textContent=`${p.count.toLocaleString("es-CL")} movimientos`;
+}
+function accountColor(name){
+  const n=norm(name);
+  if(n==="MATERIALES")return"#17849b";
+  if(n==="SUBCONTRATOS")return"#2855a6";
+  if(n==="SUBCONTRATOS MANO DE OBRA")return"#17845b";
+  if(n==="SERVICIOS Y CONSUMO GENERALES")return"#b36b00";
+  const palette=["#586574","#7b5ea7","#9a5b4f","#397b77","#6e7e35","#8a5f2d"];
+  let h=0; for(const ch of n)h=(h*31+ch.charCodeAt(0))>>>0; return palette[h%palette.length];
+}
+function renderObraCostChart(){
+  const rows=state.filtered.filter(r=>r.isInSummary); const byObra=new Map(); const accountTotals=new Map();
+  rows.forEach(r=>{
+    const key=`${r.obra} · ${r.obraName}`; const acc=r.costGroup||costGroup(r.account);
+    if(!byObra.has(key))byObra.set(key,{total:0,accounts:new Map()});
+    const o=byObra.get(key); o.total+=r.amount; o.accounts.set(acc,(o.accounts.get(acc)||0)+r.amount);
+    accountTotals.set(acc,(accountTotals.get(acc)||0)+r.amount);
+  });
+  const data=[...byObra.entries()].sort((a,b)=>Math.abs(b[1].total)-Math.abs(a[1].total));
+  const total=data.reduce((s,[,v])=>s+v.total,0); $("obraChartTotal").textContent=money(total);
+  const accounts=[...accountTotals.entries()].sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).map(x=>x[0]);
+  $("accountLegend").innerHTML=accounts.map(a=>`<span class="legend-item"><span class="legend-dot" style="background:${accountColor(a)}"></span>${safeText(a)}</span>`).join("");
+  if(!data.length){state.chartExpandedObra="";$("obraCostChart").innerHTML='<div class="chart-empty">No hay movimientos del Resumen con los filtros actuales.</div>';return;}
+  if(state.chartExpandedObra && !byObra.has(state.chartExpandedObra)) state.chartExpandedObra="";
+  const max=Math.max(...data.map(([,v])=>Math.abs(v.total)),1);
+  const preferred=["Materiales","Subcontratos","Servicios y consumo generales"];
+  const orderAccounts=entries=>[...entries].sort((a,b)=>{
+    const ai=preferred.indexOf(a[0]), bi=preferred.indexOf(b[0]);
+    if(ai!==-1||bi!==-1){ if(ai===-1)return 1; if(bi===-1)return -1; return ai-bi; }
+    return Math.abs(b[1])-Math.abs(a[1]);
+  });
+  $("obraCostChart").innerHTML=data.map(([key,v])=>{
+    const width=Math.max(2,Math.abs(v.total)/max*100);
+    const segments=orderAccounts(v.accounts.entries()).map(([acc,val])=>{
+      const pct=v.total?Math.abs(val/v.total)*100:0;
+      return `<div class="stack-seg" style="width:${pct}%;background:${accountColor(acc)}" title="${safeText(acc)}: ${safeText(money(val))}"></div>`;
+    }).join("");
+    const expanded=state.chartExpandedObra===key;
+    let detail="";
+    if(expanded){
+      const items=orderAccounts(v.accounts.entries());
+      const detailMax=Math.max(...items.map(([,val])=>Math.abs(val)),1);
+      detail=`<div class="obra-breakdown" data-detail="${safeText(key)}"><div class="obra-breakdown-head"><b>Desglose de ${safeText(key)} · Total ${safeText(money(v.total))}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${items.map(([acc,val])=>{const pctTotal=v.total?Math.abs(val/v.total)*100:0;const bar=Math.abs(val)/detailMax*100;return `<div class="breakdown-row"><div class="breakdown-label">${safeText(acc)}</div><div class="breakdown-track"><div class="breakdown-fill" style="width:${bar}%;background:${accountColor(acc)}"></div></div><div class="breakdown-value">${safeText(money(val))}</div><div class="breakdown-pct">${pctTotal.toLocaleString("es-CL",{maximumFractionDigits:1})}%</div></div>`;}).join("")}</div>`;
+    }
+    return `<div class="obra-chart-row ${expanded?'is-expanded':''}" data-chart-obra="${safeText(key)}"><button class="obra-chart-name" type="button" data-obra-detail="${safeText(key)}" aria-expanded="${expanded}">${safeText(key)}</button><div class="stack-track" data-obra-detail="${safeText(key)}" title="Clic para ver desglose · Total ${safeText(money(v.total))}"><div style="width:${width}%;display:flex;height:100%;overflow:hidden;border-radius:6px">${segments}</div></div><div class="obra-chart-total">${safeText(money(v.total))}</div></div>${detail}`;
+  }).join("");
+  const toggle=(key)=>{ state.chartExpandedObra=state.chartExpandedObra===key?"":key; renderObraCostChart(); };
+  $("obraCostChart").querySelectorAll("[data-obra-detail]").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();toggle(el.dataset.obraDetail);}));
+  $("obraCostChart").querySelectorAll("[data-close-detail]").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();state.chartExpandedObra="";renderObraCostChart();}));
+}
+function renderObras(){
+  const rows=state.filtered.filter(r=>r.isAALL2026); const m=new Map();
+  rows.forEach(r=>{const k=r.obra; if(!m.has(k))m.set(k,{name:r.obraName,official:0,pending:0}); const o=m.get(k); if(r.isInSummary)o.official+=r.amount; if(r.classification==="Pendiente clasificar")o.pending+=r.amount;});
+  const a=[...m.entries()].sort((x,y)=>Math.abs(y[1].official)-Math.abs(x[1].official)).slice(0,30);
+  const full=canSeeOfficialClient();
+  $("obraList").innerHTML=a.length?a.map(([code,v])=>`<div class="obra-row"><button data-obra="${safeText(code)}">${safeText(code)} · ${safeText(v.name||code)}</button><div class="num" title="Costo AALL visible">${safeText(money(v.official))}</div><div class="num ${full?'':'hidden'}" title="Pendiente clasificar">${safeText(money(v.pending))}</div></div>`).join(""):'<div class="empty">Sin datos.</div>';
+  $("obraList").querySelectorAll("button[data-obra]").forEach(b=>b.addEventListener("click",()=>{$("fObra").value=b.dataset.obra;applyFilters();window.scrollTo({top:document.querySelector('.filters').offsetTop-100,behavior:'smooth'});}));
+}
+function statusClass(v){ const n=norm(v); if(n==="EN CURSO")return"en-curso"; if(n==="TERMINADO")return"terminado"; if(n==="RECHAZADO")return"rechazado"; if(n==="SIN GESTION")return"sin-gestion"; return""; }
+function filteredRainWorks(){
+  const obra=$("fObra").value, so=$("fSupObra").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  return (state.rainWorks||[]).filter(w=>{
+    if(obra&&w.obra!==obra)return false;
+    if(so&&w.supervisor!==so)return false;
+    if(st&&w.status!==st)return false;
+    if(medio&&w.medio!==medio)return false;
+    if(q&&!norm([w.obra,w.name,w.supervisor,w.status,w.medio,w.obs1,w.obs2].join(" | ")).includes(q))return false;
+    return true;
+  });
+}
+function renderRainWorks(){
+  const rows=filteredRainWorks();
+  const withCost=rows.filter(w=>w.hasCost), zero=rows.filter(w=>!w.hasCost);
+  $("rainWorksTotal").textContent=`${rows.length.toLocaleString("es-CL")} obras`;
+  $("rainWorksWithCost").textContent=`${withCost.length.toLocaleString("es-CL")} con costo`;
+  $("rainWorksZero").textContent=`${zero.length.toLocaleString("es-CL")} sin costo asociado`;
+  if(state.rainExpandedObra && !rows.some(w=>w.obra===state.rainExpandedObra)) state.rainExpandedObra="";
+  $("rainWorksBody").innerHTML=rows.length?rows.map(w=>{
+    const expanded=state.rainExpandedObra===w.obra;
+    const obs=[w.obs1,w.obs2].filter(x=>x&&!isNA(x)&&norm(x)!=="0");
+    const cost=w.hasCost?`<span class="rain-money">${safeText(money(w.amount))}</span>`:`<span class="zero-cost" title="La obra registra filtración/AALL, pero no tiene costo asociado en la columna Total de la hoja resumen."><span class="qmark">?</span> Sin costo asociado</span>`;
+    const shortObs=obs.length?safeText(obs.join(" · ")):'<span class="mini">Sin observación</span>';
+    const detail=expanded?`<tr class="rain-detail"><td colspan="6"><div class="rain-detail-box"><div class="rain-detail-grid"><div class="rain-detail-item"><b>Observación 1</b>${safeText(w.obs1&&!isNA(w.obs1)&&norm(w.obs1)!=="0"?w.obs1:"Sin observación")}</div><div class="rain-detail-item"><b>Observación 2</b>${safeText(w.obs2&&!isNA(w.obs2)&&norm(w.obs2)!=="0"?w.obs2:"Sin observación")}</div><div class="rain-detail-item"><b>Fuente</b>Hoja resumen · fila ${w.row} · columnas H:P</div><div class="rain-detail-item"><b>Condición</b>${w.hasCost?`Costo AALL asociado: ${safeText(money(w.amount))}`:'Alerta: filtración registrada sin costo AALL asociado.'}</div></div></div></td></tr>`:"";
+    return `<tr class="rain-row" data-rain-obra="${safeText(w.obra)}" aria-expanded="${expanded}"><td><b>${safeText(w.obra)}</b><br>${safeText(w.name||"—")}</td><td>${safeText(w.supervisor||"—")}</td><td><span class="status-tag ${statusClass(w.status)}">${safeText(w.status||"—")}</span></td><td>${cost}</td><td>${safeText(w.medio||"—")}</td><td class="ellipsis" title="${safeText(obs.join(' · '))}">${shortObs}</td></tr>${detail}`;
+  }).join(""):'<tr><td colspan="6"><div class="empty">No hay obras con los filtros actuales.</div></td></tr>';
+  $("rainWorksBody").querySelectorAll("tr[data-rain-obra]").forEach(tr=>tr.addEventListener("click",()=>{state.rainExpandedObra=state.rainExpandedObra===tr.dataset.rainObra?"":tr.dataset.rainObra;renderRainWorks();}));
+}
+function sortRows(rows){ const k=state.sortKey,d=state.sortDir; return [...rows].sort((a,b)=>{let x=a[k],y=b[k]; if(typeof x==="number"&&typeof y==="number")return (x-y)*d; return String(x??"").localeCompare(String(y??""),"es",{numeric:true})*d;}); }
+function renderTable(){
+  const rows=sortRows(state.filtered); $("tableCount").textContent=`${rows.length.toLocaleString("es-CL")} registros · ${money(rows.reduce((a,r)=>a+r.amount,0))}`; const show=rows.slice(0,5000);
+  $("tbody").innerHTML=show.length?show.map(r=>`<tr>
+    <td>${safeText(r.date)}</td><td>${safeText(periodLabel(r.period))}</td><td><b>${safeText(r.obra)}</b><br>${safeText(r.obraName)}</td><td>${safeText(r.gp)}</td><td>${safeText(r.supervisorObra)}</td><td>${safeText(r.provider)}</td><td>${safeText(r.oc||"—")}</td><td>${invoiceCell(r)}</td><td class="ellipsis" title="${safeText(r.description)}">${safeText(r.description||"—")}</td><td><span class="tag out">${safeText(r.costGroup||costGroup(r.account))}</span><div class="confidence">${safeText(r.account||"Sin clasificación en K")}</div></td><td class="money">${safeText(money(r.amount))}</td><td><span class="tag ${tagClass(r.classification)}">${safeText(r.classification)}</span><div class="confidence">fila LM ${r.sourceRow}</div></td><td><button class="linkbtn" data-id="${safeText(r.id)}">Abrir</button></td>
+  </tr>`).join(""):'<tr><td colspan="13"><div class="empty">No hay registros con los filtros actuales.</div></td></tr>';
+  $("tbody").querySelectorAll("button[data-id]").forEach(b=>b.addEventListener("click",()=>openDetail(b.dataset.id)));
+}
+function render(){ renderKpis();renderRainWorks();renderObraCostChart();renderObras();renderTable(); }
+function detailItem(k,v){return `<div class="detail"><div class="k">${safeText(k)}</div><div class="v">${safeText(v||"—")}</div></div>`;}
+function openDetail(id){
+  const r=state.rows.find(x=>x.id===id); if(!r)return; $("modalTitle").textContent=`${r.obra} · ${r.obraName} · ${money(r.amount)}`;
+  let docs=""; if(validHttp(r.pdf))docs+=`<a href="${safeText(r.pdf)}" target="_blank" rel="noopener noreferrer">Ver factura PDF ↗</a>`; if(validHttp(r.photo))docs+=`<a href="${safeText(r.photo)}" target="_blank" rel="noopener">Abrir foto</a>`; if(r.form&&validHttp(r.form.quoteUrl))docs+=`<a href="${safeText(r.form.quoteUrl)}" target="_blank" rel="noopener">Abrir cotización</a>`; if(r.form&&validHttp(r.form.approvalUrl))docs+=`<a href="${safeText(r.form.approvalUrl)}" target="_blank" rel="noopener">Abrir aprobación</a>`;
+  let ev=`<div class="evidence ${r.classification==="Pendiente clasificar"?'no':''}"><b>${safeText(r.classification)}</b><br>${safeText(r.reason)}</div>`;
+  if(r.form)ev+=`<div class="evidence"><b>Vínculo OC Formulario — OC ${safeText(r.form.oc)}</b><br>Obra: ${safeText(r.form.obra)} ${safeText(r.form.obraName)}<br>Depto/sector: ${safeText(r.form.depto||"—")} · Folio: ${safeText(r.form.folio||"—")}<br>Cobro: ${safeText(r.form.charges.join(" / ")||"—")}<br>Trabajo: ${safeText(r.form.description||"—")}<br>Cotización: ${safeText(r.form.quote||"—")}</div>`;
+  if(r.ox)ev+=`<div class="evidence"><b>Vínculo OCExcell — OC ${safeText(r.ox.oc)}</b><br>Proveedor: ${safeText(r.ox.provider||"—")}<br>Producto/trabajo: ${safeText(r.ox.product||"—")}<br>Obra: ${safeText(r.ox.obra||"—")} · Monto neto OC: ${safeText(money(r.ox.net))}<br>Solicita: ${safeText(r.ox.requestedBy||"—")}</div>`;
+  const raw=Object.entries(r.raw||{}).filter(([k,v])=>!k.startsWith("__")&&!isNA(v)).map(([k,v])=>`${k}: ${v}`).join("\n");
+  const invoiceHero=validHttp(r.pdf)?`<div class="invoice-hero"><div class="invoice-copy"><b>Factura / documento ${safeText(r.document||"—")}</b><span>Documento de respaldo disponible desde la URL PDF del Libro Mayor.</span></div><a href="${safeText(String(r.pdf).trim())}" target="_blank" rel="noopener noreferrer">Ver factura PDF ↗</a></div>`:"";
+  $("modalBody").innerHTML=`
+    ${invoiceHero}
+    <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original (K)",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("Gerente proyecto",r.gp)}${detailItem("Supervisor obra",r.supervisorObra)}${detailItem("Supervisor costo (LM)",r.supervisorCosto)}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
+    <div class="section-title">Trabajo / glosa</div><div class="raw">${safeText(r.description||"Sin descripción")}</div>
+    <div class="section-title">Documentos</div><div class="doc-actions">${docs||'<span class="mini">No se detectaron enlaces web de respaldo en esta línea.</span>'}</div>
+    <div class="section-title">Trazabilidad</div>${ev}
+    <div class="section-title">Información enlazada en Libro Mayor</div><div class="raw">Info MS Excell: ${safeText(r.infoExcel||"—")}\nInfo MS Formu: ${safeText(r.infoForm||"—")}\nInfo Rvivallo: ${safeText(r.infoRV||"—")}
+AB AALL 2026?: ${safeText(r.directFlag||"—")}
+AC Resumen: ${safeText(r.resumenCategory||"—")}</div>
+    <div class="section-title">Origen exacto</div><div class="raw">Hoja: ${safeText(state.mainSheet)}\nFila: ${r.sourceRow}\nID local: ${safeText(r.id)}</div>
+    <div class="section-title">Fila original del Libro Mayor</div><div class="raw">${safeText(raw)}</div>`;
+  $("modal").classList.add("open");
+}
+function resetFilters(){ ["fObra","fGP","fSupObra","fSupCosto","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
+function csvCell(v){const s=String(v??"");return `"${s.replace(/"/g,'""')}"`;}
+function exportCSV(){
+  const headers=["Fecha","Periodo","Obra","Nombre obra","GP","Supervisor obra","Supervisor costo LM","Proveedor","RUT","OC","Documento","Descripción","Clasificación gasto","Descripción Cuenta original (K)","Monto","Clasificación Resumen","Incluido Resumen","Motivo","Hoja origen","Fila origen","PDF"];
+  const lines=[headers.map(csvCell).join(";")]; for(const r of state.filtered)lines.push([r.date,periodLabel(r.period),r.obra,r.obraName,r.gp,r.supervisorObra,r.supervisorCosto,r.provider,r.rut,r.oc,r.document,r.description,r.costGroup||costGroup(r.account),r.account,r.amount,r.classification,r.isInSummary?"Sí":"No",r.reason,state.mainSheet,r.sourceRow,r.pdf].map(csvCell).join(";")); const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob);a.download=`AALL_vista_${new Date().toISOString().slice(0,10)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+async function loadFile(file){
+  clearMessage(); setLoader("Abriendo Excel…"); $("infoFile").textContent=file.name; try{
+    const parsed=await parseExcel(file); setLoader("Construyendo trazabilidad…"); buildData(parsed); state.fileName=file.name; $("infoMain").textContent=state.mainSheet;$("infoRows").textContent=state.rows.length.toLocaleString("es-CL");$("infoSheets").textContent=state.sourceSheets.join(" · "); updateFilterOptions(); $("exportBtn").disabled=false;$("resetBtn").disabled=false; resetFilters();
+    if(canUpdateClient()) await publishCurrentDataset();
+    const missing=[]; if(!parsed.obras)missing.push("Obras con AALL"); if(!parsed.info)missing.push("Info BD AALL"); if(!parsed.form)missing.push("OC Formulario"); if(!parsed.ocex)missing.push("OCExcell"); if(!parsed.summary)missing.push("resumen");
+    const pending=state.rows.filter(r=>r.classification==="Pendiente clasificar"); const lm=state.lmSummary; const sh=state.sheetSummary; const diff=sh?lm.Total-sh.Total:0;
+    const square=sh&&Math.abs(diff)<1;
+    const obrasResumen=state.summaryObras?.length||0; const obraCheck=state.summaryCheck; const rain=state.rainWorks||[]; const rainZero=rain.filter(w=>!w.hasCost).length;
+    message(`Carga y publicación completadas. <b>Hoja “resumen” leída directamente: ${money(sh?.Total||0)}</b> · ${obrasResumen.toLocaleString("es-CL")} obras con costo en tabla dinámica.<br><b>Edificios con filtraciones H:P: ${rain.length.toLocaleString("es-CL")}</b> · <b>${rainZero.toLocaleString("es-CL")}</b> sin costo AALL asociado.<br><b>Libro Mayor reconstruido: ${money(lm.Total)}</b> · AALL ${money(lm.AALL)} · Mandante ${money(lm.Mandante)} · OBRA ${money(lm.OBRA)} · diferencia general: <b>${money(diff)}</b> ${square?"✓ CUADRA":"⚠ REVISAR"}.${obraCheck?`<br>Validación obra por obra: <b>${obraCheck.ok?"✓ CUADRA":"⚠ "+obraCheck.diffs.length+" obra(s) con diferencia"}</b>.`:""}<br>Movimientos AB=AALL 2026 todavía sin AC Resumen: <b>${pending.length.toLocaleString("es-CL")}</b> (${money(pending.reduce((a,r)=>a+r.amount,0))}).${missing.length?`<br><b>Atención:</b> no se identificaron: ${missing.join(", ")}.`:""}`,square&&obraCheck?.ok&&!missing.length?"good":(sh&&!square?"error":""));
+  }catch(e){ console.error(e); message(`<b>No pude procesar el archivo.</b> ${safeText(e.message||e)}`,"error"); $("infoMain").textContent="Error"; $("infoRows").textContent="—"; }
+  finally{stopLoader();}
+}
+
+const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)loadFile(f);});
+["fUniverse","fObra","fGP","fSupObra","fSupCosto","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
+document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=k==="amount"||k==="dateKey"?-1:1;}renderTable();}));
+$("modalClose").addEventListener("click",()=>$("modal").classList.remove("open"));$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
+
+function canUpdateClient(){ return state.session?.role==="admin" || state.session?.role==="updater"; }
+function canSeeOfficialClient(){ return state.session?.role==="admin" || state.session?.role==="updater"; }
+function isAdminClient(){ return state.session?.role==="admin"; }
+async function api(path,options={}){
+  const res=await fetch(path,{credentials:"same-origin",headers:{"Content-Type":"application/json",...(options.headers||{})},...options});
+  let data={}; try{data=await res.json();}catch(_){ }
+  if(!res.ok){ const e=new Error(data.error||data.message||`Error ${res.status}`); e.status=res.status; e.data=data; throw e; }
+  return data;
+}
+function datasetForServer(){
+  const rows=state.rows.map(r=>{ const {raw,...rest}=r; return {...rest,costGroup:r.costGroup||costGroup(r.account)}; });
+  return {meta:{fileName:state.fileName,mainSheet:state.mainSheet,sourceSheets:state.sourceSheets},sheetSummary:state.sheetSummary,lmSummary:state.lmSummary,summaryObras:state.summaryObras,rainWorks:state.rainWorks,summaryCheck:state.summaryCheck,rows};
+}
+async function publishCurrentDataset(){
+  const p=$("publishState"); p.className="publish-state";p.textContent="Publicando actualización para todos los visores…";
+  try{const out=await api('/api/dashboard',{method:'POST',body:JSON.stringify(datasetForServer())});state.datasetMeta=out.meta;p.className="publish-state ok";p.textContent=`Publicado correctamente · ${new Date(out.meta.updatedAt).toLocaleString('es-CL')}`;}
+  catch(e){p.className="publish-state err";p.textContent=`No se pudo publicar: ${e.message}`;throw e;}
+}
+function hydrateDataset(d){
+  if(!d)return false; state.rows=(d.rows||[]).map(r=>({...r,costGroup:r.costGroup||costGroup(r.account)})); state.fileName=d.meta?.fileName||"Dataset publicado";state.mainSheet=d.meta?.mainSheet||"";state.sourceSheets=d.meta?.sourceSheets||[];state.datasetMeta=d.meta||null;state.sheetSummary=d.sheetSummary||null;state.lmSummary=d.lmSummary||null;state.summaryObras=d.summaryObras||[];state.rainWorks=d.rainWorks||[];state.summaryCheck=d.summaryCheck||null;
+  $("infoFile").textContent=state.fileName;$("infoMain").textContent=state.mainSheet||"—";$("infoRows").textContent=state.rows.length.toLocaleString('es-CL');$("infoSheets").textContent=state.sourceSheets.join(' · ')||"—";updateFilterOptions();$("exportBtn").disabled=!state.rows.length;$("resetBtn").disabled=!state.rows.length;resetFilters();
+  if(state.datasetMeta?.updatedAt) message(`Versión publicada: <b>${safeText(state.fileName)}</b> · actualizada ${safeText(new Date(state.datasetMeta.updatedAt).toLocaleString('es-CL'))} por ${safeText(state.datasetMeta.updatedBy||'—')}.`,"good");
+  return true;
+}
+function renderRole(){
+  const role=state.session?.role||'viewer', email=state.session?.email||'', full=canSeeOfficialClient();
+  const chip=$("roleChip");chip.className=`role-chip ${role}`;$("roleText").textContent=role==='admin'?'Administrador general':role==='updater'?'Actualizador':'Visor';
+  $("loginBtn").classList.toggle('hidden',!!state.session);$("logoutBtn").classList.toggle('hidden',!state.session);$("adminBtn").classList.toggle('hidden',!isAdminClient());$("uploadSection").classList.toggle('hidden',!canUpdateClient());
+  document.querySelectorAll('.private-summary,.private-control').forEach(el=>el.classList.toggle('hidden',!full));
+  $("kpiSection").classList.toggle('viewer-mode',!full);
+  if(!full){ $("fUniverse").value='summary'; $("fClass").value=''; }
+  $("traceNotice").innerHTML=full
+    ? 'La fuente oficial es la hoja <b>“resumen”</b>. El tablero mantiene la cuadratura de <b>AALL / Mandante / OBRA</b> y muestra aparte los pendientes. El estado de edificios con filtraciones se lee directamente desde <b>H:P</b> de la misma hoja.'
+    : 'Vista de consulta de <b>Aguas Lluvias</b>. Se muestran únicamente los costos clasificados como <b>AALL</b> y el estado de los edificios con filtraciones informado en la hoja <b>“resumen”</b>.';
+  if(state.session) chip.title=email; else chip.title='Acceso de solo lectura';
+}
+function showLocked(message){$("lockMessage").textContent=message||'Sistema temporalmente bloqueado por administración.';$("lockOverlay").classList.add('show');}
+function hideLocked(){$("lockOverlay").classList.remove('show');}
+async function refreshSession(){const x=await api('/api/session');state.session=x.user;state.serverSettings=x;renderRole();if(x.blocked&&!isAdminClient())showLocked(x.blockMessage);else hideLocked();return x;}
+async function loadPublished(){try{const x=await api('/api/dashboard');if(x.dataset)hydrateDataset(x.dataset);else message('Todavía no existe una planilla publicada. Un administrador o actualizador debe ingresar y cargar el Excel base.', '');}catch(e){if(e.status===423)showLocked(e.data?.message);else message(`No se pudo cargar la versión publicada: ${safeText(e.message)}`,'error');}}
+function openLogin(){$("loginError").textContent='';$("loginPassword").value='';$("loginModal").classList.add('open');setTimeout(()=>$("loginEmail").focus(),30);}
+async function doLogin(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginError").textContent='';try{const x=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});state.session=x.user;$("loginModal").classList.remove('open');renderRole();if(x.blocked&&!isAdminClient())showLocked(state.serverSettings?.blockMessage);else hideLocked();await loadPublished();if(isAdminClient())await refreshAdmin();}catch(e){$("loginError").textContent=e.message;}}
+async function doLogout(){try{await api('/api/logout',{method:'POST',body:'{}'});}catch(_){ } state.session=null;renderRole();await refreshSession();if(!state.serverSettings?.blocked)await loadPublished();}
+async function refreshAdmin(){
+  if(!isAdminClient())return;try{const x=await api('/api/admin');state.adminData=x;const lm=x.lmSummary||{},sh=x.sheetSummary||{};const diff=(lm.Total||0)-(sh.Total||0);$("adminStats").innerHTML=`<div class="admin-stat"><div class="k">Estado página</div><div class="v">${x.settings.blocked?'BLOQUEADA':'ACTIVA'}</div></div><div class="admin-stat"><div class="k">Total publicado</div><div class="v">${money(lm.Total||0)}</div></div><div class="admin-stat"><div class="k">Cuadratura resumen</div><div class="v">${money(diff)}</div></div>`;$("blockMessage").value=x.settings.message||'';$("toggleBlockBtn").textContent=x.settings.blocked?'Desbloquear página':'Bloquear página';$("toggleBlockBtn").className=x.settings.blocked?'btn':'btn danger';$("adminUsers").innerHTML=(x.users||[]).map(u=>`<div class="admin-user"><span><b>${safeText(u.email)}</b><br><span class="mini">${u.role==='admin'?'Administrador':'Actualizador'}</span></span><span class="status-pill ${u.configured?'on':'off'}">${u.configured?'Configurado':'Falta clave en Railway'}</span></div>`).join('');$("adminHistory").innerHTML=(x.history||[]).length?(x.history||[]).map(h=>`<div class="history-row"><span>${safeText(new Date(h.at).toLocaleString('es-CL'))}</span><span>${safeText(h.fileName||'—')}<br><span class="mini">${safeText(h.by||'—')}</span></span><span>${Number(h.rows||0).toLocaleString('es-CL')} filas</span><span class="num">${money(h.total||0)}</span></div>`).join(''):'<div class="mini">Sin actualizaciones registradas.</div>';return x;}catch(e){message(`Error panel administrador: ${safeText(e.message)}`,'error');}
+}
+async function toggleBlock(){if(!isAdminClient())return;const x=state.adminData||await refreshAdmin();const next=!x.settings.blocked;try{await api('/api/admin/block',{method:'POST',body:JSON.stringify({blocked:next,message:$("blockMessage").value.trim()})});await refreshSession();await refreshAdmin();}catch(e){alert(e.message);}}
+async function boot(){try{await refreshSession();if(!state.serverSettings?.blocked||isAdminClient())await loadPublished();}catch(e){message(`No se pudo iniciar la conexión con el servidor: ${safeText(e.message)}`,'error');}}
+
+$("loginBtn").addEventListener('click',openLogin);$("lockLoginBtn").addEventListener('click',openLogin);$("loginClose").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginCancel").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginSubmit").addEventListener('click',doLogin);$("loginPassword").addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});$("logoutBtn").addEventListener('click',doLogout);$("adminBtn").addEventListener('click',async()=>{await refreshAdmin();$("adminModal").classList.add('open');});$("adminClose").addEventListener('click',()=>$("adminModal").classList.remove('open'));$("toggleBlockBtn").addEventListener('click',toggleBlock);$("adminModal").addEventListener('click',e=>{if(e.target===$("adminModal"))$("adminModal").classList.remove('open');});
+boot();
+
+</script>
+</body>
+</html>

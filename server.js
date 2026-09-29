@@ -16,7 +16,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const UPDATER_PASSWORD = process.env.UPDATER_PASSWORD || '';
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(48).toString('hex');
 const PROD = process.env.NODE_ENV === 'production';
-const MAX_BODY = 30 * 1024 * 1024;
+const MAX_BODY = 60 * 1024 * 1024;
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
@@ -92,6 +92,22 @@ function configuredUser(email, password) {
 }
 function isAdmin(u){ return u?.role === 'admin'; }
 function canUpdate(u){ return u?.role === 'admin' || u?.role === 'updater'; }
+function canSeeOfficial(u){ return u?.role === 'admin' || u?.role === 'updater'; }
+
+function viewerDataset(d) {
+  if (!d) return null;
+  const rows = (d.rows || []).filter(r => r && r.isInSummary && r.classification === 'AALL');
+  const AALL = Number(d.sheetSummary?.AALL ?? d.lmSummary?.AALL ?? rows.reduce((a,r)=>a+(Number(r.amount)||0),0)) || 0;
+  return {
+    meta: { ...(d.meta || {}), accessView: 'viewer' },
+    sheetSummary: { AALL, Total: AALL },
+    lmSummary: { AALL, Total: AALL },
+    summaryObras: (d.summaryObras || []).map(x => ({ obra:x.obra, AALL:Number(x.AALL)||0, Total:Number(x.AALL)||0, row:x.row })).filter(x => x.AALL !== 0),
+    rainWorks: Array.isArray(d.rainWorks) ? d.rainWorks : [],
+    summaryCheck: null,
+    rows
+  };
+}
 
 const loginAttempts = new Map();
 function allowLogin(ip) {
@@ -159,14 +175,16 @@ const server=http.createServer(async (req,res)=>{
     }
     if (pathname === '/api/dashboard' && req.method==='GET') {
       if(cfg.blocked && !isAdmin(me)) return json(res,423,{error:'blocked',message:cfg.message});
-      const d=readJson(DASHBOARD_FILE,null); return json(res,200,{dataset:d});
+      const d=readJson(DASHBOARD_FILE,null);
+      const visible = canSeeOfficial(me) ? d : viewerDataset(d);
+      return json(res,200,{dataset:visible,access:canSeeOfficial(me)?'official':'viewer'});
     }
     if (pathname === '/api/dashboard' && req.method==='POST') {
       if(!canUpdate(me)) return json(res,403,{error:'No tienes permisos para actualizar información.'});
       if(cfg.blocked && !isAdmin(me)) return json(res,423,{error:'La página está bloqueada por administración.'});
       const body=await readJsonBody(req); const err=validateDataset(body); if(err) return json(res,400,{error:err});
       const now=new Date().toISOString();
-      body.meta = {...(body.meta||{}), updatedAt:now, updatedBy:me.email, version:7};
+      body.meta = {...(body.meta||{}), updatedAt:now, updatedBy:me.email, version:12};
       atomicWrite(DASHBOARD_FILE,body);
       const hist=history(); hist.unshift({at:now,by:me.email,fileName:body.meta.fileName||'',rows:body.rows.length,total:body.lmSummary?.Total||0}); atomicWrite(HISTORY_FILE,hist.slice(0,50));
       return json(res,200,{ok:true,meta:body.meta});
