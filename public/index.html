@@ -38,9 +38,10 @@ button,input,select{font:inherit} button{cursor:pointer}
 .obra-chart-label{min-width:0}.obra-chart-name{border:0;background:transparent;text-align:left;color:var(--navy);font-size:10px;font-weight:760;padding:0;line-height:1.25;display:block;max-width:100%;white-space:normal}.obra-chart-name:hover{text-decoration:underline}.obra-chart-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px}.chart-meta-chip{display:inline-flex;align-items:center;border-radius:999px;padding:2px 6px;font-size:8px;font-weight:730;background:#edf2f5;color:#566575}.chart-meta-chip.alert{background:#fff0c7;color:#855700;border:1px solid #e7bf6f}
 .stack-track{height:20px;background:#edf2f5;border-radius:6px;display:flex;overflow:hidden;min-width:0;cursor:pointer}.stack-track:hover{outline:1px solid #c7d7e2}.stack-seg{height:100%;position:relative;transition:.15s;min-width:0}.stack-seg:hover{filter:brightness(.93)}.zero-chart-alert{min-height:28px;border:1px dashed #d79b28;background:#fff4d8;color:#845500;border-radius:7px;display:flex;align-items:center;gap:7px;padding:4px 8px;font-size:8px;line-height:1.15;font-weight:820;cursor:pointer;white-space:normal}.zero-chart-alert .mark{width:18px;height:18px;min-width:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#ffe2a0;border:1px solid #d79b28;font-size:11px}
 .obra-chart-total{text-align:right;font-variant-numeric:tabular-nums;font-size:10px;font-weight:760;color:var(--navy);white-space:nowrap}.obra-chart-total.zero{color:#9a6200}.chart-legend{display:flex;gap:10px;flex-wrap:wrap;padding:0 0 8px}.legend-item{display:inline-flex;align-items:center;gap:5px;font-size:9px;color:#5d6875}.legend-dot{width:9px;height:9px;border-radius:3px;display:inline-block}.legend-dot.alert{background:#ffe2a0;border:1px solid #d79b28}.chart-hint{font-size:10px;color:var(--muted);margin:0 0 10px}.chart-empty{padding:35px;text-align:center;color:var(--muted);font-size:13px}
-.obra-breakdown{grid-column:1/-1;margin:2px 0 0;padding:13px 14px;background:#f8fbfd;border:1px solid #dbe6ed;border-radius:10px}.obra-breakdown.no-cost-detail{background:#fffaf0;border-color:#ead3a0}.obra-breakdown-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.obra-breakdown-head b{font-size:11px;color:var(--navy)}.obra-breakdown-head button{border:0;background:#e8eef3;color:var(--navy);border-radius:7px;padding:5px 8px;font-size:9px;font-weight:700}
+.obra-inline-detail{margin:0 2px 8px;animation:obraDetailIn .14s ease-out}.obra-inline-detail .obra-breakdown{margin:0}.obra-breakdown{grid-column:1/-1;margin:2px 0 0;padding:13px 14px;background:#f8fbfd;border:1px solid #dbe6ed;border-radius:10px}.obra-breakdown.no-cost-detail{background:#fffaf0;border-color:#ead3a0}.obra-breakdown-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.obra-breakdown-head b{font-size:11px;color:var(--navy)}.obra-breakdown-head button{border:0;background:#e8eef3;color:var(--navy);border-radius:7px;padding:5px 8px;font-size:9px;font-weight:700}
 .obra-breakdown-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-bottom:9px}.obra-breakdown-meta div{border:1px solid #e1e8ed;border-radius:7px;background:white;padding:8px 9px;font-size:9px;color:#566575}.obra-breakdown-meta b{display:block;color:var(--navy);font-size:8px;text-transform:uppercase;letter-spacing:.35px;margin-bottom:3px}.obra-detail-observations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0 0 9px}.obra-detail-observations>div{border:1px solid #e1e8ed;border-radius:7px;background:#fff;padding:8px 9px;font-size:9px;line-height:1.35;color:#4f5f6e;min-height:48px}.obra-detail-observations b{display:block;color:var(--navy);font-size:8px;text-transform:uppercase;letter-spacing:.35px;margin-bottom:3px}.zero-detail-message{border-left:3px solid #d79b28;background:#fff2cf;padding:8px 10px;border-radius:6px;color:#7a5100;font-size:10px;font-weight:720;margin-top:4px}
 .breakdown-row{display:grid;grid-template-columns:minmax(145px,190px) minmax(180px,1fr) 110px 52px;gap:10px;align-items:center;padding:6px 0}.breakdown-label{font-size:10px;font-weight:700;color:#3c4d5e}.breakdown-track{height:12px;background:#e9eff3;border-radius:999px;overflow:hidden}.breakdown-fill{height:100%;border-radius:999px}.breakdown-value{text-align:right;font-size:10px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}.breakdown-pct{text-align:right;font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums}.chart-summary-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}.chart-summary-strip .rain-pill{font-size:9px}
+@keyframes obraDetailIn{from{opacity:.35;transform:translateY(-3px)}to{opacity:1;transform:none}}
 @media(max-width:1050px){.obra-chart-shell{grid-template-columns:1fr}.obra-breakdown-meta{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){.obra-chart-row{grid-template-columns:minmax(145px,1fr) 86px}.obra-chart-row .stack-track,.obra-chart-row .zero-chart-alert{grid-column:1/-1;order:3}.obra-breakdown-meta,.obra-detail-observations{grid-template-columns:1fr}.breakdown-row{grid-template-columns:1fr 90px}.breakdown-track{grid-column:1/-1;order:3}.breakdown-pct{display:none}}
 
@@ -159,7 +160,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 17 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 18 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -768,14 +769,23 @@ function renderObraCostChart(){
       const unmatched=Math.max(0,v.total-breakdownSum), remainder=v.total?Math.min(100,Math.abs(unmatched/v.total)*100):0;
       middle=`<div class="stack-track" data-obra-detail="${safeText(v.key)}" title="Clic para ver detalle"><div style="width:${width}%;display:flex;height:100%;overflow:hidden;border-radius:6px">${segments}${remainder>.05?`<div class="stack-seg" style="width:${remainder}%;background:#aeb8c1" title="Sin desglose: ${safeText(money(unmatched))}"></div>`:''}</div></div>`;
     }
-    return `<div class="obra-chart-row ${expanded?'is-expanded':''} ${v.noCost?'no-cost-row':''}">${labelCell}${middle}<div class="obra-chart-total ${v.noCost?'zero':''}">${v.noCost?'$0':safeText(money(v.total))}</div></div>`;
+    const row=`<div class="obra-chart-row ${expanded?'is-expanded':''} ${v.noCost?'no-cost-row':''}">${labelCell}${middle}<div class="obra-chart-total ${v.noCost?'zero':''}">${v.noCost?'$0':safeText(money(v.total))}</div></div>`;
+    return row+(expanded?`<div class="obra-inline-detail" data-open-detail="${safeText(v.key)}">${detailHtml(v)}</div>`:'');
   };
 
   const split=Math.ceil(ordered.length/2), left=ordered.slice(0,split), right=ordered.slice(split);
   const group=(title,items)=>`<section class="obra-chart-group"><div class="obra-chart-group-head"><h3>${title}</h3><div class="group-meta"><span class="group-pill">${items.length.toLocaleString('es-CL')} obras</span></div></div><div class="obra-chart-group-body"><div class="obra-chart">${items.length?items.map(rowHtml).join(''):'<div class="chart-empty">Sin obras.</div>'}</div></div></section>`;
-  const selected=ordered.find(v=>v.key===state.chartExpandedObra);
-  $('obraCostChart').innerHTML=group('Obras con mayor costo',left)+group('Resto de obras',right)+detailHtml(selected);
-  const toggle=key=>{state.chartExpandedObra=state.chartExpandedObra===key?'':key;renderObraCostChart();};
+  $('obraCostChart').innerHTML=group('Obras con mayor costo',left)+group('Resto de obras',right);
+  const toggle=key=>{
+    state.chartExpandedObra=state.chartExpandedObra===key?'':key;
+    renderObraCostChart();
+    if(state.chartExpandedObra){
+      requestAnimationFrame(()=>{
+        const target=$('obraCostChart').querySelector(`[data-open-detail="${CSS.escape(state.chartExpandedObra)}"]`);
+        if(target)target.scrollIntoView({behavior:'smooth',block:'nearest'});
+      });
+    }
+  };
   $('obraCostChart').querySelectorAll('[data-obra-detail]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();toggle(el.dataset.obraDetail);}));
   $('obraCostChart').querySelectorAll('[data-close-detail]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();state.chartExpandedObra='';renderObraCostChart();}));
 }
