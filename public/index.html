@@ -161,7 +161,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 19 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 21 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -612,14 +612,28 @@ function buildData(parsed){
   }
   if(parsed.summary) source.push(parsed.summary.name);
   source.unshift(parsed.main.name); state.sourceSheets=[...new Set(source)]; state.mainSheet=parsed.main.name;
+
+  /* v21: la hoja resumen es la fuente maestra para identificar qué obras pertenecen
+     al universo AALL 2026. No dependemos de la fórmula de la columna AB del Libro
+     Mayor, porque al insertar GD/GP/PA en resumen esa fórmula antigua puede devolver
+     otro campo. */
+  state.sheetSummary=extractSummaryTotals(parsed.summary?.raw||null);
+  state.summaryObras=extractSummaryByObra(parsed.summary?.raw||null);
+  state.rainWorks=extractRainWorks(parsed.summary?.raw||null);
+  const summaryWorkMap=new Map((state.rainWorks||[]).map(w=>[String(w.obra||""),w]));
+  const summaryAallSet=new Set((state.rainWorks||[])
+    .filter(w=>norm(w.aallFlag||"").includes("AALL 2026") || norm(w.aallFlag||"")=="AALL")
+    .map(w=>String(w.obra||"")));
+
   const out=[];
   for(const r of parsed.main.table.rows){
     const obra=normCode(get(r,["Partida","Obra","N° Obra"])); const oc=normOC(get(r,["OC"])); const form=state.formMap.get(oc)||null, ox=state.excelMap.get(oc)||null; const meta=state.obraMeta.get(obra)||{code:obra,name:String(get(r,["Descripción Partida","Descripcion Partida"])||obra||"Sin obra"),supervisorObra:"",gp:"",cases:0};
     const amount=num(get(r,["Monto","Importe"])); const date=get(r,["Fecha"]), period=periodFrom(date,get(r,["Periodo"])); const provider=String(get(r,["Proveedor"])||""); const description=String(get(r,["Descripción OC","Descripcion OC","Descripción","Descripcion"])||""); const infoExcel=String(get(r,["Info MS Excell","Info MS Excel"])||""); const infoForm=String(get(r,["Info MS Formu","Info MS Formulario"])||""); const infoRV=String(get(r,["Info Rvivallo","Info R Vivallo"])||"");
     const directFlag=String(get(r,["AALL 2026?","AALL 2026"] )||"");
     const resumenRaw=String(get(r,["Resumen"])||""); const resumenCategory=canonicalResumen(resumenRaw);
-    const isObraAALL=state.obraMeta.has(obra)||norm(directFlag)==="AALL 2026";
-    const isAALL2026=norm(directFlag)==="AALL 2026";
+    const inSummaryAALL=summaryAallSet.has(String(obra||""));
+    const isObraAALL=state.obraMeta.has(obra)||inSummaryAALL||norm(directFlag)==="AALL 2026";
+    const isAALL2026=inSummaryAALL||norm(directFlag)==="AALL 2026";
     const validResumen=["AALL","Mandante","OBRA"].includes(resumenCategory);
     const isInSummary=isAALL2026 && validResumen;
     let classification="Fuera Resumen", confidence=0, reason="Esta línea no participa en la tabla dinámica Resumen.";
@@ -632,19 +646,15 @@ function buildData(parsed){
       else if(resumenCategory==="AALL" && (aa==="ALL"||aa==="AALL")) reason="Incluido en Resumen: AC=AALL. La columna Info Rvivallo respalda ALL/AALL.";
       else if(resumenCategory==="AALL" && (y.includes("AALL")||y.includes("AGUAS DE LLUVIA")||y==="ALL")) reason="Incluido en Resumen: AC=AALL. Info MS Excell contiene una referencia explícita a AALL/aguas lluvia.";
       else reason=`Incluido en Resumen porque AC=${resumenCategory}. AC no tiene fórmula: la clasificación está cargada directamente en el Libro Mayor y esta línea no muestra un respaldo categórico explícito en Y/Z/AA.`;
-    } else if(isAALL2026 && !validResumen){ classification="Pendiente clasificar"; confidence=0; reason="AB=AALL 2026, pero AC Resumen está vacío o no contiene AALL/Mandante/OBRA. Por eso no entra al total de la hoja Resumen."; }
+    } else if(isAALL2026 && !validResumen){ classification="Pendiente clasificar"; confidence=0; reason="La obra pertenece al universo AALL 2026 de la hoja resumen, pero la clasificación Resumen del movimiento está vacía o no contiene AALL/Mandante/OBRA. Por eso no entra al total oficial."; }
     const projectDesc=String(get(r,["Descripción Partida","Descripcion Partida"])||""); const obraName=meta.name||projectDesc||obra||"Sin obra";
     const document=String(get(r,["# Documento","Documento","N° Documento"])||""); const pdf=String(get(r,["URL PDF","PDF"])||""); const photo=String(get(r,["URL Foto","Foto"])||""); const supervisorCosto=String(get(r,["Supervisor"])||""); const account=String(get(r,["Descripción Cuenta","Descripcion Cuenta"])||""); const rut=String(get(r,["RUT Proveedor","Rut Proveedor"])||""); const ref=String(get(r,["Referencia"])||""); const refOrigin=String(get(r,["Referencia Origen"])||""); const origin=String(get(r,["Origen"])||""); const insumo=String(get(r,["Insumo"])||"");
     const d=excelDate(date); out.push({id:`${parsed.main.name}-${r.__row}`,sourceRow:r.__row,dateRaw:date,date:dateDisplay(date),dateKey:d?d.getTime():0,period,obra,obraName,gp:meta.gp||"Sin GP",supervisorObra:meta.supervisorObra||"Sin supervisor",supervisorCosto:supervisorCosto||"Sin supervisor",provider,rut,amount,oc,document,description,account,costGroup:costGroup(account),insumo,pdf,photo,ref,refOrigin,origin,classification,confidence,reason,isObraAALL,isAALL2026,isInSummary,resumenCategory,directFlag,form,ox,infoExcel,infoForm,infoRV,raw:r,cases:meta.cases||0});
   }
   state.rows=out;
-  state.sheetSummary=extractSummaryTotals(parsed.summary?.raw||null);
-  state.summaryObras=extractSummaryByObra(parsed.summary?.raw||null);
-  state.rainWorks=extractRainWorks(parsed.summary?.raw||null);
   /* La hoja resumen es la fuente maestra de la ficha de cada obra. Sobrescribimos
      los metadatos del movimiento con Supervisor/GP/PA del cuadro resumen para que
      filtros, tabla y gráfico hablen el mismo idioma. */
-  const summaryWorkMap=new Map((state.rainWorks||[]).map(w=>[String(w.obra||""),w]));
   for(const r of out){
     const w=summaryWorkMap.get(String(r.obra||""));
     if(!w){ r.pa=r.pa||""; r.gd=r.gd||""; continue; }
@@ -908,7 +918,7 @@ async function loadFile(file){
     const pending=state.rows.filter(r=>r.classification==="Pendiente clasificar"); const lm=state.lmSummary; const sh=state.sheetSummary; const diff=sh?lm.Total-sh.Total:0;
     const square=sh&&Math.abs(diff)<1;
     const obrasResumen=state.summaryObras?.length||0; const obraCheck=state.summaryCheck; const rain=state.rainWorks||[]; const rainZero=rain.filter(w=>!w.hasCost).length;
-    message(`Carga y publicación completadas. <b>Hoja “resumen” leída directamente: ${money(sh?.Total||0)}</b> · ${obrasResumen.toLocaleString("es-CL")} obras con costo en tabla dinámica.<br><b>Edificios con filtraciones en Resumen: ${rain.length.toLocaleString("es-CL")}</b> · <b>${rainZero.toLocaleString("es-CL")}</b> sin costo AALL asociado.<br><b>Libro Mayor reconstruido: ${money(lm.Total)}</b> · AALL ${money(lm.AALL)} · Mandante ${money(lm.Mandante)} · OBRA ${money(lm.OBRA)} · diferencia general: <b>${money(diff)}</b> ${square?"✓ CUADRA":"⚠ REVISAR"}.${obraCheck?`<br>Validación obra por obra: <b>${obraCheck.ok?"✓ CUADRA":"⚠ "+obraCheck.diffs.length+" obra(s) con diferencia"}</b>.`:""}<br>Movimientos AB=AALL 2026 todavía sin AC Resumen: <b>${pending.length.toLocaleString("es-CL")}</b> (${money(pending.reduce((a,r)=>a+r.amount,0))}).${missing.length?`<br><b>Atención:</b> no se identificaron: ${missing.join(", ")}.`:""}`,square&&obraCheck?.ok&&!missing.length?"good":(sh&&!square?"error":""));
+    message(`Carga y publicación completadas. <b>Hoja “resumen” leída directamente: ${money(sh?.Total||0)}</b> · ${obrasResumen.toLocaleString("es-CL")} obras con costo en tabla dinámica.<br><b>Edificios con filtraciones en Resumen: ${rain.length.toLocaleString("es-CL")}</b> · <b>${rainZero.toLocaleString("es-CL")}</b> sin costo AALL asociado.<br><b>Libro Mayor reconstruido: ${money(lm.Total)}</b> · AALL ${money(lm.AALL)} · Mandante ${money(lm.Mandante)} · OBRA ${money(lm.OBRA)} · diferencia general: <b>${money(diff)}</b> ${square?"✓ CUADRA":"⚠ REVISAR"}.${obraCheck?`<br>Validación obra por obra: <b>${obraCheck.ok?"✓ CUADRA":"⚠ "+obraCheck.diffs.length+" obra(s) con diferencia"}</b>.`:""}<br>Movimientos de obras AALL 2026 todavía sin clasificación Resumen: <b>${pending.length.toLocaleString("es-CL")}</b> (${money(pending.reduce((a,r)=>a+r.amount,0))}).${missing.length?`<br><b>Atención:</b> no se identificaron: ${missing.join(", ")}.`:""}`,square&&obraCheck?.ok&&!missing.length?"good":(sh&&!square?"error":""));
   }catch(e){ console.error(e); message(`<b>No pude procesar el archivo.</b> ${safeText(e.message||e)}`,"error"); $("infoMain").textContent="Error"; $("infoRows").textContent="—"; }
   finally{stopLoader();}
 }
