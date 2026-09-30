@@ -14,27 +14,42 @@
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink);background:var(--bg)}
 button,input,select{font:inherit} button{cursor:pointer}
 .topbar{background:linear-gradient(120deg,var(--navy),var(--navy2));color:white;padding:24px 28px 20px;position:sticky;top:0;z-index:20;box-shadow:0 4px 18px rgba(0,0,0,.12)}
-.topbar-inner{max-width:1500px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.topbar-inner{max-width:1800px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .brand h1{margin:0;font-size:22px;letter-spacing:.2px}.brand p{margin:5px 0 0;color:#cbd7e4;font-size:13px}
 .top-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid transparent;border-radius:9px;padding:9px 13px;background:#fff;color:var(--navy);font-weight:650}.btn:hover{filter:brightness(.98)}
 .btn.secondary{background:transparent;color:white;border-color:#6d8299}.btn.ghost{background:#eef3f7;color:var(--navy);border-color:#d8e1e8}.btn.danger{color:#9b1c1c;background:#fff0f0;border-color:#ffd0d0}.btn:disabled{opacity:.45;cursor:not-allowed}
-.container{max-width:1500px;margin:0 auto;padding:24px 28px 40px}
+.container{max-width:1800px;margin:0 auto;padding:24px 28px 40px}
 .import-card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
 .import-grid{display:grid;grid-template-columns:minmax(300px,1.1fr) minmax(280px,.9fr);gap:18px;align-items:stretch}
 .drop{min-height:150px;border:2px dashed #aebdca;border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#f9fbfc;transition:.15s}.drop.drag{border-color:var(--teal);background:#edf9fb}.drop strong{font-size:16px}.drop span{font-size:12px;color:var(--muted);margin-top:7px}.drop input{display:none}.upload-label{margin-top:14px;display:inline-block;background:var(--navy);color:white;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer}
 .info-panel{border:1px solid #dce7ee;border-radius:12px;background:#f7fafc;padding:16px}.info-panel h3{margin:0 0 10px;font-size:14px}.info-line{display:grid;grid-template-columns:130px 1fr;gap:8px;font-size:12px;margin:6px 0}.info-line b{color:#435263}.privacy{margin-top:12px;color:#506070;font-size:11px;line-height:1.5}
 .notice{border-left:4px solid var(--amber);background:#fff8e8;color:#694600;padding:11px 14px;border-radius:8px;margin:0 0 18px;font-size:12px;line-height:1.45}.notice.good{border-left-color:var(--green);background:#eefaf4;color:#155f43}.notice.error{border-left-color:var(--red);background:#fff0ef;color:#8c2018}
 .kpis{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px;margin-bottom:18px}.kpis.viewer-mode{grid-template-columns:minmax(220px,360px)}.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow)}.kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);font-weight:700}.kpi .value{font-size:23px;margin-top:8px;font-weight:760;color:var(--navy)}.kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}.kpi.emph .value{color:var(--green)}.kpi.warn .value{color:var(--amber)}.kpi.no .value{color:var(--red)}
-.filters{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);margin-bottom:18px}.filters-grid{display:grid;grid-template-columns:repeat(7,minmax(135px,1fr));gap:10px}.field label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:760;letter-spacing:.45px;display:block;margin:0 0 5px}.field select,.field input{width:100%;border:1px solid #ccd7df;border-radius:8px;background:white;padding:8px 9px;color:var(--ink);min-height:38px}.field.search{grid-column:span 2}
+.filters{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);margin-bottom:18px}.filters-grid{display:grid;grid-template-columns:repeat(6,minmax(145px,1fr));gap:10px}.field label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:760;letter-spacing:.45px;display:block;margin:0 0 5px}.field select,.field input{width:100%;border:1px solid #ccd7df;border-radius:8px;background:white;padding:8px 9px;color:var(--ink);min-height:38px}.field.search{grid-column:span 2}
 .grid2{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr);gap:18px;margin-bottom:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}.card-head h2{font-size:14px;margin:0;color:var(--navy)}.card-body{padding:14px 16px}.mini{font-size:11px;color:var(--muted)}
 
-.obra-master-card{margin-bottom:18px}.obra-chart-shell{display:grid;grid-template-columns:1fr;gap:18px}.obra-chart-group{border:1px solid #e2e8ed;border-radius:11px;overflow:hidden;background:#fff}.obra-chart-group.alert-group{border-color:#ecd39a;background:#fffdf8}.obra-chart-group-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:#f7fafc;border-bottom:1px solid #e5ebef}.obra-chart-group.alert-group .obra-chart-group-head{background:#fff7e5;border-bottom-color:#ecd39a}.obra-chart-group-head h3{margin:0;font-size:11px;color:var(--navy);letter-spacing:.1px}.obra-chart-group-head .group-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:9px;color:var(--muted)}.group-pill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;background:#eaf0f4;color:#536474;font-weight:760}.group-pill.alert{background:#ffe8b3;color:#815400;border:1px solid #e1b961}.obra-chart-group-body{padding:4px 8px 8px}.obra-detail-observations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0 0 9px}.obra-detail-observations>div{border:1px solid #e1e8ed;border-radius:7px;background:#fff;padding:8px 9px;font-size:9px;line-height:1.35;color:#4f5f6e;min-height:48px}.obra-detail-observations b{display:block;color:var(--navy);font-size:8px;text-transform:uppercase;letter-spacing:.35px;margin-bottom:3px}.chart-summary-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}.chart-summary-strip .rain-pill{font-size:9px}.obra-chart-group .obra-chart{max-height:460px}.obra-chart-group.alert-group .obra-chart{max-height:420px}@media(max-width:720px){.obra-detail-observations{grid-template-columns:1fr}}
-.obra-chart{max-height:560px;overflow:auto;padding:4px 2px 6px}.obra-chart-row{display:grid;grid-template-columns:minmax(190px,255px) minmax(260px,1fr) 104px;gap:10px;align-items:center;padding:8px 4px;border-bottom:1px solid #eef2f4;transition:.15s;border-radius:8px}.obra-chart-row:last-child{border-bottom:0}.obra-chart-row.is-expanded{background:#f4f8fb}.obra-chart-row.no-cost-row{background:#fffaf0;border:1px solid #f1dfb9;margin:3px 0}.obra-chart-row.no-cost-row:hover{background:#fff5dc}.obra-chart-label{min-width:0}.obra-chart-name{border:0;background:transparent;text-align:left;color:var(--navy);font-size:10px;font-weight:760;padding:0;line-height:1.25;display:block;max-width:100%}.obra-chart-name:hover{text-decoration:underline}.obra-chart-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px}.chart-meta-chip{display:inline-flex;align-items:center;border-radius:999px;padding:2px 6px;font-size:8px;font-weight:730;background:#edf2f5;color:#566575;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chart-meta-chip.managed{background:#eef5f8;color:#31566a}.chart-meta-chip.alert{background:#fff0c7;color:#855700;border:1px solid #e7bf6f}.stack-track{height:20px;background:#edf2f5;border-radius:6px;display:flex;overflow:hidden;min-width:0;cursor:pointer}.stack-track:hover{outline:1px solid #c7d7e2}.stack-seg{height:100%;position:relative;transition:.15s;min-width:0}.stack-seg:hover{filter:brightness(.93)}.zero-chart-alert{height:27px;border:1px dashed #d79b28;background:#fff4d8;color:#845500;border-radius:7px;display:flex;align-items:center;gap:7px;padding:0 10px;font-size:9px;font-weight:820;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zero-chart-alert .mark{width:18px;height:18px;min-width:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#ffe2a0;border:1px solid #d79b28;font-size:11px}.obra-chart-total{text-align:right;font-variant-numeric:tabular-nums;font-size:10px;font-weight:760;color:var(--navy)}.obra-chart-total.zero{color:#9a6200}.chart-legend{display:flex;gap:10px;flex-wrap:wrap;padding:0 0 8px}.legend-item{display:inline-flex;align-items:center;gap:5px;font-size:9px;color:#5d6875}.legend-dot{width:9px;height:9px;border-radius:3px;display:inline-block}.legend-dot.alert{background:#ffe2a0;border:1px solid #d79b28}.chart-hint{font-size:10px;color:var(--muted);margin:0 0 10px}.chart-empty{padding:35px;text-align:center;color:var(--muted);font-size:13px}.obra-breakdown{margin:0 4px 10px;padding:12px 14px;background:#f8fbfd;border:1px solid #dbe6ed;border-radius:10px}.obra-breakdown.no-cost-detail{background:#fffaf0;border-color:#ead3a0}.obra-breakdown-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.obra-breakdown-head b{font-size:11px;color:var(--navy)}.obra-breakdown-head button{border:0;background:#e8eef3;color:var(--navy);border-radius:7px;padding:5px 8px;font-size:9px;font-weight:700}.obra-breakdown-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:9px}.obra-breakdown-meta div{border:1px solid #e1e8ed;border-radius:7px;background:white;padding:7px 8px;font-size:9px;color:#566575}.obra-breakdown-meta b{display:block;color:var(--navy);font-size:8px;text-transform:uppercase;letter-spacing:.35px;margin-bottom:2px}.zero-detail-message{border-left:3px solid #d79b28;background:#fff2cf;padding:8px 10px;border-radius:6px;color:#7a5100;font-size:10px;font-weight:720;margin-top:4px}.breakdown-row{display:grid;grid-template-columns:minmax(155px,210px) minmax(220px,1fr) 110px 52px;gap:10px;align-items:center;padding:6px 0}.breakdown-label{font-size:10px;font-weight:700;color:#3c4d5e}.breakdown-track{height:12px;background:#e9eff3;border-radius:999px;overflow:hidden}.breakdown-fill{height:100%;border-radius:999px}.breakdown-value{text-align:right;font-size:10px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}.breakdown-pct{text-align:right;font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums}@media(max-width:720px){.obra-chart-row{grid-template-columns:minmax(150px,1fr) 92px}.obra-chart-row .stack-track,.obra-chart-row .zero-chart-alert{grid-column:1/-1;order:3}.obra-breakdown-meta{grid-template-columns:1fr}.breakdown-row{grid-template-columns:1fr 90px}.breakdown-track{grid-column:1/-1;order:3}.breakdown-pct{display:none}}
-.obra-list{max-height:275px;overflow:auto}.obra-row{display:grid;grid-template-columns:minmax(120px,1fr) 90px 90px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #eef2f4;font-size:11px}.obra-row:last-child{border-bottom:0}.obra-row button{border:0;background:transparent;text-align:left;padding:0;color:var(--navy);font-weight:650}.obra-row button:hover{text-decoration:underline}.num{text-align:right;font-variant-numeric:tabular-nums}.kpis.viewer-mode .kpi{max-width:360px}
+.obra-master-card{margin-bottom:18px}
+.obra-chart-shell{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.obra-chart-group{border:1px solid #e2e8ed;border-radius:11px;overflow:hidden;background:#fff;min-width:0}
+.obra-chart-group-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:#f7fafc;border-bottom:1px solid #e5ebef}
+.obra-chart-group-head h3{margin:0;font-size:11px;color:var(--navy);letter-spacing:.1px}.obra-chart-group-head .group-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:9px;color:var(--muted)}
+.group-pill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;background:#eaf0f4;color:#536474;font-weight:760}.obra-chart-group-body{padding:4px 8px 8px}
+.obra-chart{max-height:650px;overflow:auto;padding:4px 2px 6px}.obra-chart-row{display:grid;grid-template-columns:minmax(145px,34%) minmax(150px,1fr) 92px;gap:8px;align-items:center;padding:8px 4px;border-bottom:1px solid #eef2f4;transition:.15s;border-radius:8px;min-width:0}.obra-chart-row:last-child{border-bottom:0}.obra-chart-row.is-expanded{background:#f4f8fb}.obra-chart-row.no-cost-row{background:#fffaf0;border:1px solid #f1dfb9;margin:3px 0}.obra-chart-row.no-cost-row:hover{background:#fff5dc}
+.obra-chart-label{min-width:0}.obra-chart-name{border:0;background:transparent;text-align:left;color:var(--navy);font-size:10px;font-weight:760;padding:0;line-height:1.25;display:block;max-width:100%;white-space:normal}.obra-chart-name:hover{text-decoration:underline}.obra-chart-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px}.chart-meta-chip{display:inline-flex;align-items:center;border-radius:999px;padding:2px 6px;font-size:8px;font-weight:730;background:#edf2f5;color:#566575}.chart-meta-chip.alert{background:#fff0c7;color:#855700;border:1px solid #e7bf6f}
+.stack-track{height:20px;background:#edf2f5;border-radius:6px;display:flex;overflow:hidden;min-width:0;cursor:pointer}.stack-track:hover{outline:1px solid #c7d7e2}.stack-seg{height:100%;position:relative;transition:.15s;min-width:0}.stack-seg:hover{filter:brightness(.93)}.zero-chart-alert{min-height:28px;border:1px dashed #d79b28;background:#fff4d8;color:#845500;border-radius:7px;display:flex;align-items:center;gap:7px;padding:4px 8px;font-size:8px;line-height:1.15;font-weight:820;cursor:pointer;white-space:normal}.zero-chart-alert .mark{width:18px;height:18px;min-width:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#ffe2a0;border:1px solid #d79b28;font-size:11px}
+.obra-chart-total{text-align:right;font-variant-numeric:tabular-nums;font-size:10px;font-weight:760;color:var(--navy);white-space:nowrap}.obra-chart-total.zero{color:#9a6200}.chart-legend{display:flex;gap:10px;flex-wrap:wrap;padding:0 0 8px}.legend-item{display:inline-flex;align-items:center;gap:5px;font-size:9px;color:#5d6875}.legend-dot{width:9px;height:9px;border-radius:3px;display:inline-block}.legend-dot.alert{background:#ffe2a0;border:1px solid #d79b28}.chart-hint{font-size:10px;color:var(--muted);margin:0 0 10px}.chart-empty{padding:35px;text-align:center;color:var(--muted);font-size:13px}
+.obra-breakdown{grid-column:1/-1;margin:2px 0 0;padding:13px 14px;background:#f8fbfd;border:1px solid #dbe6ed;border-radius:10px}.obra-breakdown.no-cost-detail{background:#fffaf0;border-color:#ead3a0}.obra-breakdown-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.obra-breakdown-head b{font-size:11px;color:var(--navy)}.obra-breakdown-head button{border:0;background:#e8eef3;color:var(--navy);border-radius:7px;padding:5px 8px;font-size:9px;font-weight:700}
+.obra-breakdown-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-bottom:9px}.obra-breakdown-meta div{border:1px solid #e1e8ed;border-radius:7px;background:white;padding:8px 9px;font-size:9px;color:#566575}.obra-breakdown-meta b{display:block;color:var(--navy);font-size:8px;text-transform:uppercase;letter-spacing:.35px;margin-bottom:3px}.obra-detail-observations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0 0 9px}.obra-detail-observations>div{border:1px solid #e1e8ed;border-radius:7px;background:#fff;padding:8px 9px;font-size:9px;line-height:1.35;color:#4f5f6e;min-height:48px}.obra-detail-observations b{display:block;color:var(--navy);font-size:8px;text-transform:uppercase;letter-spacing:.35px;margin-bottom:3px}.zero-detail-message{border-left:3px solid #d79b28;background:#fff2cf;padding:8px 10px;border-radius:6px;color:#7a5100;font-size:10px;font-weight:720;margin-top:4px}
+.breakdown-row{display:grid;grid-template-columns:minmax(145px,190px) minmax(180px,1fr) 110px 52px;gap:10px;align-items:center;padding:6px 0}.breakdown-label{font-size:10px;font-weight:700;color:#3c4d5e}.breakdown-track{height:12px;background:#e9eff3;border-radius:999px;overflow:hidden}.breakdown-fill{height:100%;border-radius:999px}.breakdown-value{text-align:right;font-size:10px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}.breakdown-pct{text-align:right;font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums}.chart-summary-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}.chart-summary-strip .rain-pill{font-size:9px}
+@media(max-width:1050px){.obra-chart-shell{grid-template-columns:1fr}.obra-breakdown-meta{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.obra-chart-row{grid-template-columns:minmax(145px,1fr) 86px}.obra-chart-row .stack-track,.obra-chart-row .zero-chart-alert{grid-column:1/-1;order:3}.obra-breakdown-meta,.obra-detail-observations{grid-template-columns:1fr}.breakdown-row{grid-template-columns:1fr 90px}.breakdown-track{grid-column:1/-1;order:3}.breakdown-pct{display:none}}
+
 .rain-card{margin-bottom:18px}.rain-summary{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.rain-pill{display:inline-flex;gap:5px;align-items:center;border-radius:999px;padding:5px 8px;background:#eef3f7;color:#455565;font-size:9px;font-weight:760}.rain-pill.alert{background:#fff3db;color:#8a5a00}.rain-table-wrap{overflow:auto;max-height:560px}.rain-table{width:100%;border-collapse:separate;border-spacing:0;min-width:1050px;font-size:11px}.rain-table th{position:sticky;top:0;z-index:3;background:#eef3f7;color:#465565;padding:9px 8px;text-align:left;border-bottom:1px solid #ccd7df;font-size:10px;text-transform:uppercase;letter-spacing:.35px}.rain-table td{padding:9px 8px;border-bottom:1px solid #edf1f3;vertical-align:top}.rain-table tr.rain-row{cursor:pointer}.rain-table tr.rain-row:hover td{background:#f8fbfc}.rain-table tr.no-cost-alert td{background:#fff9ec;border-bottom-color:#efd9aa}.rain-table tr.no-cost-alert:hover td{background:#fff4d8}.rain-money{font-weight:760;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}.zero-cost{display:inline-flex;align-items:center;gap:7px;font-weight:800;color:#8f5700;margin-top:3px}.zero-cost .qmark{width:21px;height:21px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#ffe7ad;border:1px solid #d79b28;font-size:12px}.alert-badge{display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:4px 7px;border-radius:999px;background:#fff0c7;border:1px solid #e3b65e;color:#855700;font-size:9px;font-weight:800;letter-spacing:.15px}.blank-m-note{display:block;margin-top:3px;font-size:9px;color:#8a6a2d;font-weight:650}.status-tag{display:inline-flex;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:760;background:#edf2f5;color:#53616f;white-space:nowrap}.status-tag.en-curso{background:#eaf2ff;color:#24539b}.status-tag.terminado{background:#e8f7ef;color:#13704d}.status-tag.rechazado{background:#ffeceb;color:#a42a22}.status-tag.sin-gestion{background:#fff4d9;color:#855700}.rain-detail td{background:#fafcfd!important;padding:0!important}.rain-detail-box{padding:12px 14px;border-left:3px solid #b9c8d4;margin:4px 8px 10px;border-radius:7px;background:#f5f8fa}.rain-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.rain-detail-item{font-size:10px;color:#52606e;line-height:1.45}.rain-detail-item b{display:block;color:var(--navy);margin-bottom:2px}.viewer-note{font-size:10px;color:var(--muted);margin-top:4px}.rain-alert-summary{margin:0 15px 10px;padding:9px 11px;border:1px solid #e3b65e;background:#fff8e6;border-radius:8px;color:#7b560c;font-size:10px;line-height:1.45}.rain-alert-summary b{color:#684600}@media(max-width:760px){.rain-detail-grid{grid-template-columns:1fr}}
 
-.table-card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)}.table-toolbar h2{font-size:14px;margin:0;color:var(--navy)}.table-wrap{overflow:auto;max-height:620px}.data-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1380px;font-size:11px}.data-table th{position:sticky;top:0;z-index:4;background:#eef3f7;color:#465565;padding:9px 8px;text-align:left;border-bottom:1px solid #ccd7df;font-size:10px;text-transform:uppercase;letter-spacing:.35px;white-space:nowrap;cursor:pointer}.data-table td{padding:9px 8px;border-bottom:1px solid #edf1f3;vertical-align:top}.data-table tr:hover td{background:#f8fbfc}.data-table td.money{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}.ellipsis{max-width:360px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tag{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:760;white-space:nowrap}.tag.confirm{background:#e8f7ef;color:#13704d}.tag.prob{background:#eaf2ff;color:#24539b}.tag.review{background:#fff4d9;color:#855700}.tag.no{background:#ffeceb;color:#a42a22}.tag.out{background:#edf0f2;color:#606c78}.confidence{font-size:9px;color:#687482;margin-top:3px}.linkbtn{border:0;background:#eaf1f5;color:var(--navy);border-radius:6px;padding:5px 7px;font-size:10px;font-weight:650}
-.pdf-link{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--navy);background:#f0f7fa;border:1px solid #cfe2e8;border-radius:8px;padding:6px 8px;min-width:118px;transition:.15s}.pdf-link:hover{background:#e5f2f6;border-color:#9fc6d1;transform:translateY(-1px)}.pdf-badge{display:inline-flex;align-items:center;justify-content:center;background:#b42318;color:white;border-radius:5px;padding:4px 5px;font-size:8px;font-weight:800;letter-spacing:.35px;line-height:1}.pdf-meta{display:flex;flex-direction:column;min-width:0}.pdf-doc{font-size:10px;font-weight:760;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:145px}.pdf-action{font-size:9px;color:var(--teal);font-weight:700;margin-top:2px}.no-pdf-doc{display:flex;flex-direction:column}.no-pdf-doc .doc-number{font-weight:650}.no-pdf-doc .doc-status{font-size:9px;color:#8a959f;margin-top:2px}.invoice-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #cfe2e8;background:#f2f9fb;border-radius:10px;padding:12px 14px;margin-bottom:14px}.invoice-hero .invoice-copy{min-width:0}.invoice-hero .invoice-copy b{display:block;color:var(--navy);font-size:12px}.invoice-hero .invoice-copy span{display:block;color:var(--muted);font-size:10px;margin-top:3px;overflow-wrap:anywhere}.invoice-hero a{text-decoration:none;background:var(--navy);color:white;border-radius:8px;padding:9px 12px;font-size:10px;font-weight:700;white-space:nowrap}.empty{padding:35px;text-align:center;color:var(--muted);font-size:13px}
+.table-card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)}.table-toolbar h2{font-size:14px;margin:0;color:var(--navy)}
+.table-wrap{overflow-y:auto;overflow-x:hidden;max-height:620px;width:100%}.data-table{border-collapse:separate;border-spacing:0;width:100%;min-width:0;table-layout:fixed;font-size:9px}.data-table th{position:sticky;top:0;z-index:4;background:#eef3f7;color:#465565;padding:7px 5px;text-align:left;border-bottom:1px solid #ccd7df;font-size:8px;text-transform:uppercase;letter-spacing:.2px;white-space:normal;line-height:1.15;cursor:pointer;overflow-wrap:anywhere}.data-table td{padding:7px 5px;border-bottom:1px solid #edf1f3;vertical-align:top;line-height:1.25;overflow-wrap:anywhere;word-break:break-word}.data-table tr:hover td{background:#f8fbfc}.data-table td.money{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}.ellipsis{max-width:none;white-space:normal;overflow:visible;text-overflow:clip}.tag{display:inline-flex;align-items:center;border-radius:999px;padding:3px 5px;font-size:8px;font-weight:760;white-space:normal;line-height:1.1}.tag.confirm{background:#e8f7ef;color:#13704d}.tag.prob{background:#eaf2ff;color:#24539b}.tag.review{background:#fff4d9;color:#855700}.tag.no{background:#ffeceb;color:#a42a22}.tag.out{background:#edf0f2;color:#606c78}.confidence{font-size:8px;color:#687482;margin-top:3px}.linkbtn{border:0;background:#eaf1f5;color:var(--navy);border-radius:6px;padding:4px 5px;font-size:8px;font-weight:650;max-width:100%}
+.data-table th:nth-child(1),.data-table td:nth-child(1){width:5%}.data-table th:nth-child(2),.data-table td:nth-child(2){width:6%}.data-table th:nth-child(3),.data-table td:nth-child(3){width:7%}.data-table th:nth-child(4),.data-table td:nth-child(4){width:5%}.data-table th:nth-child(5),.data-table td:nth-child(5){width:7%}.data-table th:nth-child(6),.data-table td:nth-child(6){width:9%}.data-table th:nth-child(7),.data-table td:nth-child(7){width:5%}.data-table th:nth-child(8),.data-table td:nth-child(8){width:9%}.data-table th:nth-child(9),.data-table td:nth-child(9){width:18%}.data-table th:nth-child(10),.data-table td:nth-child(10){width:9%}.data-table th:nth-child(11),.data-table td:nth-child(11){width:7%}.data-table th:nth-child(12),.data-table td:nth-child(12){width:8%}.data-table th:nth-child(13),.data-table td:nth-child(13){width:5%}
+.pdf-link{display:inline-flex;align-items:center;gap:4px;text-decoration:none;color:var(--navy);background:#f0f7fa;border:1px solid #cfe2e8;border-radius:7px;padding:4px 5px;min-width:0;width:100%;max-width:100%;transition:.15s}.pdf-link:hover{background:#e5f2f6;border-color:#9fc6d1;transform:translateY(-1px)}.pdf-badge{display:inline-flex;align-items:center;justify-content:center;background:#b42318;color:white;border-radius:5px;padding:4px 5px;font-size:8px;font-weight:800;letter-spacing:.35px;line-height:1}.pdf-meta{display:flex;flex-direction:column;min-width:0}.pdf-doc{font-size:8px;font-weight:760;white-space:normal;overflow-wrap:anywhere;max-width:100%}.pdf-action{font-size:8px;color:var(--teal);font-weight:700;margin-top:2px}.no-pdf-doc{display:flex;flex-direction:column}.no-pdf-doc .doc-number{font-weight:650}.no-pdf-doc .doc-status{font-size:9px;color:#8a959f;margin-top:2px}.invoice-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #cfe2e8;background:#f2f9fb;border-radius:10px;padding:12px 14px;margin-bottom:14px}.invoice-hero .invoice-copy{min-width:0}.invoice-hero .invoice-copy b{display:block;color:var(--navy);font-size:12px}.invoice-hero .invoice-copy span{display:block;color:var(--muted);font-size:10px;margin-top:3px;overflow-wrap:anywhere}.invoice-hero a{text-decoration:none;background:var(--navy);color:white;border-radius:8px;padding:9px 12px;font-size:10px;font-weight:700;white-space:nowrap}.empty{padding:35px;text-align:center;color:var(--muted);font-size:13px}
 .modal{position:fixed;inset:0;background:rgba(15,27,41,.52);display:none;align-items:center;justify-content:center;z-index:50;padding:22px}.modal.open{display:flex}.modal-box{width:min(920px,96vw);max-height:90vh;overflow:auto;background:white;border-radius:14px;box-shadow:0 20px 70px rgba(0,0,0,.28)}.modal-head{position:sticky;top:0;z-index:2;background:white;border-bottom:1px solid var(--line);padding:15px 18px;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;font-size:16px;color:var(--navy)}.close{border:0;background:#eef2f5;border-radius:8px;width:32px;height:32px;font-size:18px}.modal-body{padding:18px}.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.detail{border:1px solid #e1e8ed;border-radius:9px;padding:10px;background:#fafcfd}.detail .k{font-size:9px;text-transform:uppercase;color:#6c7884;font-weight:760;letter-spacing:.4px}.detail .v{font-size:12px;margin-top:5px;overflow-wrap:anywhere}.section-title{font-size:12px;color:var(--navy);margin:20px 0 8px;font-weight:780;text-transform:uppercase;letter-spacing:.4px}.evidence{border:1px solid #dce5ea;border-left:4px solid var(--teal);border-radius:8px;padding:11px;margin:8px 0;background:#fbfdfe;font-size:11px;line-height:1.5}.evidence.no{border-left-color:var(--red)}.raw{white-space:pre-wrap;background:#f5f7f9;border:1px solid #e0e6ea;border-radius:8px;padding:10px;font-size:10px;line-height:1.45;color:#3d4b58}.doc-actions{display:flex;gap:8px;flex-wrap:wrap}.doc-actions a{text-decoration:none;background:var(--navy);color:white;border-radius:7px;padding:7px 10px;font-size:10px;font-weight:650}
 .loader{display:none;align-items:center;gap:8px;font-size:12px;color:#435263}.loader.show{display:flex}.spin{width:15px;height:15px;border:2px solid #cfd9e0;border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 .footer{font-size:10px;color:#78838e;text-align:center;padding:20px}
@@ -103,7 +118,6 @@ button,input,select{font:inherit} button{cursor:pointer}
       <div class="field"><label>Obra</label><select id="fObra"><option value="">Todas</option></select></div>
       <div class="field"><label>Gerente proyecto</label><select id="fGP"><option value="">Todos</option></select></div>
       <div class="field"><label>Supervisor obra</label><select id="fSupObra"><option value="">Todos</option></select></div>
-      <div class="field"><label>Supervisor costo (LM)</label><select id="fSupCosto"><option value="">Todos</option></select></div>
       <div class="field private-control"><label>Clasificación Resumen</label><select id="fClass"><option value="">Todas</option></select></div>
       <div class="field"><label>Clasificación de gasto</label><select id="fAccount"><option value="">Todos</option></select></div>
       <div class="field"><label>Periodo</label><select id="fPeriod"><option value="">Todos</option></select></div>
@@ -118,7 +132,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     <div class="card-head">
       <div>
         <h2>Costos por obra — clasificación, estado y alertas</h2>
-        <div class="viewer-note">Fuente directa: hoja “resumen”, cuadro H:P. <b>I = obra · L = estatus · M = costo · N = gestionado por · O/P = observaciones.</b></div>
+        <div class="viewer-note">Información de obra, supervisor, estado, costo, gestión y observaciones actualizada dinámicamente desde la hoja “resumen”.</div>
       </div>
       <span class="mini" id="obraChartTotal">$0</span>
     </div>
@@ -126,10 +140,10 @@ button,input,select{font:inherit} button{cursor:pointer}
       <div class="chart-summary-strip">
         <span class="rain-pill" id="obraChartWorksTotal">0 obras</span>
         <span class="rain-pill" id="obraChartWithCost">0 con costo</span>
-        <span class="rain-pill alert" id="obraChartNoCost">0 sin costo en M</span>
+        <span class="rain-pill alert" id="obraChartNoCost">0 sin costo registrado</span>
       </div>
       <div id="accountLegend" class="chart-legend"></div>
-      <div class="chart-hint">Las obras se presentan en <b>dos esquemas verticales</b>: primero las que tienen costo registrado en la columna M y luego las que tienen M vacía/$0. Haz clic en cualquier obra para ver <b>estatus (L), gestionado por (N) y observaciones (O/P)</b>. Las obras sin costo quedan marcadas con alerta.</div>
+      <div class="chart-hint">Las obras se distribuyen en <b>dos columnas</b>, ordenadas desde los mayores costos. Haz clic en cualquier obra para ver supervisor, estado, costo, gestión y observaciones. Las obras sin gasto quedan marcadas con alerta.</div>
       <div id="obraCostChart" class="obra-chart-shell"><div class="chart-empty">Carga el Excel para ver los costos y alertas por obra.</div></div>
     </div>
   </section>
@@ -139,13 +153,13 @@ button,input,select{font:inherit} button{cursor:pointer}
     <div class="table-wrap">
       <table class="data-table">
         <thead><tr>
-          <th data-sort="dateKey">Fecha</th><th data-sort="period">Periodo</th><th data-sort="obraName">Obra</th><th data-sort="gp">GP</th><th data-sort="supervisorObra">Supervisor obra</th><th data-sort="provider">Proveedor</th><th data-sort="oc">OC</th><th data-sort="document">Factura / PDF</th><th data-sort="description">Trabajo / glosa</th><th data-sort="account">Tipo costo (K)</th><th data-sort="amount">Monto</th><th data-sort="classification">Clasificación Resumen</th><th>Detalle</th>
+          <th data-sort="dateKey">Fecha</th><th data-sort="period">Periodo</th><th data-sort="obraName">Obra</th><th data-sort="gp">GP</th><th data-sort="supervisorObra">Supervisor obra</th><th data-sort="provider">Proveedor</th><th data-sort="oc">OC</th><th data-sort="document">Factura / PDF</th><th data-sort="description">Trabajo / glosa</th><th data-sort="account">Tipo costo</th><th data-sort="amount">Monto</th><th data-sort="classification">Clasificación Resumen</th><th>Detalle</th>
         </tr></thead>
         <tbody id="tbody"><tr><td colspan="13"><div class="empty">Carga un Excel para comenzar.</div></td></tr></tbody>
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 16 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 17 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -242,7 +256,12 @@ function periodFrom(rowDate, period){
   let p=String(period??"").replace(/\D/g,""); if(p.length>=6) return p.slice(0,6);
   const d=excelDate(rowDate); return d?`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}`:"";
 }
-function periodLabel(p){ if(!p||p.length<6)return p||"—"; const m=+p.slice(4,6), y=p.slice(0,4); const names=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]; return `${names[m-1]||m} ${y}`; }
+function periodLabel(p){
+  const raw=String(p??"").replace(/\D/g,""); if(raw.length<6)return p||"—";
+  const y=raw.slice(0,4), m=+raw.slice(4,6);
+  const names=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  return `${names[m-1]||m} ${y}`;
+}
 function mostCommon(a){ const m=new Map(); a.filter(Boolean).forEach(x=>m.set(x,(m.get(x)||0)+1)); return [...m.entries()].sort((x,y)=>y[1]-x[1])[0]?.[0]||""; }
 function isNA(v){ const s=norm(v); return !s || s==="#N A" || s==="N A" || s==="#N/A" || s==="N/A"; }
 function hasAny(text, arr){ const n=norm(text); return arr.some(k=>n.includes(norm(k))); }
@@ -601,6 +620,12 @@ function clearMessage(){$("messages").innerHTML="";}
 function fillSelect(id,values,label="Todas"){
   const el=$(id), current=el.value; el.innerHTML=`<option value="">${label}</option>`+[...new Set(values.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"es",{numeric:true})).map(v=>`<option value="${safeText(v)}">${safeText(v)}</option>`).join(""); if([...el.options].some(o=>o.value===current))el.value=current;
 }
+function fillPeriodSelect(){
+  const el=$("fPeriod"), current=el.value;
+  const vals=[...new Set(state.rows.map(r=>String(r.period||"")).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+  el.innerHTML='<option value="">Todos</option>'+vals.map(v=>`<option value="${safeText(v)}">${safeText(periodLabel(v))}</option>`).join('');
+  if([...el.options].some(o=>o.value===current))el.value=current;
+}
 function fillObraSelect(){
   const el=$("fObra"), current=el.value, map=new Map();
   for(const w of state.rainWorks||[]) if(w.obra) map.set(w.obra,w.name||w.obra);
@@ -614,16 +639,15 @@ function updateFilterOptions(){
   fillObraSelect();
   fillSelect("fGP",aallRows.map(r=>r.gp));
   fillSelect("fSupObra",[...aallRows.map(r=>r.supervisorObra),...(state.rainWorks||[]).map(w=>w.supervisor)]);
-  fillSelect("fSupCosto",aallRows.map(r=>r.supervisorCosto));
   fillSelect("fClass",state.rows.map(r=>r.classification));
   fillSelect("fAccount",aallRows.map(r=>r.costGroup||costGroup(r.account)),"Todos");
-  fillSelect("fPeriod",state.rows.map(r=>r.period).filter(Boolean).sort(),"Todos");
+  fillPeriodSelect();
   fillSelect("fProvider",aallRows.map(r=>r.provider));
   fillSelect("fStatus",(state.rainWorks||[]).map(w=>w.status),"Todos");
   fillSelect("fMedio",(state.rainWorks||[]).map(w=>w.medio),"Todos");
 }
 function applyFilters(){
-  const universe=$("fUniverse").value, obra=$("fObra").value, gp=$("fGP").value, so=$("fSupObra").value, sc=$("fSupCosto").value, cl=$("fClass").value, account=$("fAccount").value, pe=$("fPeriod").value, pr=$("fProvider").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  const universe=$("fUniverse").value, obra=$("fObra").value, gp=$("fGP").value, so=$("fSupObra").value, cl=$("fClass").value, account=$("fAccount").value, pe=$("fPeriod").value, pr=$("fProvider").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
   const workMap=new Map((state.rainWorks||[]).map(w=>[w.obra,w]));
   state.filtered=state.rows.filter(r=>{
     if(universe==="summary" && !r.isInSummary)return false;
@@ -632,7 +656,6 @@ function applyFilters(){
     if(obra && r.obra!==obra)return false;
     if(gp&&r.gp!==gp)return false;
     if(so&&r.supervisorObra!==so&&w?.supervisor!==so)return false;
-    if(sc&&r.supervisorCosto!==sc)return false;
     if(cl&&r.classification!==cl)return false;
     if(account&&(r.costGroup||costGroup(r.account))!==account)return false;
     if(pe&&r.period!==pe)return false;
@@ -663,10 +686,6 @@ function accountColor(name){
   let h=0; for(const ch of n)h=(h*31+ch.charCodeAt(0))>>>0; return palette[h%palette.length];
 }
 function renderObraCostChart(){
-  /* v16: toda la lectura visual de obras nace del cuadro H:P de la hoja resumen.
-     Se muestran dos esquemas verticales dentro del mismo recuadro:
-     (1) obras con costo en M y (2) obras con M vacía/$0, siempre visibles con alerta.
-     Al hacer clic se muestran L, N, O y P, además del desglose de costo cuando existe. */
   const isNoCost=w=>w.noCostAlert===true || w.amountBlank===true || w.amountZero===true || w.hasCost===false || Math.abs(num(w.amount))<0.005;
   const baseWorks=filteredRainWorks();
   const aallRows=state.filtered.filter(r=>r.isInSummary && r.classification==="AALL");
@@ -678,54 +697,37 @@ function renderObraCostChart(){
     const m=rowAccounts.get(obra); m.set(acc,(m.get(acc)||0)+r.amount);
   });
 
-  /* Los filtros contables (GP, proveedor, periodo, tipo de costo, etc.) solo pueden
-     aplicarse a obras que tengan movimientos asociados. Los filtros propios de H:P
-     (obra, supervisor, estatus, gestionado por, búsqueda) se aplican a todas. */
-  const hasCostSpecificFilter=!!($('fGP').value||$('fSupCosto').value||$('fClass').value||$('fAccount').value||$('fPeriod').value||$('fProvider').value);
+  const hasCostSpecificFilter=!!($('fGP').value||$('fClass').value||$('fAccount').value||$('fPeriod').value||$('fProvider').value);
   const costObras=new Set(aallRows.map(r=>String(r.obra||"")));
   const works=hasCostSpecificFilter ? baseWorks.filter(w=>costObras.has(String(w.obra||""))) : baseWorks;
 
-  /* Compatibilidad con datasets antiguos sin cuadro H:P publicado. */
   if(!works.length && !(state.rainWorks||[]).length){
-    const byObra=new Map(); const accountTotals=new Map();
-    state.filtered.filter(r=>r.isInSummary).forEach(r=>{
-      const key=String(r.obra||""); const acc=r.costGroup||costGroup(r.account);
-      if(!byObra.has(key))byObra.set(key,{key,label:`${r.obra} · ${r.obraName}`,total:0,accounts:new Map(),status:"Sin estatus",medio:"Sin gestión informada",obs1:"",obs2:"",noCost:false,amountBlank:false});
-      const o=byObra.get(key); o.total+=r.amount; o.accounts.set(acc,(o.accounts.get(acc)||0)+r.amount);
-      accountTotals.set(acc,(accountTotals.get(acc)||0)+r.amount);
-    });
-    const legacy=[...byObra.values()].sort((x,y)=>Math.abs(y.total)-Math.abs(x.total));
-    $('obraChartTotal').textContent=money(legacy.reduce((a,v)=>a+v.total,0));
-    $('obraChartWorksTotal').textContent=`${legacy.length.toLocaleString('es-CL')} obras`;
-    $('obraChartWithCost').textContent=`${legacy.length.toLocaleString('es-CL')} con costo`;
-    $('obraChartNoCost').textContent='0 sin costo en M';
-    const accounts=[...accountTotals.entries()].sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).map(x=>x[0]);
-    $('accountLegend').innerHTML=accounts.map(a=>`<span class="legend-item"><span class="legend-dot" style="background:${accountColor(a)}"></span>${safeText(a)}</span>`).join('');
-    if(!legacy.length){state.chartExpandedObra='';$('obraCostChart').innerHTML='<div class="chart-empty">No hay movimientos del Resumen con los filtros actuales.</div>';return;}
+    $('obraChartTotal').textContent='$0'; $('obraChartWorksTotal').textContent='0 obras'; $('obraChartWithCost').textContent='0 con costo'; $('obraChartNoCost').textContent='0 sin costo registrado';
+    $('accountLegend').innerHTML=''; $('obraCostChart').innerHTML='<div class="chart-empty" style="grid-column:1/-1">No hay información de obras para mostrar.</div>'; return;
   }
 
   const data=works.map(w=>({
     key:String(w.obra||""), label:`${w.obra} · ${w.name||w.obra}`,
     total:num(w.amount), accounts:rowAccounts.get(String(w.obra||""))||new Map(),
-    status:w.status||"Sin estatus", medio:w.medio||"Sin gestión informada",
-    obs1:w.obs1||"", obs2:w.obs2||"", row:w.row, amountBlank:w.amountBlank===true,
-    noCost:isNoCost(w)
+    supervisor:w.supervisor||"Sin supervisor", status:w.status||"Sin estatus", medio:w.medio||"Sin gestión informada",
+    obs1:w.obs1||"", obs2:w.obs2||"", row:w.row, amountBlank:w.amountBlank===true, noCost:isNoCost(w)
   }));
   const withCost=data.filter(v=>!v.noCost).sort((a,b)=>Math.abs(b.total)-Math.abs(a.total));
-  const noCost=data.filter(v=>v.noCost).sort((a,b)=>a.key.localeCompare(b.key,'es',{numeric:true}));
-  const total=withCost.reduce((s,v)=>s+v.total,0);
+  const noCost=data.filter(v=>v.noCost).sort((a,b)=>a.label.localeCompare(b.label,'es',{numeric:true}));
+  const ordered=[...withCost,...noCost];
+  const total=withCost.reduce((sum,v)=>sum+v.total,0);
   $('obraChartTotal').textContent=`${money(total)} · ⚠ ${noCost.length} sin costo`;
   $('obraChartWorksTotal').textContent=`${data.length.toLocaleString('es-CL')} obras`;
   $('obraChartWithCost').textContent=`${withCost.length.toLocaleString('es-CL')} con costo`;
-  $('obraChartNoCost').textContent=`⚠ ${noCost.length.toLocaleString('es-CL')} sin costo en M`;
+  $('obraChartNoCost').textContent=`⚠ ${noCost.length.toLocaleString('es-CL')} sin costo registrado`;
 
   const accountTotals=new Map();
   withCost.forEach(v=>v.accounts.forEach((val,acc)=>accountTotals.set(acc,(accountTotals.get(acc)||0)+val)));
   const accounts=[...accountTotals.entries()].sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).map(x=>x[0]);
-  $('accountLegend').innerHTML=`<span class="legend-item"><span class="legend-dot alert"></span>Alerta: columna M vacía/$0</span>`+accounts.map(a=>`<span class="legend-item"><span class="legend-dot" style="background:${accountColor(a)}"></span>${safeText(a)}</span>`).join('');
+  $('accountLegend').innerHTML=`<span class="legend-item"><span class="legend-dot alert"></span>Alerta: no registra costo por PV</span>`+accounts.map(a=>`<span class="legend-item"><span class="legend-dot" style="background:${accountColor(a)}"></span>${safeText(a)}</span>`).join('');
 
-  if(!data.length){state.chartExpandedObra='';$('obraCostChart').innerHTML='<div class="chart-empty">No hay obras del cuadro H:P con los filtros actuales.</div>';return;}
-  if(state.chartExpandedObra && !data.some(v=>v.key===state.chartExpandedObra)) state.chartExpandedObra='';
+  if(!ordered.length){state.chartExpandedObra='';$('obraCostChart').innerHTML='<div class="chart-empty" style="grid-column:1/-1">No hay obras con los filtros actuales.</div>';return;}
+  if(state.chartExpandedObra && !ordered.some(v=>v.key===state.chartExpandedObra)) state.chartExpandedObra='';
 
   const max=Math.max(...withCost.map(v=>Math.abs(v.total)),1);
   const preferred=['Materiales','Subcontratos','Servicios y consumo generales'];
@@ -740,39 +742,39 @@ function renderObraCostChart(){
     return {o1,o2};
   };
   const detailHtml=v=>{
-    const expanded=state.chartExpandedObra===v.key;if(!expanded)return '';
-    const statusText=safeText(v.status||'Sin estatus'), medioText=safeText(v.medio||'Sin gestión informada');
+    if(!v)return '';
     const obs=obsText(v);
-    const meta=`<div class="obra-breakdown-meta"><div><b>Estatus · columna L</b>${statusText}</div><div><b>Gestionado por · columna N</b>${medioText}</div><div><b>Costo · columna M</b>${v.noCost?'$0 · SIN COSTO REGISTRADO':safeText(money(v.total))}</div></div>`;
-    const observations=`<div class="obra-detail-observations"><div><b>Observación · columna O</b>${safeText(obs.o1)}</div><div><b>Observación · columna P</b>${safeText(obs.o2)}</div></div>`;
+    const meta=`<div class="obra-breakdown-meta"><div><b>Supervisor</b>${safeText(v.supervisor||'Sin supervisor')}</div><div><b>Estado</b>${safeText(v.status||'Sin estatus')}</div><div><b>Costo</b>${v.noCost?'$0':safeText(money(v.total))}</div><div><b>Gestionado por</b>${safeText(v.medio||'Sin gestión informada')}</div></div>`;
+    const observations=`<div class="obra-detail-observations"><div><b>Observación 1</b>${safeText(obs.o1)}</div><div><b>Observación 2</b>${safeText(obs.o2)}</div></div>`;
     if(v.noCost){
-      return `<div class="obra-breakdown no-cost-detail" data-detail="${safeText(v.key)}"><div class="obra-breakdown-head"><b>${safeText(v.label)}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${meta}${observations}<div class="zero-detail-message">⚠ Esta obra figura en el cuadro H:P de la hoja resumen como edificio con AALL/Postventa, pero la columna M está ${v.amountBlank?'vacía':'en $0'}. No figura gasto asociado.</div></div>`;
+      return `<div class="obra-breakdown no-cost-detail"><div class="obra-breakdown-head"><b>${safeText(v.label)}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${meta}${observations}<div class="zero-detail-message">⚠ Esta obra registra atención de Postventa/AALL, pero no registra costo por PV.</div></div>`;
     }
     const items=orderAccounts(v.accounts.entries());
     const detailMax=Math.max(...items.map(([,val])=>Math.abs(val)),1);
     const breakdown=items.length?items.map(([acc,val])=>{const pctTotal=v.total?Math.abs(val/v.total)*100:0;const bar=Math.abs(val)/detailMax*100;return `<div class="breakdown-row"><div class="breakdown-label">${safeText(acc)}</div><div class="breakdown-track"><div class="breakdown-fill" style="width:${bar}%;background:${accountColor(acc)}"></div></div><div class="breakdown-value">${safeText(money(val))}</div><div class="breakdown-pct">${pctTotal.toLocaleString('es-CL',{maximumFractionDigits:1})}%</div></div>`;}).join(''):'<div class="mini">No hay detalle de movimientos AALL enlazado para esta obra.</div>';
-    return `<div class="obra-breakdown" data-detail="${safeText(v.key)}"><div class="obra-breakdown-head"><b>Detalle de ${safeText(v.label)} · Total M ${safeText(money(v.total))}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${meta}${observations}${breakdown}</div>`;
+    return `<div class="obra-breakdown"><div class="obra-breakdown-head"><b>Detalle de ${safeText(v.label)}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${meta}${observations}${breakdown}</div>`;
   };
   const rowHtml=v=>{
     const expanded=state.chartExpandedObra===v.key;
-    const statusText=safeText(v.status||'Sin estatus'), medioText=safeText(v.medio||'Sin gestión informada');
-    const labelCell=`<div class="obra-chart-label"><button class="obra-chart-name" type="button" data-obra-detail="${safeText(v.key)}" aria-expanded="${expanded}">${safeText(v.label)}</button><div class="obra-chart-meta"><span class="chart-meta-chip">L · ${statusText}</span><span class="chart-meta-chip managed" title="Gestionado por · columna N">N · ${medioText}</span>${v.noCost?'<span class="chart-meta-chip alert">⚠ SIN COSTO</span>':''}</div></div>`;
+    const labelCell=`<div class="obra-chart-label"><button class="obra-chart-name" type="button" data-obra-detail="${safeText(v.key)}" aria-expanded="${expanded}">${safeText(v.label)}</button>${v.noCost?'<div class="obra-chart-meta"><span class="chart-meta-chip alert">⚠ No registra costo por PV</span></div>':''}</div>`;
     let middle='';
     if(v.noCost){
-      middle=`<div class="zero-chart-alert" data-obra-detail="${safeText(v.key)}" title="Obra registrada con AALL/Postventa, pero sin costo en M"><span class="mark">!</span> SIN COSTO REGISTRADO · COLUMNA M ${v.amountBlank?'VACÍA':'$0'}</div>`;
+      middle=`<div class="zero-chart-alert" data-obra-detail="${safeText(v.key)}" title="Abrir detalle"><span class="mark">!</span> NO REGISTRA COSTO POR PV</div>`;
     }else{
       const width=Math.max(2,Math.abs(v.total)/max*100);
       const items=orderAccounts(v.accounts.entries());
       const breakdownSum=items.reduce((sum,[,val])=>sum+val,0);
       const segments=items.map(([acc,val])=>{const pct=v.total?Math.max(0,Math.min(100,Math.abs(val/v.total)*100)):0;return `<div class="stack-seg" style="width:${pct}%;background:${accountColor(acc)}" title="${safeText(acc)}: ${safeText(money(val))}"></div>`;}).join('');
       const unmatched=Math.max(0,v.total-breakdownSum), remainder=v.total?Math.min(100,Math.abs(unmatched/v.total)*100):0;
-      middle=`<div class="stack-track" data-obra-detail="${safeText(v.key)}" title="Clic para ver L, N, O/P y desglose"><div style="width:${width}%;display:flex;height:100%;overflow:hidden;border-radius:6px">${segments}${remainder>.05?`<div class="stack-seg" style="width:${remainder}%;background:#aeb8c1" title="Sin desglose: ${safeText(money(unmatched))}"></div>`:''}</div></div>`;
+      middle=`<div class="stack-track" data-obra-detail="${safeText(v.key)}" title="Clic para ver detalle"><div style="width:${width}%;display:flex;height:100%;overflow:hidden;border-radius:6px">${segments}${remainder>.05?`<div class="stack-seg" style="width:${remainder}%;background:#aeb8c1" title="Sin desglose: ${safeText(money(unmatched))}"></div>`:''}</div></div>`;
     }
-    return `<div class="obra-chart-row ${expanded?'is-expanded':''} ${v.noCost?'no-cost-row':''}" data-chart-obra="${safeText(v.key)}">${labelCell}${middle}<div class="obra-chart-total ${v.noCost?'zero':''}">${v.noCost?'⚠ $0':safeText(money(v.total))}</div></div>${detailHtml(v)}`;
+    return `<div class="obra-chart-row ${expanded?'is-expanded':''} ${v.noCost?'no-cost-row':''}">${labelCell}${middle}<div class="obra-chart-total ${v.noCost?'zero':''}">${v.noCost?'$0':safeText(money(v.total))}</div></div>`;
   };
-  const group=(title,items,alert=false)=>`<section class="obra-chart-group ${alert?'alert-group':''}"><div class="obra-chart-group-head"><h3>${title}</h3><div class="group-meta"><span class="group-pill ${alert?'alert':''}">${alert?'⚠ ':''}${items.length.toLocaleString('es-CL')} obra${items.length===1?'':'s'}</span></div></div><div class="obra-chart-group-body"><div class="obra-chart">${items.length?items.map(rowHtml).join(''):`<div class="chart-empty">${alert?'No hay obras sin costo con los filtros actuales.':'No hay obras con costo con los filtros actuales.'}</div>`}</div></div></section>`;
 
-  $('obraCostChart').innerHTML=group('Obras con costo registrado · columna M',withCost,false)+group('Alerta · obras con AALL/Postventa sin costo registrado',noCost,true);
+  const split=Math.ceil(ordered.length/2), left=ordered.slice(0,split), right=ordered.slice(split);
+  const group=(title,items)=>`<section class="obra-chart-group"><div class="obra-chart-group-head"><h3>${title}</h3><div class="group-meta"><span class="group-pill">${items.length.toLocaleString('es-CL')} obras</span></div></div><div class="obra-chart-group-body"><div class="obra-chart">${items.length?items.map(rowHtml).join(''):'<div class="chart-empty">Sin obras.</div>'}</div></div></section>`;
+  const selected=ordered.find(v=>v.key===state.chartExpandedObra);
+  $('obraCostChart').innerHTML=group('Obras con mayor costo',left)+group('Resto de obras',right)+detailHtml(selected);
   const toggle=key=>{state.chartExpandedObra=state.chartExpandedObra===key?'':key;renderObraCostChart();};
   $('obraCostChart').querySelectorAll('[data-obra-detail]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();toggle(el.dataset.obraDetail);}));
   $('obraCostChart').querySelectorAll('[data-close-detail]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();state.chartExpandedObra='';renderObraCostChart();}));
@@ -786,7 +788,7 @@ function filteredRainWorks(){
     if(so&&w.supervisor!==so)return false;
     if(st&&w.status!==st)return false;
     if(medio&&w.medio!==medio)return false;
-    if(q&&!norm([w.obra,w.name,w.supervisor,w.status,w.medio,w.obs1,w.obs2,(w.noCostAlert||!w.hasCost)?"ALERTA SIN GASTO COLUMNA M VACIA":""].join(" | ")).includes(q))return false;
+    if(q&&!norm([w.obra,w.name,w.supervisor,w.status,w.medio,w.obs1,w.obs2,(w.noCostAlert||!w.hasCost)?"NO REGISTRA COSTO POR PV":""].join(" | ")).includes(q))return false;
     return true;
   });
 }
@@ -794,7 +796,7 @@ function sortRows(rows){ const k=state.sortKey,d=state.sortDir; return [...rows]
 function renderTable(){
   const rows=sortRows(state.filtered); $("tableCount").textContent=`${rows.length.toLocaleString("es-CL")} registros · ${money(rows.reduce((a,r)=>a+r.amount,0))}`; const show=rows.slice(0,5000);
   $("tbody").innerHTML=show.length?show.map(r=>`<tr>
-    <td>${safeText(r.date)}</td><td>${safeText(periodLabel(r.period))}</td><td><b>${safeText(r.obra)}</b><br>${safeText(r.obraName)}</td><td>${safeText(r.gp)}</td><td>${safeText(r.supervisorObra)}</td><td>${safeText(r.provider)}</td><td>${safeText(r.oc||"—")}</td><td>${invoiceCell(r)}</td><td class="ellipsis" title="${safeText(r.description)}">${safeText(r.description||"—")}</td><td><span class="tag out">${safeText(r.costGroup||costGroup(r.account))}</span><div class="confidence">${safeText(r.account||"Sin clasificación en K")}</div></td><td class="money">${safeText(money(r.amount))}</td><td><span class="tag ${tagClass(r.classification)}">${safeText(r.classification)}</span><div class="confidence">fila LM ${r.sourceRow}</div></td><td><button class="linkbtn" data-id="${safeText(r.id)}">Abrir</button></td>
+    <td>${safeText(r.date)}</td><td>${safeText(periodLabel(r.period))}</td><td><b>${safeText(r.obra)}</b><br>${safeText(r.obraName)}</td><td>${safeText(r.gp)}</td><td>${safeText(r.supervisorObra)}</td><td>${safeText(r.provider)}</td><td>${safeText(r.oc||"—")}</td><td>${invoiceCell(r)}</td><td class="ellipsis" title="${safeText(r.description)}">${safeText(r.description||"—")}</td><td><span class="tag out">${safeText(r.costGroup||costGroup(r.account))}</span><div class="confidence">${safeText(r.account||"Sin clasificación")}</div></td><td class="money">${safeText(money(r.amount))}</td><td><span class="tag ${tagClass(r.classification)}">${safeText(r.classification)}</span><div class="confidence">fila LM ${r.sourceRow}</div></td><td><button class="linkbtn" data-id="${safeText(r.id)}">Abrir</button></td>
   </tr>`).join(""):'<tr><td colspan="13"><div class="empty">No hay registros con los filtros actuales.</div></td></tr>';
   $("tbody").querySelectorAll("button[data-id]").forEach(b=>b.addEventListener("click",()=>openDetail(b.dataset.id)));
 }
@@ -821,7 +823,7 @@ AC Resumen: ${safeText(r.resumenCategory||"—")}</div>
     <div class="section-title">Fila original del Libro Mayor</div><div class="raw">${safeText(raw)}</div>`;
   $("modal").classList.add("open");
 }
-function resetFilters(){ ["fObra","fGP","fSupObra","fSupCosto","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
+function resetFilters(){ ["fObra","fGP","fSupObra","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
 function csvCell(v){const s=String(v??"");return `"${s.replace(/"/g,'""')}"`;}
 function exportCSV(){
   const headers=["Fecha","Periodo","Obra","Nombre obra","GP","Supervisor obra","Supervisor costo LM","Proveedor","RUT","OC","Documento","Descripción","Clasificación gasto","Descripción Cuenta original (K)","Monto","Clasificación Resumen","Incluido Resumen","Motivo","Hoja origen","Fila origen","PDF"];
@@ -843,7 +845,7 @@ async function loadFile(file){
 
 const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});
 ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)loadFile(f);});
-["fUniverse","fObra","fGP","fSupObra","fSupCosto","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
+["fUniverse","fObra","fGP","fSupObra","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=k==="amount"||k==="dateKey"?-1:1;}renderTable();}));
 $("modalClose").addEventListener("click",()=>$("modal").classList.remove("open"));$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
 
