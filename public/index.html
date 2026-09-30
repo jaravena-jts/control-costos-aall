@@ -117,7 +117,8 @@ button,input,select{font:inherit} button{cursor:pointer}
     <div class="filters-grid">
       <div class="field private-control"><label>Universo</label><select id="fUniverse"><option value="summary">Resumen oficial</option><option value="aall">AALL 2026 + pendientes</option><option value="all">Todo el libro mayor</option></select></div>
       <div class="field"><label>Obra</label><select id="fObra"><option value="">Todas</option></select></div>
-      <div class="field"><label>Gerente proyecto</label><select id="fGP"><option value="">Todos</option></select></div>
+      <div class="field"><label>GP</label><select id="fGP"><option value="">Todos</option></select></div>
+      <div class="field"><label>PA</label><select id="fPA"><option value="">Todos</option></select></div>
       <div class="field"><label>Supervisor obra</label><select id="fSupObra"><option value="">Todos</option></select></div>
       <div class="field private-control"><label>Clasificación Resumen</label><select id="fClass"><option value="">Todas</option></select></div>
       <div class="field"><label>Clasificación de gasto</label><select id="fAccount"><option value="">Todos</option></select></div>
@@ -640,6 +641,21 @@ function buildData(parsed){
   state.sheetSummary=extractSummaryTotals(parsed.summary?.raw||null);
   state.summaryObras=extractSummaryByObra(parsed.summary?.raw||null);
   state.rainWorks=extractRainWorks(parsed.summary?.raw||null);
+  /* La hoja resumen es la fuente maestra de la ficha de cada obra. Sobrescribimos
+     los metadatos del movimiento con Supervisor/GP/PA del cuadro resumen para que
+     filtros, tabla y gráfico hablen el mismo idioma. */
+  const summaryWorkMap=new Map((state.rainWorks||[]).map(w=>[String(w.obra||""),w]));
+  for(const r of out){
+    const w=summaryWorkMap.get(String(r.obra||""));
+    if(!w){ r.pa=r.pa||""; r.gd=r.gd||""; continue; }
+    r.obraName=w.name||r.obraName;
+    r.supervisorObra=(!isNA(w.supervisor)&&w.supervisor)?w.supervisor:r.supervisorObra;
+    r.gd=(!isNA(w.gd)&&w.gd)?w.gd:"";
+    r.gp=(!isNA(w.gp)&&w.gp)?w.gp:(r.gp||"Sin GP");
+    r.pa=(!isNA(w.pa)&&w.pa)?w.pa:"";
+    r.status=w.status||"";
+    r.managedBy=w.medio||"";
+  }
   const inc=out.filter(r=>r.isInSummary); state.lmSummary={AALL:inc.filter(r=>r.classification==="AALL").reduce((a,r)=>a+r.amount,0),Mandante:inc.filter(r=>r.classification==="Mandante").reduce((a,r)=>a+r.amount,0),OBRA:inc.filter(r=>r.classification==="OBRA").reduce((a,r)=>a+r.amount,0)}; state.lmSummary.Total=state.lmSummary.AALL+state.lmSummary.Mandante+state.lmSummary.OBRA;
   state.summaryCheck=validateSummaryByObra(out,state.summaryObras);
   return out;
@@ -651,7 +667,10 @@ function stopLoader(){$("loader").classList.remove("show");}
 function message(text,type="good"){ $("messages").innerHTML=`<div class="notice ${type}">${text}</div>`; }
 function clearMessage(){$("messages").innerHTML="";}
 function fillSelect(id,values,label="Todas"){
-  const el=$(id), current=el.value; el.innerHTML=`<option value="">${label}</option>`+[...new Set(values.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"es",{numeric:true})).map(v=>`<option value="${safeText(v)}">${safeText(v)}</option>`).join(""); if([...el.options].some(o=>o.value===current))el.value=current;
+  const el=$(id), current=el.value;
+  const clean=values.filter(v=>v!==undefined&&v!==null&&String(v).trim()!==""&&!isNA(v));
+  el.innerHTML=`<option value="">${label}</option>`+[...new Set(clean)].sort((a,b)=>String(a).localeCompare(String(b),"es",{numeric:true})).map(v=>`<option value="${safeText(v)}">${safeText(v)}</option>`).join("");
+  if([...el.options].some(o=>o.value===current))el.value=current;
 }
 function fillPeriodSelect(){
   const el=$("fPeriod"), current=el.value;
@@ -669,18 +688,21 @@ function fillObraSelect(){
 }
 function updateFilterOptions(){
   const aallRows=state.rows.filter(r=>r.isAALL2026);
+  const works=state.rainWorks||[];
   fillObraSelect();
-  fillSelect("fGP",[...aallRows.map(r=>r.gp),...(state.rainWorks||[]).map(w=>w.gp)]);
-  fillSelect("fSupObra",[...aallRows.map(r=>r.supervisorObra),...(state.rainWorks||[]).map(w=>w.supervisor)]);
+  /* GP y PA se obtienen principalmente del cuadro operativo de la hoja resumen. */
+  fillSelect("fGP",[...works.map(w=>w.gp),...aallRows.map(r=>r.gp)]);
+  fillSelect("fPA",[...works.map(w=>w.pa),...aallRows.map(r=>r.pa)]);
+  fillSelect("fSupObra",[...works.map(w=>w.supervisor),...aallRows.map(r=>r.supervisorObra)]);
   fillSelect("fClass",state.rows.map(r=>r.classification));
   fillSelect("fAccount",aallRows.map(r=>r.costGroup||costGroup(r.account)),"Todos");
   fillPeriodSelect();
   fillSelect("fProvider",aallRows.map(r=>r.provider));
-  fillSelect("fStatus",(state.rainWorks||[]).map(w=>w.status),"Todos");
-  fillSelect("fMedio",(state.rainWorks||[]).map(w=>w.medio),"Todos");
+  fillSelect("fStatus",works.map(w=>w.status),"Todos");
+  fillSelect("fMedio",works.map(w=>w.medio),"Todos");
 }
 function applyFilters(){
-  const universe=$("fUniverse").value, obra=$("fObra").value, gp=$("fGP").value, so=$("fSupObra").value, cl=$("fClass").value, account=$("fAccount").value, pe=$("fPeriod").value, pr=$("fProvider").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  const universe=$("fUniverse").value, obra=$("fObra").value, gp=$("fGP").value, pa=$("fPA").value, so=$("fSupObra").value, cl=$("fClass").value, account=$("fAccount").value, pe=$("fPeriod").value, pr=$("fProvider").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
   const workMap=new Map((state.rainWorks||[]).map(w=>[w.obra,w]));
   state.filtered=state.rows.filter(r=>{
     if(universe==="summary" && !r.isInSummary)return false;
@@ -688,6 +710,7 @@ function applyFilters(){
     const w=workMap.get(r.obra);
     if(obra && r.obra!==obra)return false;
     if(gp&&r.gp!==gp&&w?.gp!==gp)return false;
+    if(pa&&r.pa!==pa&&w?.pa!==pa)return false;
     if(so&&r.supervisorObra!==so&&w?.supervisor!==so)return false;
     if(cl&&r.classification!==cl)return false;
     if(account&&(r.costGroup||costGroup(r.account))!==account)return false;
@@ -695,7 +718,7 @@ function applyFilters(){
     if(pr&&r.provider!==pr)return false;
     if(st&&w?.status!==st)return false;
     if(medio&&w?.medio!==medio)return false;
-    if(q){ const hay=norm([r.obra,r.obraName,r.gp,r.supervisorObra,r.supervisorCosto,r.provider,r.oc,r.document,r.description,r.account,r.costGroup||costGroup(r.account),r.ref,r.refOrigin,r.infoExcel,r.infoForm,r.infoRV,r.resumenCategory,w?.supervisor,w?.gd,w?.gp,w?.pa,w?.status,w?.medio,w?.obs1,w?.obs2].join(" | ")); if(!hay.includes(q))return false; }
+    if(q){ const hay=norm([r.obra,r.obraName,r.gd,r.gp,r.pa,r.status,r.managedBy,r.supervisorObra,r.supervisorCosto,r.provider,r.oc,r.document,r.description,r.account,r.costGroup||costGroup(r.account),r.ref,r.refOrigin,r.infoExcel,r.infoForm,r.infoRV,r.resumenCategory,w?.supervisor,w?.gd,w?.gp,w?.pa,w?.status,w?.medio,w?.obs1,w?.obs2].join(" | ")); if(!hay.includes(q))return false; }
     return true;
   });
   render();
@@ -730,7 +753,9 @@ function renderObraCostChart(){
     const m=rowAccounts.get(obra); m.set(acc,(m.get(acc)||0)+r.amount);
   });
 
-  const hasCostSpecificFilter=!!($('fGP').value||$('fClass').value||$('fAccount').value||$('fPeriod').value||$('fProvider').value);
+  /* GP, PA, Supervisor, Estado y Gestionado por pertenecen al cuadro de la hoja resumen.
+     No deben eliminar obras sin costo. Sólo los filtros de movimientos contables limitan a obras con gasto. */
+  const hasCostSpecificFilter=!!($('fClass').value||$('fAccount').value||$('fPeriod').value||$('fProvider').value);
   const costObras=new Set(aallRows.map(r=>String(r.obra||"")));
   const works=hasCostSpecificFilter ? baseWorks.filter(w=>costObras.has(String(w.obra||""))) : baseWorks;
 
@@ -825,10 +850,11 @@ function renderObraCostChart(){
 
 function statusClass(v){ const n=norm(v); if(n==="EN CURSO")return"en-curso"; if(n==="TERMINADO")return"terminado"; if(n==="RECHAZADO")return"rechazado"; if(n==="SIN GESTION")return"sin-gestion"; return""; }
 function filteredRainWorks(){
-  const obra=$("fObra").value, gp=$("fGP").value, so=$("fSupObra").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  const obra=$("fObra").value, gp=$("fGP").value, pa=$("fPA").value, so=$("fSupObra").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
   return (state.rainWorks||[]).filter(w=>{
     if(obra&&w.obra!==obra)return false;
     if(gp&&w.gp!==gp)return false;
+    if(pa&&w.pa!==pa)return false;
     if(so&&w.supervisor!==so)return false;
     if(st&&w.status!==st)return false;
     if(medio&&w.medio!==medio)return false;
@@ -856,7 +882,7 @@ function openDetail(id){
   const invoiceHero=validHttp(r.pdf)?`<div class="invoice-hero"><div class="invoice-copy"><b>Factura / documento ${safeText(r.document||"—")}</b><span>Documento de respaldo disponible desde la URL PDF del Libro Mayor.</span></div><a href="${safeText(String(r.pdf).trim())}" target="_blank" rel="noopener noreferrer">Ver factura PDF ↗</a></div>`:"";
   $("modalBody").innerHTML=`
     ${invoiceHero}
-    <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original (K)",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("Gerente proyecto",r.gp)}${detailItem("Supervisor obra",r.supervisorObra)}${detailItem("Supervisor costo (LM)",r.supervisorCosto)}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
+    <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original (K)",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("GD",r.gd)}${detailItem("GP",r.gp)}${detailItem("PA",r.pa)}${detailItem("Supervisor obra",r.supervisorObra)}${detailItem("Supervisor costo (LM)",r.supervisorCosto)}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
     <div class="section-title">Trabajo / glosa</div><div class="raw">${safeText(r.description||"Sin descripción")}</div>
     <div class="section-title">Documentos</div><div class="doc-actions">${docs||'<span class="mini">No se detectaron enlaces web de respaldo en esta línea.</span>'}</div>
     <div class="section-title">Trazabilidad</div>${ev}
@@ -867,11 +893,11 @@ AC Resumen: ${safeText(r.resumenCategory||"—")}</div>
     <div class="section-title">Fila original del Libro Mayor</div><div class="raw">${safeText(raw)}</div>`;
   $("modal").classList.add("open");
 }
-function resetFilters(){ ["fObra","fGP","fSupObra","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
+function resetFilters(){ ["fObra","fGP","fPA","fSupObra","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
 function csvCell(v){const s=String(v??"");return `"${s.replace(/"/g,'""')}"`;}
 function exportCSV(){
-  const headers=["Fecha","Periodo","Obra","Nombre obra","GP","Supervisor obra","Supervisor costo LM","Proveedor","RUT","OC","Documento","Descripción","Clasificación gasto","Descripción Cuenta original (K)","Monto","Clasificación Resumen","Incluido Resumen","Motivo","Hoja origen","Fila origen","PDF"];
-  const lines=[headers.map(csvCell).join(";")]; for(const r of state.filtered)lines.push([r.date,periodLabel(r.period),r.obra,r.obraName,r.gp,r.supervisorObra,r.supervisorCosto,r.provider,r.rut,r.oc,r.document,r.description,r.costGroup||costGroup(r.account),r.account,r.amount,r.classification,r.isInSummary?"Sí":"No",r.reason,state.mainSheet,r.sourceRow,r.pdf].map(csvCell).join(";")); const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob);a.download=`AALL_vista_${new Date().toISOString().slice(0,10)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  const headers=["Fecha","Periodo","Obra","Nombre obra","GD","GP","PA","Supervisor obra","Supervisor costo LM","Proveedor","RUT","OC","Documento","Descripción","Clasificación gasto","Descripción Cuenta original (K)","Monto","Clasificación Resumen","Incluido Resumen","Motivo","Hoja origen","Fila origen","PDF"];
+  const lines=[headers.map(csvCell).join(";")]; for(const r of state.filtered)lines.push([r.date,periodLabel(r.period),r.obra,r.obraName,r.gd,r.gp,r.pa,r.supervisorObra,r.supervisorCosto,r.provider,r.rut,r.oc,r.document,r.description,r.costGroup||costGroup(r.account),r.account,r.amount,r.classification,r.isInSummary?"Sí":"No",r.reason,state.mainSheet,r.sourceRow,r.pdf].map(csvCell).join(";")); const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob);a.download=`AALL_vista_${new Date().toISOString().slice(0,10)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
 async function loadFile(file){
@@ -889,7 +915,7 @@ async function loadFile(file){
 
 const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});
 ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)loadFile(f);});
-["fUniverse","fObra","fGP","fSupObra","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
+["fUniverse","fObra","fGP","fPA","fSupObra","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=k==="amount"||k==="dateKey"?-1:1;}renderTable();}));
 $("modalClose").addEventListener("click",()=>$("modal").classList.remove("open"));$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
 
