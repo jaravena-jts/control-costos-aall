@@ -133,7 +133,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     <div class="card-head">
       <div>
         <h2>Costos por obra — clasificación, estado y alertas</h2>
-        <div class="viewer-note">Información de obra, supervisor, estado, costo, gestión y observaciones actualizada dinámicamente desde la hoja “resumen”.</div>
+        <div class="viewer-note">Información de obra, supervisor, estado, costo, gestión y observaciones actualizada dinámicamente desde la tabla operativa de la hoja “resumen”.</div>
       </div>
       <span class="mini" id="obraChartTotal">$0</span>
     </div>
@@ -160,7 +160,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 18 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 19 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -493,50 +493,82 @@ function extractSummaryByObra(summaryRaw){
 }
 
 /* Registro operativo de edificios con filtraciones. Se lee directamente de la
-   tabla ubicada en la hoja resumen (encabezados Obra...Obs2, actualmente H:P).
+   tabla ubicada en la hoja resumen (encabezados Obra...Obs2).
    Se detecta por nombre de encabezado para tolerar cambios de fila o posición. */
 function extractRainWorks(summaryRaw){
   if(!summaryRaw)return [];
 
-  /* v14: esta tabla se lee por POSICIÓN REAL en la hoja resumen.
-     H=Obra, I=Nombre obra, J=Supervisor, K=AALL 2026,
-     L=Status, M=Costo, N=Gestionado por/Medio, O=Obs1, P=Obs2.
-     Así las filas con M vacía NO desaparecen: siguen existiendo porque H/I/L/N tienen datos. */
-  const COL={H:7,I:8,J:9,K:10,L:11,M:12,N:13,O:14,P:15};
-  let header=null;
+  /* v19: lectura dinámica por NOMBRE DE ENCABEZADO.
+     La planilla puede insertar nuevas columnas sin romper el portal.
+     Formato nuevo detectado en Resumen:
+     Obra | Nombre de obra | Supervisor | GD | GP | PA | AALL 2026 |
+     Status | Total | GESTIONADO POR | Obs1 | Obs2.
+     También mantiene compatibilidad con el formato anterior. */
+  const aliases={
+    obra:["OBRA"],
+    name:["NOMBRE DE OBRA","NOMBRE OBRA","PROYECTO"],
+    supervisor:["SUPERVISOR"],
+    gd:["GD"],
+    gp:["GP"],
+    pa:["PA"],
+    aall:["AALL 2026","AALL"],
+    status:["STATUS","ESTATUS","ESTADO"],
+    total:["TOTAL","COSTO","MONTO"],
+    medio:["GESTIONADO POR","MEDIO","GESTIÓN","GESTION"],
+    obs1:["OBS1","OBS 1","OBSERVACION 1","OBSERVACIÓN 1"],
+    obs2:["OBS2","OBS 2","OBSERVACION 2","OBSERVACIÓN 2"]
+  };
+  const findIdx=(vals,names)=>{
+    const ns=(vals||[]).map(norm);
+    for(const name of names){
+      const target=norm(name);
+      const exact=ns.findIndex(v=>v===target);
+      if(exact>=0)return exact;
+    }
+    return -1;
+  };
+
+  let header=null, idx=null;
   for(const r of summaryRaw){
-    if(norm(r.vals?.[COL.H])==="OBRA" && norm(r.vals?.[COL.I])==="NOMBRE DE OBRA" &&
-       (norm(r.vals?.[COL.L])==="STATUS" || norm(r.vals?.[COL.L])==="ESTATUS") &&
-       norm(r.vals?.[COL.M])==="TOTAL" && (norm(r.vals?.[COL.N])==="MEDIO" || norm(r.vals?.[COL.N]).includes("GESTION"))){
-      header=r; break;
+    const vals=r.vals||[];
+    const candidate={};
+    Object.entries(aliases).forEach(([k,names])=>candidate[k]=findIdx(vals,names));
+    /* Campos mínimos para reconocer el bloque de obras. */
+    if(candidate.obra>=0 && candidate.name>=0 && candidate.supervisor>=0 &&
+       candidate.status>=0 && candidate.total>=0 && candidate.medio>=0){
+      header=r; idx=candidate; break;
     }
   }
-  if(!header)return [];
+  if(!header||!idx)return [];
 
   const out=[];
   for(const r of summaryRaw){
     if(r.rn<=header.rn)continue;
-    const obra=normCode(r.vals?.[COL.H]);
-    const name=String(r.vals?.[COL.I]??"").trim();
+    const vals=r.vals||[];
+    const obra=normCode(idx.obra>=0?vals[idx.obra]:"");
+    const name=String(idx.name>=0?(vals[idx.name]??""):"").trim();
     if(!obra || !/^\d+$/.test(obra) || !name)continue;
 
-    const supervisor=String(r.vals?.[COL.J]??"").trim();
-    const aallFlag=String(r.vals?.[COL.K]??"").trim();
-    const status=String(r.vals?.[COL.L]??"").trim();
-    const amountRaw=r.vals?.[COL.M];
+    const supervisor=String(idx.supervisor>=0?(vals[idx.supervisor]??""):"").trim();
+    const gd=String(idx.gd>=0?(vals[idx.gd]??""):"").trim();
+    const gp=String(idx.gp>=0?(vals[idx.gp]??""):"").trim();
+    const pa=String(idx.pa>=0?(vals[idx.pa]??""):"").trim();
+    const aallFlag=String(idx.aall>=0?(vals[idx.aall]??""):"").trim();
+    const status=String(idx.status>=0?(vals[idx.status]??""):"").trim();
+    const amountRaw=idx.total>=0?vals[idx.total]:"";
     const amountBlank=amountRaw===undefined || amountRaw===null || String(amountRaw).trim()==="";
     const amount=num(amountRaw);
     const amountZero=!amountBlank && Math.abs(amount)<0.005;
     const noCostAlert=amountBlank || amountZero;
-    const medio=String(r.vals?.[COL.N]??"").trim();
-    const obs1=String(r.vals?.[COL.O]??"").trim();
-    const obs2=String(r.vals?.[COL.P]??"").trim();
+    const medio=String(idx.medio>=0?(vals[idx.medio]??""):"").trim();
+    const obs1=String(idx.obs1>=0?(vals[idx.obs1]??""):"").trim();
+    const obs2=String(idx.obs2>=0?(vals[idx.obs2]??""):"").trim();
 
     out.push({
-      obra,name,supervisor,aallFlag,status,
+      obra,name,supervisor,gd,gp,pa,aallFlag,status,
       amount,amountBlank,amountZero,noCostAlert,
       medio,obs1,obs2,row:r.rn,hasCost:!noCostAlert,
-      sourceColumns:{obra:"H",name:"I",status:"L",amount:"M",medio:"N",obs1:"O",obs2:"P"}
+      sourceHeaderRow:header.rn
     });
   }
   return out;
@@ -638,7 +670,7 @@ function fillObraSelect(){
 function updateFilterOptions(){
   const aallRows=state.rows.filter(r=>r.isAALL2026);
   fillObraSelect();
-  fillSelect("fGP",aallRows.map(r=>r.gp));
+  fillSelect("fGP",[...aallRows.map(r=>r.gp),...(state.rainWorks||[]).map(w=>w.gp)]);
   fillSelect("fSupObra",[...aallRows.map(r=>r.supervisorObra),...(state.rainWorks||[]).map(w=>w.supervisor)]);
   fillSelect("fClass",state.rows.map(r=>r.classification));
   fillSelect("fAccount",aallRows.map(r=>r.costGroup||costGroup(r.account)),"Todos");
@@ -655,7 +687,7 @@ function applyFilters(){
     if(universe==="aall" && !r.isAALL2026)return false;
     const w=workMap.get(r.obra);
     if(obra && r.obra!==obra)return false;
-    if(gp&&r.gp!==gp)return false;
+    if(gp&&r.gp!==gp&&w?.gp!==gp)return false;
     if(so&&r.supervisorObra!==so&&w?.supervisor!==so)return false;
     if(cl&&r.classification!==cl)return false;
     if(account&&(r.costGroup||costGroup(r.account))!==account)return false;
@@ -663,7 +695,7 @@ function applyFilters(){
     if(pr&&r.provider!==pr)return false;
     if(st&&w?.status!==st)return false;
     if(medio&&w?.medio!==medio)return false;
-    if(q){ const hay=norm([r.obra,r.obraName,r.gp,r.supervisorObra,r.supervisorCosto,r.provider,r.oc,r.document,r.description,r.account,r.costGroup||costGroup(r.account),r.ref,r.refOrigin,r.infoExcel,r.infoForm,r.infoRV,r.resumenCategory,w?.status,w?.medio,w?.obs1,w?.obs2].join(" | ")); if(!hay.includes(q))return false; }
+    if(q){ const hay=norm([r.obra,r.obraName,r.gp,r.supervisorObra,r.supervisorCosto,r.provider,r.oc,r.document,r.description,r.account,r.costGroup||costGroup(r.account),r.ref,r.refOrigin,r.infoExcel,r.infoForm,r.infoRV,r.resumenCategory,w?.supervisor,w?.gd,w?.gp,w?.pa,w?.status,w?.medio,w?.obs1,w?.obs2].join(" | ")); if(!hay.includes(q))return false; }
     return true;
   });
   render();
@@ -710,7 +742,7 @@ function renderObraCostChart(){
   const data=works.map(w=>({
     key:String(w.obra||""), label:`${w.obra} · ${w.name||w.obra}`,
     total:num(w.amount), accounts:rowAccounts.get(String(w.obra||""))||new Map(),
-    supervisor:w.supervisor||"Sin supervisor", status:w.status||"Sin estatus", medio:w.medio||"Sin gestión informada",
+    supervisor:w.supervisor||"Sin supervisor", gd:w.gd||"", gp:w.gp||"", pa:w.pa||"", status:w.status||"Sin estatus", medio:w.medio||"Sin gestión informada",
     obs1:w.obs1||"", obs2:w.obs2||"", row:w.row, amountBlank:w.amountBlank===true, noCost:isNoCost(w)
   }));
   const withCost=data.filter(v=>!v.noCost).sort((a,b)=>Math.abs(b.total)-Math.abs(a.total));
@@ -745,7 +777,8 @@ function renderObraCostChart(){
   const detailHtml=v=>{
     if(!v)return '';
     const obs=obsText(v);
-    const meta=`<div class="obra-breakdown-meta"><div><b>Supervisor</b>${safeText(v.supervisor||'Sin supervisor')}</div><div><b>Estado</b>${safeText(v.status||'Sin estatus')}</div><div><b>Costo</b>${v.noCost?'$0':safeText(money(v.total))}</div><div><b>Gestionado por</b>${safeText(v.medio||'Sin gestión informada')}</div></div>`;
+    const extraMeta=[v.gd?`<div><b>GD</b>${safeText(v.gd)}</div>`:'',v.gp?`<div><b>GP</b>${safeText(v.gp)}</div>`:'',v.pa?`<div><b>PA</b>${safeText(v.pa)}</div>`:''].join('');
+    const meta=`<div class="obra-breakdown-meta"><div><b>Supervisor</b>${safeText(v.supervisor||'Sin supervisor')}</div>${extraMeta}<div><b>Estado</b>${safeText(v.status||'Sin estatus')}</div><div><b>Costo</b>${v.noCost?'$0':safeText(money(v.total))}</div><div><b>Gestionado por</b>${safeText(v.medio||'Sin gestión informada')}</div></div>`;
     const observations=`<div class="obra-detail-observations"><div><b>Observación 1</b>${safeText(obs.o1)}</div><div><b>Observación 2</b>${safeText(obs.o2)}</div></div>`;
     if(v.noCost){
       return `<div class="obra-breakdown no-cost-detail"><div class="obra-breakdown-head"><b>${safeText(v.label)}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${meta}${observations}<div class="zero-detail-message">⚠ Esta obra registra atención de Postventa/AALL, pero no registra costo por PV.</div></div>`;
@@ -792,13 +825,14 @@ function renderObraCostChart(){
 
 function statusClass(v){ const n=norm(v); if(n==="EN CURSO")return"en-curso"; if(n==="TERMINADO")return"terminado"; if(n==="RECHAZADO")return"rechazado"; if(n==="SIN GESTION")return"sin-gestion"; return""; }
 function filteredRainWorks(){
-  const obra=$("fObra").value, so=$("fSupObra").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  const obra=$("fObra").value, gp=$("fGP").value, so=$("fSupObra").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
   return (state.rainWorks||[]).filter(w=>{
     if(obra&&w.obra!==obra)return false;
+    if(gp&&w.gp!==gp)return false;
     if(so&&w.supervisor!==so)return false;
     if(st&&w.status!==st)return false;
     if(medio&&w.medio!==medio)return false;
-    if(q&&!norm([w.obra,w.name,w.supervisor,w.status,w.medio,w.obs1,w.obs2,(w.noCostAlert||!w.hasCost)?"NO REGISTRA COSTO POR PV":""].join(" | ")).includes(q))return false;
+    if(q&&!norm([w.obra,w.name,w.supervisor,w.gd,w.gp,w.pa,w.status,w.medio,w.obs1,w.obs2,(w.noCostAlert||!w.hasCost)?"NO REGISTRA COSTO POR PV":""].join(" | ")).includes(q))return false;
     return true;
   });
 }
@@ -848,7 +882,7 @@ async function loadFile(file){
     const pending=state.rows.filter(r=>r.classification==="Pendiente clasificar"); const lm=state.lmSummary; const sh=state.sheetSummary; const diff=sh?lm.Total-sh.Total:0;
     const square=sh&&Math.abs(diff)<1;
     const obrasResumen=state.summaryObras?.length||0; const obraCheck=state.summaryCheck; const rain=state.rainWorks||[]; const rainZero=rain.filter(w=>!w.hasCost).length;
-    message(`Carga y publicación completadas. <b>Hoja “resumen” leída directamente: ${money(sh?.Total||0)}</b> · ${obrasResumen.toLocaleString("es-CL")} obras con costo en tabla dinámica.<br><b>Edificios con filtraciones H:P: ${rain.length.toLocaleString("es-CL")}</b> · <b>${rainZero.toLocaleString("es-CL")}</b> sin costo AALL asociado.<br><b>Libro Mayor reconstruido: ${money(lm.Total)}</b> · AALL ${money(lm.AALL)} · Mandante ${money(lm.Mandante)} · OBRA ${money(lm.OBRA)} · diferencia general: <b>${money(diff)}</b> ${square?"✓ CUADRA":"⚠ REVISAR"}.${obraCheck?`<br>Validación obra por obra: <b>${obraCheck.ok?"✓ CUADRA":"⚠ "+obraCheck.diffs.length+" obra(s) con diferencia"}</b>.`:""}<br>Movimientos AB=AALL 2026 todavía sin AC Resumen: <b>${pending.length.toLocaleString("es-CL")}</b> (${money(pending.reduce((a,r)=>a+r.amount,0))}).${missing.length?`<br><b>Atención:</b> no se identificaron: ${missing.join(", ")}.`:""}`,square&&obraCheck?.ok&&!missing.length?"good":(sh&&!square?"error":""));
+    message(`Carga y publicación completadas. <b>Hoja “resumen” leída directamente: ${money(sh?.Total||0)}</b> · ${obrasResumen.toLocaleString("es-CL")} obras con costo en tabla dinámica.<br><b>Edificios con filtraciones en Resumen: ${rain.length.toLocaleString("es-CL")}</b> · <b>${rainZero.toLocaleString("es-CL")}</b> sin costo AALL asociado.<br><b>Libro Mayor reconstruido: ${money(lm.Total)}</b> · AALL ${money(lm.AALL)} · Mandante ${money(lm.Mandante)} · OBRA ${money(lm.OBRA)} · diferencia general: <b>${money(diff)}</b> ${square?"✓ CUADRA":"⚠ REVISAR"}.${obraCheck?`<br>Validación obra por obra: <b>${obraCheck.ok?"✓ CUADRA":"⚠ "+obraCheck.diffs.length+" obra(s) con diferencia"}</b>.`:""}<br>Movimientos AB=AALL 2026 todavía sin AC Resumen: <b>${pending.length.toLocaleString("es-CL")}</b> (${money(pending.reduce((a,r)=>a+r.amount,0))}).${missing.length?`<br><b>Atención:</b> no se identificaron: ${missing.join(", ")}.`:""}`,square&&obraCheck?.ok&&!missing.length?"good":(sh&&!square?"error":""));
   }catch(e){ console.error(e); message(`<b>No pude procesar el archivo.</b> ${safeText(e.message||e)}`,"error"); $("infoMain").textContent="Error"; $("infoRows").textContent="—"; }
   finally{stopLoader();}
 }
@@ -891,8 +925,8 @@ function renderRole(){
   $("kpiSection").classList.toggle('viewer-mode',!full);
   if(!full){ $("fUniverse").value='summary'; $("fClass").value=''; }
   $("traceNotice").innerHTML=full
-    ? 'La fuente oficial es la hoja <b>“resumen”</b>. El tablero mantiene la cuadratura de <b>AALL / Mandante / OBRA</b> y muestra aparte los pendientes. Las obras con filtraciones y sus alertas se integran directamente en el gráfico principal desde <b>H:P</b> de la misma hoja.'
-    : 'Vista de consulta de <b>Aguas Lluvias</b>. Se muestran únicamente los costos clasificados como <b>AALL</b> y las alertas/estado de las obras informadas en <b>H:P</b> de la hoja <b>“resumen”</b>.';
+    ? 'La fuente oficial es la hoja <b>“resumen”</b>. El tablero mantiene la cuadratura de <b>AALL / Mandante / OBRA</b> y muestra aparte los pendientes. Las obras con filtraciones y sus alertas se integran directamente en el gráfico principal desde la tabla operativa de la misma hoja.'
+    : 'Vista de consulta de <b>Aguas Lluvias</b>. Se muestran únicamente los costos clasificados como <b>AALL</b> y las alertas/estado de las obras informadas en la tabla operativa de la hoja <b>“resumen”</b>.';
   if(state.session) chip.title=email; else chip.title='Acceso de solo lectura';
 }
 function showLocked(message){$("lockMessage").textContent=message||'Sistema temporalmente bloqueado por administración.';$("lockOverlay").classList.add('show');}

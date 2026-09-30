@@ -1,4 +1,4 @@
-# Control de costo de aguas lluvias 2026 — v12
+# Control de costo de aguas lluvias 2026 — v19
 
 Aplicación web preparada para **GitHub + Railway**, manteniendo el diseño de las versiones anteriores.
 
@@ -19,32 +19,36 @@ Aplicación web preparada para **GitHub + Railway**, manteniendo el diseño de l
 
 > Las claves no están guardadas dentro del HTML ni del repositorio. Se configuran como variables privadas en Railway.
 
-## Nueva lectura desde hoja `resumen`
+## Lectura dinámica desde hoja `resumen`
 
-La versión v12 mantiene la hoja **`resumen`** como fuente oficial y agrega una segunda lectura directa del bloque de edificios con filtraciones.
+La hoja **`resumen`** sigue siendo la fuente oficial. Desde la v19, el cuadro operativo de obras se detecta por **nombre de encabezado**, no por letras fijas de columna.
 
-La lectura se detecta por encabezados, actualmente ubicados en **H:P**:
+El archivo `Gastos AALL 2026 (7).xlsx` incorpora:
 
-- H: Obra
-- I: Nombre de obra
-- J: Supervisor
-- K: AALL 2026
-- L: Status
-- M: Total / costo AALL
-- N: Medio / gestionado por
-- O: Obs1
-- P: Obs2
+- Obra
+- Nombre de obra
+- Supervisor
+- GD
+- GP
+- PA
+- AALL 2026
+- Status
+- Total
+- GESTIONADO POR
+- Obs1
+- Obs2
 
-La web muestra una sección **Estado de obras con filtraciones 2026**. Cada obra indica estado, costo AALL, medio de gestión y observaciones. Las obras con costo cero se muestran con una alerta **? Sin costo asociado**. Al hacer clic en la obra se despliegan Obs1 y Obs2.
+Esto permite insertar nuevas columnas sin romper la lectura. Al seleccionar una obra, el gráfico muestra Supervisor, GD, GP, PA, Estado, Costo, Gestionado por y Observaciones cuando estén disponibles.
 
 ## Archivo validado
 
-Con `Gastos AALL 2026 (6).xlsx` se detectaron:
+Con `Gastos AALL 2026 (7).xlsx` se detectaron:
 
-- 84 edificios/obras en el bloque H:P.
+- 84 edificios/obras.
 - 27 con costo AALL asociado.
 - 57 sin costo AALL asociado.
-- Suma de columna M: **$211.239.599,75**, que coincide con el total AALL de la tabla dinámica principal de la hoja `resumen`.
+- Total AALL del cuadro: **$211.239.599,75**.
+- Total oficial de la hoja `resumen`: **$236.069.055,75**.
 
 ## Publicar en GitHub + Railway
 
