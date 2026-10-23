@@ -134,7 +134,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     <div class="card-head">
       <div>
         <h2>Costos por obra — clasificación, estado y alertas</h2>
-        <div class="viewer-note">Información de obra, supervisor, estado, costo, gestión y observaciones actualizada dinámicamente desde la tabla operativa de la hoja “resumen”.</div>
+        <div class="viewer-note">Costo AALL oficial por obra desde la tabla dinámica de “resumen”; supervisor, GD, GP, PA, estado, gestión y observaciones desde el cuadro operativo de la misma hoja.</div>
       </div>
       <span class="mini" id="obraChartTotal">$0</span>
     </div>
@@ -161,7 +161,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 21 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 23 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -301,6 +301,39 @@ class ZipReader{
     throw new Error(`Método de compresión ZIP no soportado: ${e.method}`);
   }
   async text(name){ return new TextDecoder("utf-8").decode(await this.bytes(name)); }
+  async textUntilRow(name,maxRow=6000){
+    const e=this.entries.get(name); if(!e) throw new Error(`Parte no encontrada: ${name}`);
+    if(!Number.isFinite(maxRow)||maxRow<=0) return this.text(name);
+    const p=e.local;
+    if(this.u32(p)!==0x04034b50) throw new Error(`Entrada ZIP inválida: ${name}`);
+    const nlen=this.u16(p+26), xlen=this.u16(p+28), start=p+30+nlen+xlen;
+    const raw=new Uint8Array(this.buffer,start,e.comp), td=new TextDecoder("utf-8");
+    if(e.method===0){
+      const full=td.decode(raw); const re=/<row\b[^>]*\br="(\d+)"[^>]*>/gi; let m;
+      while((m=re.exec(full))){ if(Number(m[1])>maxRow) return full.slice(0,m.index); }
+      return full;
+    }
+    if(e.method!==8) return this.text(name);
+    let ds; try{ds=new DecompressionStream("deflate-raw");}catch(_){return this.text(name);}
+    const reader=new Blob([raw]).stream().pipeThrough(ds).getReader();
+    let out="", scanFrom=0;
+    try{
+      while(true){
+        const {value,done}=await reader.read(); if(done)break;
+        out+=td.decode(value,{stream:true});
+        const startScan=Math.max(0,scanFrom-160), part=out.slice(startScan);
+        const re=/<row\b[^>]*\br="(\d+)"[^>]*>/gi; let m;
+        while((m=re.exec(part))){
+          if(Number(m[1])>maxRow){
+            const cut=startScan+m.index; try{await reader.cancel();}catch(_){}
+            return out.slice(0,cut);
+          }
+        }
+        scanFrom=out.length;
+      }
+      out+=td.decode(); return out;
+    } finally { try{reader.releaseLock();}catch(_){} }
+  }
 }
 function xml(text){ const d=new DOMParser().parseFromString(text,"application/xml"); if(d.getElementsByTagName("parsererror").length) throw new Error("Error leyendo XML interno del Excel."); return d; }
 function els(doc,local){return Array.from(doc.getElementsByTagNameNS("*",local));}
@@ -355,9 +388,14 @@ function readSheetLargeXml(text,shared,maxRows=Infinity){
   return rows;
 }
 async function readSheet(zip,path,shared,maxRows=Infinity){
-  const text=await zip.text(path);
-  /* DOMParser sobre hojas de 100+ MB puede congelar el navegador. Usamos lector liviano para esas hojas. */
-  if(text.length>20*1024*1024) return readSheetLargeXml(text,shared,maxRows);
+  const meta=zip.entries.get(path);
+  /* Si la hoja es enorme pero sólo necesitamos sus primeras filas reales, descomprimimos
+     hasta ese límite y cancelamos el resto del stream. Esto evita congelar el navegador
+     con hojas que Excel dejó extendidas hasta la fila 1.048.576. */
+  const shouldStreamCut=Number.isFinite(maxRows) && meta && meta.uncomp>20*1024*1024;
+  const text=shouldStreamCut ? await zip.textUntilRow(path,maxRows) : await zip.text(path);
+  /* DOMParser sobre hojas de 20+ MB puede congelar el navegador. Usamos lector liviano para esas hojas. */
+  if((meta?.uncomp||text.length)>20*1024*1024) return readSheetLargeXml(text,shared,maxRows);
   const doc=xml(text); const rows=[];
   for(const row of els(doc,"row")){
     const rn=Number(row.getAttribute("r")||rows.length+1); if(rn>maxRows) break; const vals=[];
@@ -445,7 +483,14 @@ async function parseExcel(file){
 
   const chosen=[main,obras,info,form,ocex].filter(Boolean); const uniq=[]; const seen=new Set(); chosen.forEach(x=>{if(!seen.has(x.path)){seen.add(x.path);uniq.push(x);}});
   const full=new Map(); let count=0;
-  for(const s of uniq){ count++; setLoader(`Leyendo ${s.name} (${count}/${uniq.length})…`); full.set(s.path,makeTable(await readSheet(zip,s.path,shared))); }
+  for(const s of uniq){
+    count++; setLoader(`Leyendo ${s.name} (${count}/${uniq.length})…`);
+    /* OC Formulario puede venir físicamente extendida hasta la fila 1.048.576 aunque
+       los registros reales terminen mucho antes. Para trazabilidad bastan las primeras
+       6.000 filas; así preservamos OC, trabajo y vínculos sin bloquear la carga. */
+    const rowLimit=norm(s.name).includes("OC FORMULARIO") ? 6000 : Infinity;
+    full.set(s.path,makeTable(await readSheet(zip,s.path,shared,rowLimit)));
+  }
   main={...main,table:full.get(main.path)};
   if(headerScore(main.table.headers,["PROVEEDOR","MONTO","PARTIDA","OC"])<4) throw new Error(`La hoja “${main.name}” no parece contener el Libro Mayor esperado (Proveedor, Monto, Partida y OC).`);
   return {sheets, main, obras:obras?{...obras,table:full.get(obras.path)}:null, info:info?{...info,table:full.get(info.path)}:null, form:form?{...form,table:full.get(form.path)}:null, ocex:ocex?{...ocex,table:full.get(ocex.path)}:null, summary:summary?{...summary,raw:summaryRaw}:null};
@@ -619,7 +664,30 @@ function buildData(parsed){
      otro campo. */
   state.sheetSummary=extractSummaryTotals(parsed.summary?.raw||null);
   state.summaryObras=extractSummaryByObra(parsed.summary?.raw||null);
-  state.rainWorks=extractRainWorks(parsed.summary?.raw||null);
+
+  /* v22: el costo AALL oficial por obra NO se toma de la columna Total del
+     cuadro operativo. Esa columna puede contener fórmulas incompletas, #N/A o
+     rangos antiguos. La tabla dinámica A:E de la misma hoja resumen es la
+     fuente financiera oficial. El cuadro operativo se mantiene como fuente de
+     Supervisor / GD / GP / PA / Estado / Gestionado por / Observaciones. */
+  const summaryOfficialMap=new Map((state.summaryObras||[]).map(x=>[String(x.obra||""),x]));
+  state.rainWorks=extractRainWorks(parsed.summary?.raw||null).map(w=>{
+    const official=summaryOfficialMap.get(String(w.obra||""))||null;
+    const officialAALL=official?num(official.AALL):0;
+    const hasOfficialAALL=Math.abs(officialAALL)>=0.005;
+    return {
+      ...w,
+      operationalAmount:w.amount,
+      officialAALL,
+      officialSummaryTotal:official?num(official.Total):0,
+      costSource:"Tabla dinámica Resumen · AALL",
+      amount:officialAALL,
+      amountBlank:!hasOfficialAALL,
+      amountZero:!hasOfficialAALL,
+      noCostAlert:!hasOfficialAALL,
+      hasCost:hasOfficialAALL
+    };
+  });
   const summaryWorkMap=new Map((state.rainWorks||[]).map(w=>[String(w.obra||""),w]));
   const summaryAallSet=new Set((state.rainWorks||[])
     .filter(w=>norm(w.aallFlag||"").includes("AALL 2026") || norm(w.aallFlag||"")=="AALL")
@@ -917,8 +985,8 @@ async function loadFile(file){
     const missing=[]; if(!parsed.obras)missing.push("Obras con AALL"); if(!parsed.info)missing.push("Info BD AALL"); if(!parsed.form)missing.push("OC Formulario"); if(!parsed.ocex)missing.push("OCExcell"); if(!parsed.summary)missing.push("resumen");
     const pending=state.rows.filter(r=>r.classification==="Pendiente clasificar"); const lm=state.lmSummary; const sh=state.sheetSummary; const diff=sh?lm.Total-sh.Total:0;
     const square=sh&&Math.abs(diff)<1;
-    const obrasResumen=state.summaryObras?.length||0; const obraCheck=state.summaryCheck; const rain=state.rainWorks||[]; const rainZero=rain.filter(w=>!w.hasCost).length;
-    message(`Carga y publicación completadas. <b>Hoja “resumen” leída directamente: ${money(sh?.Total||0)}</b> · ${obrasResumen.toLocaleString("es-CL")} obras con costo en tabla dinámica.<br><b>Edificios con filtraciones en Resumen: ${rain.length.toLocaleString("es-CL")}</b> · <b>${rainZero.toLocaleString("es-CL")}</b> sin costo AALL asociado.<br><b>Libro Mayor reconstruido: ${money(lm.Total)}</b> · AALL ${money(lm.AALL)} · Mandante ${money(lm.Mandante)} · OBRA ${money(lm.OBRA)} · diferencia general: <b>${money(diff)}</b> ${square?"✓ CUADRA":"⚠ REVISAR"}.${obraCheck?`<br>Validación obra por obra: <b>${obraCheck.ok?"✓ CUADRA":"⚠ "+obraCheck.diffs.length+" obra(s) con diferencia"}</b>.`:""}<br>Movimientos de obras AALL 2026 todavía sin clasificación Resumen: <b>${pending.length.toLocaleString("es-CL")}</b> (${money(pending.reduce((a,r)=>a+r.amount,0))}).${missing.length?`<br><b>Atención:</b> no se identificaron: ${missing.join(", ")}.`:""}`,square&&obraCheck?.ok&&!missing.length?"good":(sh&&!square?"error":""));
+    const obrasResumen=state.summaryObras?.length||0; const obrasCostoAall=(state.summaryObras||[]).filter(x=>Math.abs(num(x.AALL))>=0.005).length; const obraCheck=state.summaryCheck; const rain=state.rainWorks||[]; const rainZero=rain.filter(w=>!w.hasCost).length;
+    message(`Carga y publicación completadas. <b>Hoja “resumen” leída directamente: ${money(sh?.Total||0)}</b> · <b>${obrasCostoAall.toLocaleString("es-CL")}</b> obras con costo AALL oficial en tabla dinámica (${obrasResumen.toLocaleString("es-CL")} obras con algún movimiento oficial).<br><b>Edificios AALL informados en cuadro operativo: ${rain.length.toLocaleString("es-CL")}</b> · <b>${rainZero.toLocaleString("es-CL")}</b> sin costo AALL oficial. La alerta se determina por la tabla dinámica, no por fórmulas del campo Total.<br><b>Libro Mayor reconstruido: ${money(lm.Total)}</b> · AALL ${money(lm.AALL)} · Mandante ${money(lm.Mandante)} · OBRA ${money(lm.OBRA)} · diferencia general: <b>${money(diff)}</b> ${square?"✓ CUADRA":"⚠ REVISAR"}.${obraCheck?`<br>Validación obra por obra: <b>${obraCheck.ok?"✓ CUADRA":"⚠ "+obraCheck.diffs.length+" obra(s) con diferencia"}</b>.`:""}<br>Movimientos de obras AALL 2026 todavía sin clasificación Resumen: <b>${pending.length.toLocaleString("es-CL")}</b> (${money(pending.reduce((a,r)=>a+r.amount,0))}).${missing.length?`<br><b>Atención:</b> no se identificaron: ${missing.join(", ")}.`:""}`,square&&obraCheck?.ok&&!missing.length?"good":(sh&&!square?"error":""));
   }catch(e){ console.error(e); message(`<b>No pude procesar el archivo.</b> ${safeText(e.message||e)}`,"error"); $("infoMain").textContent="Error"; $("infoRows").textContent="—"; }
   finally{stopLoader();}
 }
@@ -961,8 +1029,8 @@ function renderRole(){
   $("kpiSection").classList.toggle('viewer-mode',!full);
   if(!full){ $("fUniverse").value='summary'; $("fClass").value=''; }
   $("traceNotice").innerHTML=full
-    ? 'La fuente oficial es la hoja <b>“resumen”</b>. El tablero mantiene la cuadratura de <b>AALL / Mandante / OBRA</b> y muestra aparte los pendientes. Las obras con filtraciones y sus alertas se integran directamente en el gráfico principal desde la tabla operativa de la misma hoja.'
-    : 'Vista de consulta de <b>Aguas Lluvias</b>. Se muestran únicamente los costos clasificados como <b>AALL</b> y las alertas/estado de las obras informadas en la tabla operativa de la hoja <b>“resumen”</b>.';
+    ? 'La fuente oficial es la hoja <b>“resumen”</b>. La <b>tabla dinámica</b> define el costo AALL oficial por obra y la cuadratura AALL / Mandante / OBRA; el cuadro operativo aporta responsables, GP, PA, estado y observaciones. Las alertas sin costo se calculan contra el AALL oficial, no contra fórmulas auxiliares.'
+    : 'Vista de consulta de <b>Aguas Lluvias</b>. El costo AALL oficial por obra proviene de la tabla dinámica de <b>“resumen”</b>; responsables, estado y observaciones provienen del cuadro operativo de la misma hoja.';
   if(state.session) chip.title=email; else chip.title='Acceso de solo lectura';
 }
 function showLocked(message){$("lockMessage").textContent=message||'Sistema temporalmente bloqueado por administración.';$("lockOverlay").classList.add('show');}

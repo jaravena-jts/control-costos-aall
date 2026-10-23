@@ -83,3 +83,7 @@ La restricción del visor no depende solo de ocultar tarjetas en HTML. El backen
 
 ## v14 — lectura H:P / alertas M vacía
 La tabla de obras con filtraciones se lee directamente desde H:P de la hoja `resumen`. Las obras con M vacía o $0 se muestran primero, con alerta y los valores de L (estatus) y N (gestionado por).
+
+
+## v22
+La matriz JG utiliza la tabla dinámica de `resumen` como fuente oficial del costo AALL por obra; el cuadro operativo entrega metadatos y alertas. Ver `PARCHE_v22.md`.
