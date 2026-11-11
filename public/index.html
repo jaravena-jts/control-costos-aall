@@ -161,7 +161,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 24 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 25 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -301,7 +301,7 @@ class ZipReader{
     throw new Error(`Método de compresión ZIP no soportado: ${e.method}`);
   }
   async text(name){ return new TextDecoder("utf-8").decode(await this.bytes(name)); }
-  async textUntilRow(name,maxRow=6000){
+  async textUntilRow(name,maxRow=6000,emptyTail=500){
     const e=this.entries.get(name); if(!e) throw new Error(`Parte no encontrada: ${name}`);
     if(!Number.isFinite(maxRow)||maxRow<=0) return this.text(name);
     const p=e.local;
@@ -316,20 +316,45 @@ class ZipReader{
     if(e.method!==8) return this.text(name);
     let ds; try{ds=new DecompressionStream("deflate-raw");}catch(_){return this.text(name);}
     const reader=new Blob([raw]).stream().pipeThrough(ds).getReader();
-    let out="", scanFrom=0;
+    let out="", scanPos=0, seenUseful=false, emptyRun=0, firstEmptyStart=-1;
+    const rowRe=/<row\b([^>]*?)(?:\/>|>([\s\S]*?)<\/row>)/gi;
+    const hasRealData=body=>{
+      if(/<f(?:\s|>)/i.test(body)) return true;
+      let m; const vre=/<v(?:\s[^>]*)?>([\s\S]*?)<\/v>/gi;
+      while((m=vre.exec(body))) if(String(m[1]??"").trim()!=="") return true;
+      const tre=/<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/gi;
+      while((m=tre.exec(body))) if(String(m[1]??"").trim()!=="") return true;
+      return false;
+    };
     try{
       while(true){
         const {value,done}=await reader.read(); if(done)break;
         out+=td.decode(value,{stream:true});
-        const startScan=Math.max(0,scanFrom-160), part=out.slice(startScan);
-        const re=/<row\b[^>]*\br="(\d+)"[^>]*>/gi; let m;
-        while((m=re.exec(part))){
-          if(Number(m[1])>maxRow){
-            const cut=startScan+m.index; try{await reader.cancel();}catch(_){}
-            return out.slice(0,cut);
+        /* Recorremos solamente filas completas. Un solape amplio cubre una fila que
+           haya quedado partida entre dos chunks sin volver a procesar filas previas. */
+        const startScan=Math.max(0,scanPos-65536), part=out.slice(startScan);
+        rowRe.lastIndex=0; let m;
+        while((m=rowRe.exec(part))){
+          const globalStart=startScan+m.index, globalEnd=startScan+rowRe.lastIndex;
+          if(globalEnd<=scanPos) continue;
+          scanPos=globalEnd;
+          const attrs=m[1]||"", body=m[2]||"";
+          const rm=attrs.match(/(?:^|\s)r="(\d+)"/), rn=Number(rm?.[1]||0);
+          if(rn>maxRow){
+            try{await reader.cancel();}catch(_){}
+            return out.slice(0,globalStart);
+          }
+          const useful=hasRealData(body);
+          if(useful){ seenUseful=true; emptyRun=0; firstEmptyStart=-1; }
+          else if(seenUseful){
+            if(emptyRun===0) firstEmptyStart=globalStart;
+            emptyRun++;
+            if(emptyRun>=emptyTail){
+              try{await reader.cancel();}catch(_){}
+              return out.slice(0,firstEmptyStart>=0?firstEmptyStart:globalStart);
+            }
           }
         }
-        scanFrom=out.length;
       }
       out+=td.decode(); return out;
     } finally { try{reader.releaseLock();}catch(_){} }
