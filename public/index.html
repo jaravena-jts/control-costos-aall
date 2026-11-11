@@ -102,7 +102,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="notice" id="traceNotice">La fuente de control es la hoja <b>“resumen”</b>. El tablero se actualiza automáticamente al publicar una nueva planilla.</div>
+  <div class="notice" id="traceNotice">La fuente de control es la hoja <b>“resumen”</b>. El Libro Mayor se detecta automáticamente (Agosto, Septiembre, Octubre, etc.) y el tablero se recalcula al publicar una nueva planilla.</div>
   <div id="messages"></div>
 
   <section class="kpis" id="kpiSection">
@@ -161,7 +161,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 23 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 24 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -416,9 +416,12 @@ function makeTable(rows){
   return {headers,rows:recs,headerRow:rows[d.idx]?.rn||1,score:d.score};
 }
 function headerScore(headers, needles){ const hs=headers.map(hnorm); return needles.reduce((s,n)=>s+(hs.some(h=>h===n||h.includes(n))?1:0),0); }
-function pickSheet(previews, exactName, needles){
+function pickSheet(previews, exactName, needles, minScore=null){
   const exact=previews.find(x=>norm(x.name)===norm(exactName)); if(exact)return exact;
-  return previews.map(x=>({...x,_score:headerScore(x.table.headers,needles)})).sort((a,b)=>b._score-a._score)[0];
+  const ranked=previews.map(x=>({...x,_score:headerScore(x.table.headers,needles)})).sort((a,b)=>b._score-a._score);
+  const best=ranked[0]||null;
+  const required=minScore??Math.min(3,needles.length);
+  return best && best._score>=required ? best : null;
 }
 function get(row, aliases){
   const keys=Object.keys(row); for(const a of aliases){ const na=hnorm(a); const k=keys.find(k=>hnorm(k)===na); if(k!==undefined && !isNA(row[k]))return row[k]; }
@@ -466,18 +469,20 @@ async function parseExcel(file){
     if(!extractSummaryTotals(summaryRaw)) throw new Error(`La hoja “${summary.name}” existe, pero no pude localizar la tabla Resumen esperada (AALL / Mandante / OBRA / Total general).`);
   }
 
-  /* Si cambia el nombre de alguna hoja, sólo inspeccionamos hojas razonables (< 25 MB sin comprimir). */
-  if(!main || !obras || !info || !form || !ocex){
+  /* Si cambia el nombre de una hoja NECESARIA, inspeccionamos sólo hojas razonables.
+     “Obras con AALL” e “Info BD” son auxiliares legacy y ya no son requisito:
+     la hoja resumen es la fuente maestra de obras, responsables y estados. */
+  if(!main || !form || !ocex){
     setLoader("Detectando hojas y columnas…"); const previews=[];
     for(const s of sheets){
       const meta=zip.entries.get(s.path); if(meta && meta.uncomp>25*1024*1024) continue;
       const rr=await readSheet(zip,s.path,shared,10); previews.push({...s,table:makeTable(rr)});
     }
-    if(!main) main=pickSheet(previews,"LM a Julio 2026",["PROVEEDOR","MONTO","PARTIDA","DESCRIPCION PARTIDA","SUPERVISOR","OC","DESCRIPCION OC"]);
-    if(!obras) obras=pickSheet(previews,"Obras con AALL2026",["OBRA","NOMBRE DE OBRA","SUPERVISOR","AALL 2026"]);
-    if(!info) info=pickSheet(previews,"Info BD XS AALL2026",["N OBRA","PROYECTO","SUPERVISOR PVTA","GP","CLASIFICACION"]);
-    if(!form) form=pickSheet(previews,"OC Formulario",["N DE OBRA","NOMBRE DE LA OBRA","DESCRIPCION GRAL DEL TRABAJO","N OC","SE DEBE COBRAR A"]);
-    if(!ocex) ocex=pickSheet(previews,"OCExcell",["FECHA","OC","PROVEEDOR","PRODUCTO","OBRA","MONTO NETO","SOLICITA"]);
+    if(!main) main=pickSheet(previews,"Libro Mayor",["PROVEEDOR","MONTO","PARTIDA","DESCRIPCION PARTIDA","SUPERVISOR","OC","DESCRIPCION OC"],4);
+    if(!obras) obras=pickSheet(previews,"Obras con AALL2026",["OBRA","NOMBRE DE OBRA","SUPERVISOR","AALL 2026"],3);
+    if(!info) info=pickSheet(previews,"Info BD XS AALL2026",["N OBRA","PROYECTO","SUPERVISOR PVTA","GP","CLASIFICACION"],3);
+    if(!form) form=pickSheet(previews,"OC Formulario",["N DE OBRA","NOMBRE DE LA OBRA","DESCRIPCION GRAL DEL TRABAJO","N OC","SE DEBE COBRAR A"],3);
+    if(!ocex) ocex=pickSheet(previews,"OCExcell",["FECHA","OC","PROVEEDOR","PRODUCTO","OBRA","MONTO NETO","SOLICITA"],4);
   }
   if(!main) throw new Error("No pude identificar la hoja del Libro Mayor.");
 
@@ -488,7 +493,13 @@ async function parseExcel(file){
     /* OC Formulario puede venir físicamente extendida hasta la fila 1.048.576 aunque
        los registros reales terminen mucho antes. Para trazabilidad bastan las primeras
        6.000 filas; así preservamos OC, trabajo y vínculos sin bloquear la carga. */
-    const rowLimit=norm(s.name).includes("OC FORMULARIO") ? 6000 : Infinity;
+    let rowLimit=Infinity;
+    if(norm(s.name).includes("OC FORMULARIO")) rowLimit=10000;
+    /* La matriz octubre deja también el Libro Mayor físicamente extendido hasta
+       la fila 1.048.576 aunque los datos reales terminan mucho antes.
+       Leemos un margen amplio de 50.000 filas: cubre holgadamente el año y evita
+       descomprimir decenas de MB de filas residuales vacías/formateadas. */
+    if(s.path===main.path || norm(s.name).startsWith("LM ") || norm(s.name).includes("LIBRO MAYOR")) rowLimit=50000;
     full.set(s.path,makeTable(await readSheet(zip,s.path,shared,rowLimit)));
   }
   main={...main,table:full.get(main.path)};
@@ -708,12 +719,12 @@ function buildData(parsed){
     if(isInSummary){
       classification=resumenCategory; confidence=100;
       const z=norm(infoForm), aa=norm(infoRV), y=norm(infoExcel);
-      if(resumenCategory==="Mandante" && z==="MANDANTE") reason="Incluido en Resumen: AC=Mandante. La columna Info MS Formu también declara Mandante.";
-      else if(resumenCategory==="OBRA" && z==="OBRA") reason="Incluido en Resumen: AC=OBRA. La columna Info MS Formu también declara Obra.";
-      else if(resumenCategory==="AALL" && z==="AALL") reason="Incluido en Resumen: AC=AALL. La columna Info MS Formu también declara AALL.";
-      else if(resumenCategory==="AALL" && (aa==="ALL"||aa==="AALL")) reason="Incluido en Resumen: AC=AALL. La columna Info Rvivallo respalda ALL/AALL.";
-      else if(resumenCategory==="AALL" && (y.includes("AALL")||y.includes("AGUAS DE LLUVIA")||y==="ALL")) reason="Incluido en Resumen: AC=AALL. Info MS Excell contiene una referencia explícita a AALL/aguas lluvia.";
-      else reason=`Incluido en Resumen porque AC=${resumenCategory}. AC no tiene fórmula: la clasificación está cargada directamente en el Libro Mayor y esta línea no muestra un respaldo categórico explícito en Y/Z/AA.`;
+      if(resumenCategory==="Mandante" && z==="MANDANTE") reason="Incluido en Resumen: clasificación Mandante. Info MS Formu también declara Mandante.";
+      else if(resumenCategory==="OBRA" && z==="OBRA") reason="Incluido en Resumen: clasificación OBRA. Info MS Formu también declara Obra.";
+      else if(resumenCategory==="AALL" && z==="AALL") reason="Incluido en Resumen: clasificación AALL. Info MS Formu también declara AALL.";
+      else if(resumenCategory==="AALL" && (aa==="ALL"||aa==="AALL")) reason="Incluido en Resumen: clasificación AALL. Info Rvivallo respalda ALL/AALL.";
+      else if(resumenCategory==="AALL" && (y.includes("AALL")||y.includes("AGUAS DE LLUVIA")||y==="ALL")) reason="Incluido en Resumen: clasificación AALL. Info MS Excell contiene una referencia explícita a AALL/aguas lluvia.";
+      else reason=`Incluido en Resumen porque la clasificación es ${resumenCategory}. La clasificación está cargada directamente en el Libro Mayor y esta línea no muestra un respaldo categórico explícito en los campos auxiliares.`;
     } else if(isAALL2026 && !validResumen){ classification="Pendiente clasificar"; confidence=0; reason="La obra pertenece al universo AALL 2026 de la hoja resumen, pero la clasificación Resumen del movimiento está vacía o no contiene AALL/Mandante/OBRA. Por eso no entra al total oficial."; }
     const projectDesc=String(get(r,["Descripción Partida","Descripcion Partida"])||""); const obraName=meta.name||projectDesc||obra||"Sin obra";
     const document=String(get(r,["# Documento","Documento","N° Documento"])||""); const pdf=String(get(r,["URL PDF","PDF"])||""); const photo=String(get(r,["URL Foto","Foto"])||""); const supervisorCosto=String(get(r,["Supervisor"])||""); const account=String(get(r,["Descripción Cuenta","Descripcion Cuenta"])||""); const rut=String(get(r,["RUT Proveedor","Rut Proveedor"])||""); const ref=String(get(r,["Referencia"])||""); const refOrigin=String(get(r,["Referencia Origen"])||""); const origin=String(get(r,["Origen"])||""); const insumo=String(get(r,["Insumo"])||"");
@@ -960,13 +971,13 @@ function openDetail(id){
   const invoiceHero=validHttp(r.pdf)?`<div class="invoice-hero"><div class="invoice-copy"><b>Factura / documento ${safeText(r.document||"—")}</b><span>Documento de respaldo disponible desde la URL PDF del Libro Mayor.</span></div><a href="${safeText(String(r.pdf).trim())}" target="_blank" rel="noopener noreferrer">Ver factura PDF ↗</a></div>`:"";
   $("modalBody").innerHTML=`
     ${invoiceHero}
-    <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original (K)",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("GD",r.gd)}${detailItem("GP",r.gp)}${detailItem("PA",r.pa)}${detailItem("Supervisor obra",r.supervisorObra)}${detailItem("Supervisor costo (LM)",r.supervisorCosto)}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
+    <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("GD",r.gd)}${detailItem("GP",r.gp)}${detailItem("PA",r.pa)}${detailItem("Supervisor obra",r.supervisorObra)}${detailItem("Supervisor costo (LM)",r.supervisorCosto)}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
     <div class="section-title">Trabajo / glosa</div><div class="raw">${safeText(r.description||"Sin descripción")}</div>
     <div class="section-title">Documentos</div><div class="doc-actions">${docs||'<span class="mini">No se detectaron enlaces web de respaldo en esta línea.</span>'}</div>
     <div class="section-title">Trazabilidad</div>${ev}
     <div class="section-title">Información enlazada en Libro Mayor</div><div class="raw">Info MS Excell: ${safeText(r.infoExcel||"—")}\nInfo MS Formu: ${safeText(r.infoForm||"—")}\nInfo Rvivallo: ${safeText(r.infoRV||"—")}
-AB AALL 2026?: ${safeText(r.directFlag||"—")}
-AC Resumen: ${safeText(r.resumenCategory||"—")}</div>
+AALL 2026?: ${safeText(r.directFlag||"—")}
+Clasificación Resumen: ${safeText(r.resumenCategory||"—")}</div>
     <div class="section-title">Origen exacto</div><div class="raw">Hoja: ${safeText(state.mainSheet)}\nFila: ${r.sourceRow}\nID local: ${safeText(r.id)}</div>
     <div class="section-title">Fila original del Libro Mayor</div><div class="raw">${safeText(raw)}</div>`;
   $("modal").classList.add("open");
@@ -974,7 +985,7 @@ AC Resumen: ${safeText(r.resumenCategory||"—")}</div>
 function resetFilters(){ ["fObra","fGP","fPA","fSupObra","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
 function csvCell(v){const s=String(v??"");return `"${s.replace(/"/g,'""')}"`;}
 function exportCSV(){
-  const headers=["Fecha","Periodo","Obra","Nombre obra","GD","GP","PA","Supervisor obra","Supervisor costo LM","Proveedor","RUT","OC","Documento","Descripción","Clasificación gasto","Descripción Cuenta original (K)","Monto","Clasificación Resumen","Incluido Resumen","Motivo","Hoja origen","Fila origen","PDF"];
+  const headers=["Fecha","Periodo","Obra","Nombre obra","GD","GP","PA","Supervisor obra","Supervisor costo LM","Proveedor","RUT","OC","Documento","Descripción","Clasificación gasto","Descripción Cuenta original","Monto","Clasificación Resumen","Incluido Resumen","Motivo","Hoja origen","Fila origen","PDF"];
   const lines=[headers.map(csvCell).join(";")]; for(const r of state.filtered)lines.push([r.date,periodLabel(r.period),r.obra,r.obraName,r.gd,r.gp,r.pa,r.supervisorObra,r.supervisorCosto,r.provider,r.rut,r.oc,r.document,r.description,r.costGroup||costGroup(r.account),r.account,r.amount,r.classification,r.isInSummary?"Sí":"No",r.reason,state.mainSheet,r.sourceRow,r.pdf].map(csvCell).join(";")); const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob);a.download=`AALL_vista_${new Date().toISOString().slice(0,10)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
@@ -982,7 +993,7 @@ async function loadFile(file){
   clearMessage(); setLoader("Abriendo Excel…"); $("infoFile").textContent=file.name; try{
     const parsed=await parseExcel(file); setLoader("Construyendo trazabilidad…"); buildData(parsed); state.fileName=file.name; $("infoMain").textContent=state.mainSheet;$("infoRows").textContent=state.rows.length.toLocaleString("es-CL");$("infoSheets").textContent=state.sourceSheets.join(" · "); updateFilterOptions(); $("exportBtn").disabled=false;$("resetBtn").disabled=false; resetFilters();
     if(canUpdateClient()) await publishCurrentDataset();
-    const missing=[]; if(!parsed.obras)missing.push("Obras con AALL"); if(!parsed.info)missing.push("Info BD AALL"); if(!parsed.form)missing.push("OC Formulario"); if(!parsed.ocex)missing.push("OCExcell"); if(!parsed.summary)missing.push("resumen");
+    const missing=[]; if(!parsed.form)missing.push("OC Formulario"); if(!parsed.ocex)missing.push("OCExcell"); if(!parsed.summary)missing.push("resumen");
     const pending=state.rows.filter(r=>r.classification==="Pendiente clasificar"); const lm=state.lmSummary; const sh=state.sheetSummary; const diff=sh?lm.Total-sh.Total:0;
     const square=sh&&Math.abs(diff)<1;
     const obrasResumen=state.summaryObras?.length||0; const obrasCostoAall=(state.summaryObras||[]).filter(x=>Math.abs(num(x.AALL))>=0.005).length; const obraCheck=state.summaryCheck; const rain=state.rainWorks||[]; const rainZero=rain.filter(w=>!w.hasCost).length;
