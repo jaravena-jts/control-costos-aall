@@ -161,7 +161,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 25 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 26 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -1054,7 +1054,7 @@ async function publishCurrentDataset(){
 function hydrateDataset(d){
   if(!d)return false; state.rows=(d.rows||[]).map(r=>({...r,costGroup:r.costGroup||costGroup(r.account)})); state.fileName=d.meta?.fileName||"Dataset publicado";state.mainSheet=d.meta?.mainSheet||"";state.sourceSheets=d.meta?.sourceSheets||[];state.datasetMeta=d.meta||null;state.sheetSummary=d.sheetSummary||null;state.lmSummary=d.lmSummary||null;state.summaryObras=d.summaryObras||[];state.rainWorks=(d.rainWorks||[]).map(w=>{const amount=num(w.amount), amountBlank=w.amountBlank===true; const noCostAlert=w.noCostAlert===true||amountBlank||w.hasCost===false||Math.abs(amount)<0.005; return {...w,amount,amountBlank,noCostAlert,hasCost:!noCostAlert};});state.summaryCheck=d.summaryCheck||null;
   $("infoFile").textContent=state.fileName;$("infoMain").textContent=state.mainSheet||"—";$("infoRows").textContent=state.rows.length.toLocaleString('es-CL');$("infoSheets").textContent=state.sourceSheets.join(' · ')||"—";updateFilterOptions();$("exportBtn").disabled=!state.rows.length;$("resetBtn").disabled=!state.rows.length;resetFilters();
-  if(state.datasetMeta?.updatedAt) message(`Versión publicada: <b>${safeText(state.fileName)}</b> · actualizada ${safeText(new Date(state.datasetMeta.updatedAt).toLocaleString('es-CL'))} por ${safeText(state.datasetMeta.updatedBy||'—')}.`,"good");
+  if(state.datasetMeta?.updatedAt) message(`Versión publicada: <b>${safeText(state.fileName)}</b> · última actualización ${safeText(new Date(state.datasetMeta.updatedAt).toLocaleString('es-CL'))}.`,"good");
   return true;
 }
 function renderRole(){
