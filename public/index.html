@@ -161,7 +161,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 26 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 27 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -848,11 +848,15 @@ function renderKpis(){
 }
 function accountColor(name){
   const n=norm(name);
-  if(n==="MATERIALES")return"#17849b";
-  if(n==="SUBCONTRATOS")return"#2855a6";
-  if(n==="SUBCONTRATOS MANO DE OBRA")return"#17845b";
-  if(n==="SERVICIOS Y CONSUMO GENERALES")return"#b36b00";
-  const palette=["#586574","#7b5ea7","#9a5b4f","#397b77","#6e7e35","#8a5f2d"];
+  /* Paleta ejecutiva v27: colores fijos por tipo de gasto para mantener
+     la misma lectura visual en todos los gráficos y filtros. */
+  if(n==="MATERIALES")return"#0F8B8D";
+  if(n==="SUBCONTRATOS")return"#3157A4";
+  if(n==="SUBCONTRATOS MANO DE OBRA"||n==="MANO DE OBRA")return"#6F8E3A";
+  if(n==="SERVICIOS Y CONSUMO GENERALES")return"#D28A17";
+  if(n==="ARRIENDOS"||n==="ARRIENDO")return"#6C63A8";
+  if(n==="NO FACTURADO")return"#B85C4B";
+  const palette=["#4C6A92","#2E7D6E","#7A5C8E","#8B6F47","#5F7B87","#A66D4F"];
   let h=0; for(const ch of n)h=(h*31+ch.charCodeAt(0))>>>0; return palette[h%palette.length];
 }
 function renderObraCostChart(){
