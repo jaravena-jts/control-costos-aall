@@ -31,7 +31,44 @@ function atomicWrite(file, value) {
   fs.writeFileSync(tmp, JSON.stringify(value), 'utf8');
   fs.renameSync(tmp, file);
 }
-function settings() { return readJson(SETTINGS_FILE, { blocked: false, message: 'Sistema temporalmente bloqueado por administración.' }); }
+function settings() {
+  const base={blocked:false,message:'Sistema temporalmente bloqueado por administración.',driveSources:{costUrl:'',ocUrl:'',authUrl:''}};
+  const x=readJson(SETTINGS_FILE,base);
+  return {...base,...x,driveSources:{...base.driveSources,...(x.driveSources||{})}};
+}
+function driveFileId(value){
+  const s=String(value||'').trim();
+  if(!s)return '';
+  if(/^[A-Za-z0-9_-]{20,}$/.test(s))return s;
+  try{
+    const u=new URL(s);
+    if(!['docs.google.com','drive.google.com'].includes(u.hostname))return '';
+    const m=u.pathname.match(/\/(?:spreadsheets\/d|file\/d)\/([A-Za-z0-9_-]+)/);
+    if(m)return m[1];
+    return u.searchParams.get('id')||'';
+  }catch{return '';}
+}
+function validDriveSource(value){ return !value || !!driveFileId(value); }
+async function downloadDriveXlsx(sourceUrl){
+  const id=driveFileId(sourceUrl); if(!id)throw Object.assign(new Error('Link de Google Drive inválido.'),{status:400});
+  const candidates=[
+    `https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/export?format=xlsx`,
+    `https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download&confirm=t`,
+    `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}`
+  ];
+  let last='';
+  for(const url of candidates){
+    try{
+      const r=await fetch(url,{redirect:'follow',headers:{'User-Agent':'Control-AALL-Railway/1.0'}});
+      if(!r.ok){last=`HTTP ${r.status}`;continue;}
+      const ab=await r.arrayBuffer(); const buf=Buffer.from(ab);
+      if(buf.length>MAX_BODY)throw Object.assign(new Error('El archivo de Drive excede el tamaño permitido.'),{status:413});
+      if(buf.length>=4 && buf[0]===0x50 && buf[1]===0x4b)return buf;
+      last='Google devolvió una página web en vez del Excel. Revisa que el archivo esté en “Cualquiera con el enlace · Lector”.';
+    }catch(e){last=e.message||String(e);}
+  }
+  throw Object.assign(new Error(last||'No fue posible descargar el Excel desde Google Drive.'),{status:502});
+}
 function history() { return readJson(HISTORY_FILE, []); }
 function json(res, status, payload, headers={}) {
   const body = JSON.stringify(payload);
@@ -192,8 +229,40 @@ const server=http.createServer(async (req,res)=>{
     if (pathname === '/api/admin' && req.method==='GET') {
       if(!isAdmin(me)) return json(res,403,{error:'Acceso exclusivo del administrador.'});
       const d=readJson(DASHBOARD_FILE,null);
-      return json(res,200,{settings:cfg,history:history().slice(0,20),datasetMeta:d?.meta||null,lmSummary:d?.lmSummary||null,sheetSummary:d?.sheetSummary||null,users:[{email:ADMIN_EMAIL,role:'admin',configured:!!ADMIN_PASSWORD},{email:UPDATER_EMAIL,role:'updater',configured:!!UPDATER_PASSWORD}]});
+      return json(res,200,{settings:cfg,driveSources:cfg.driveSources||{},history:history().slice(0,20),datasetMeta:d?.meta||null,lmSummary:d?.lmSummary||null,sheetSummary:d?.sheetSummary||null,users:[{email:ADMIN_EMAIL,role:'admin',configured:!!ADMIN_PASSWORD},{email:UPDATER_EMAIL,role:'updater',configured:!!UPDATER_PASSWORD}]});
     }
+    if (pathname === '/api/admin/drive-sources' && req.method==='POST') {
+      if(!isAdmin(me)) return json(res,403,{error:'Acceso exclusivo del administrador.'});
+      const body=await readJsonBody(req);
+      const sources={
+        costUrl:String(body.costUrl||'').trim(),
+        ocUrl:String(body.ocUrl||'').trim(),
+        authUrl:String(body.authUrl||'').trim()
+      };
+      if(!validDriveSource(sources.costUrl)||!validDriveSource(sources.ocUrl)||!validDriveSource(sources.authUrl))
+        return json(res,400,{error:'Uno de los links no corresponde a un archivo válido de Google Drive.'});
+      const next={...cfg,driveSources:sources};
+      atomicWrite(SETTINGS_FILE,next);
+      return json(res,200,{ok:true,driveSources:sources});
+    }
+    if (pathname === '/api/drive/source' && req.method==='GET') {
+      if(!canUpdate(me)) return json(res,403,{error:'Solo administrador o actualizador pueden sincronizar desde Drive.'});
+      if(cfg.blocked && !isAdmin(me)) return json(res,423,{error:'La página está bloqueada por administración.'});
+      const type=String(u.searchParams.get('type')||'');
+      const key=type==='cost'?'costUrl':type==='oc'?'ocUrl':type==='auth'?'authUrl':'';
+      if(!key) return json(res,400,{error:'Fuente Drive inválida.'});
+      const source=cfg.driveSources?.[key]||'';
+      if(!source) return json(res,404,{error:'Este archivo Drive todavía no está configurado en el panel administrador.'});
+      const buf=await downloadDriveXlsx(source);
+      res.writeHead(200,{
+        'Content-Type':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Length':String(buf.length),
+        'Content-Disposition':`attachment; filename="${type}.xlsx"`,
+        'Cache-Control':'no-store'
+      });
+      return res.end(buf);
+    }
+
     if (pathname === '/api/admin/block' && req.method==='POST') {
       if(!isAdmin(me)) return json(res,403,{error:'Acceso exclusivo del administrador.'});
       const body=await readJsonBody(req); const next={blocked:!!body.blocked,message:String(body.message||'Sistema temporalmente bloqueado por administración.').slice(0,300)}; atomicWrite(SETTINGS_FILE,next); return json(res,200,{ok:true,settings:next});
