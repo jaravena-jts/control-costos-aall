@@ -163,7 +163,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 32 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 33 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -207,7 +207,7 @@ button,input,select{font:inherit} button{cursor:pointer}
             <input class="admin-input" id="driveAuthUrl" placeholder="Pega aquí el link del Formulario de autorización">
           </label>
         </div>
-        <div class="login-actions" style="justify-content:flex-start;margin-top:10px"><button class="btn" id="saveDriveSourcesBtn">Guardar links Drive</button></div>
+        <div class="login-actions" style="justify-content:flex-start;margin-top:10px"><button class="btn" id="saveDriveSourcesBtn">Guardar y actualizar desde Drive</button></div>
         <div class="drive-source-status" id="driveSourceStatus">Los archivos deben estar compartidos como “Cualquiera con el enlace · Lector”.</div>
       </div>
       <div class="admin-section">
@@ -1253,8 +1253,10 @@ async function saveDriveSources(){
   const st=$("driveSourceStatus"); st.textContent="Guardando fuentes…";
   try{
     await api('/api/admin/drive-sources',{method:'POST',body:JSON.stringify(payload)});
-    st.textContent="Links guardados. Ya puedes usar “Actualizar desde Drive”.";
+    st.textContent="Links guardados. Probando acceso y actualizando desde Drive…";
     await refreshAdmin();
+    $("adminModal").classList.remove("open");
+    await syncFromDrive();
   }catch(e){st.textContent="No se pudieron guardar los links: "+e.message;}
 }
 async function toggleBlock(){if(!isAdminClient())return;const x=state.adminData||await refreshAdmin();const next=!x.settings.blocked;try{await api('/api/admin/block',{method:'POST',body:JSON.stringify({blocked:next,message:$("blockMessage").value.trim()})});await refreshSession();await refreshAdmin();}catch(e){alert(e.message);}}
