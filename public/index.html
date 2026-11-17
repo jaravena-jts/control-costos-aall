@@ -165,7 +165,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 37 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 38 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -1095,7 +1095,7 @@ function render(){ renderKpis();renderObraCostChart();renderTable(); }
 function detailItem(k,v){return `<div class="detail"><div class="k">${safeText(k)}</div><div class="v">${safeText(v||"—")}</div></div>`;}
 function openDetail(id){
   const r=state.rows.find(x=>x.id===id); if(!r)return; $("modalTitle").textContent=`${r.obra} · ${r.obraName} · ${money(r.amount)}`;
-  let docs=""; if(r.form&&validHttp(r.form.quoteUrl))docs+=`<a href="${safeText(r.form.quoteUrl)}" target="_blank" rel="noopener">Cotización ↗</a>`; if(r.form&&validHttp(r.form.approvalUrl))docs+=`<a href="${safeText(r.form.approvalUrl)}" target="_blank" rel="noopener">Aprobación / autorización ↗</a>`;
+  let docs=""; if(r.ox&&validHttp(r.ox.imageUrl))docs+=`<a href="${safeText(r.ox.imageUrl)}" target="_blank" rel="noopener noreferrer">Orden de compra PDF ↗</a>`; if(r.form&&validHttp(r.form.quoteUrl))docs+=`<a href="${safeText(r.form.quoteUrl)}" target="_blank" rel="noopener">Cotización ↗</a>`; if(r.form&&validHttp(r.form.approvalUrl))docs+=`<a href="${safeText(r.form.approvalUrl)}" target="_blank" rel="noopener">Aprobación / autorización ↗</a>`;
   let ev=`<div class="evidence ${r.classification==="Pendiente clasificar"?'no':''}"><b>${safeText(r.classification)}</b><br>${safeText(r.reason)}</div>`;
   if(r.form)ev+=`<div class="evidence"><b>Solicitud / autorización del costo — OC ${safeText(r.form.oc)}</b><br>Fecha solicitud: ${safeText(dateDisplay(r.form.requestedAt)||"—")}<br>Obra: ${safeText(r.form.obra)} ${safeText(r.form.obraName)}<br>Depto/sector: ${safeText(r.form.depto||"—")} · Folio: ${safeText(r.form.folio||"—")}<br>Corresponde a AALL: ${safeText(r.form.isAALL||"—")} · Cobro: ${safeText(r.form.charges.join(" / ")||"—")}<br>Monto solicitud: ${safeText(r.form.amount?money(r.form.amount):"—")}<br>Categoría: ${safeText(r.form.category||"—")}<br>Trabajo: ${safeText(r.form.description||"—")}<br>Cotización: ${safeText(r.form.quote||"—")}</div>`;
   if(r.ox)ev+=`<div class="evidence"><b>Estado y trazabilidad de OC — OC ${safeText(r.ox.oc)}</b><br>Estado: ${safeText(r.ox.status||"—")} · Creación: ${safeText(dateDisplay(r.ox.date)||"—")}<br>Proveedor: ${safeText(r.ox.provider||"—")}${r.ox.rut?" · RUT "+safeText(r.ox.rut):""}<br>Obra: ${safeText(r.ox.obra||"—")} ${safeText(r.ox.obraName||"")}<br>Monto OC: ${safeText(money(r.ox.net))} · Saldo: ${safeText(money(r.ox.balance))}<br>Tipo: ${safeText(r.ox.type||"—")} · Envío BC: ${safeText(r.ox.sent||"—")} · Completada: ${safeText(r.ox.completed||"—")}<br>Ingreso: ${safeText(r.ox.ingreso||"—")}${r.ox.product?"<br>Producto/trabajo: "+safeText(r.ox.product):""}${r.ox.requestedBy?"<br>Solicita: "+safeText(r.ox.requestedBy):""}</div>`;
@@ -1104,7 +1104,7 @@ function openDetail(id){
   $("modalBody").innerHTML=`
     <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("GD",r.gd)}${detailItem("GP",r.gp)}${detailItem("PA",r.pa)}${detailItem("Estado OC",r.ox?.status||"—")}${detailItem("Autorización AALL",r.form?(r.form.isAALL||r.form.charges.join(" / ")||"Registrada"):"Sin registro")}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
     <div class="section-title">Trabajo / glosa</div><div class="raw">${safeText(r.description||"Sin descripción")}</div>
-    <div class="section-title">Respaldos</div><div class="doc-actions">${docs||'<span class="mini">Esta OC no registra cotización ni aprobación enlazada.</span>'}</div>
+    <div class="section-title">Respaldos</div><div class="doc-actions">${docs||'<span class="mini">Esta OC no registra orden de compra, cotización ni aprobación enlazada.</span>'}</div>
     <div class="section-title">Trazabilidad</div>${ev}
     <div class="section-title">Información enlazada en Libro Mayor</div><div class="raw">Info MS Excell: ${safeText(r.infoExcel||"—")}\nInfo MS Formu: ${safeText(r.infoForm||"—")}\nInfo Rvivallo: ${safeText(r.infoRV||"—")}
 AALL 2026?: ${safeText(r.directFlag||"—")}
