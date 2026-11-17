@@ -165,7 +165,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 40 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 41 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -232,7 +232,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 
 const state = {
   rows: [], filtered: [], obraMeta: new Map(), mainSheet: "", sourceSheets: [], fileName: "",
-  sortKey: "dateKey", sortDir: -1, formMap: new Map(), excelMap: new Map(), infoCases: new Map(), sheetSummary: null, lmSummary: null, summaryObras: [], rainWorks: [], summaryCheck: null, session: null, datasetMeta: null, serverSettings: null, chartExpandedObra: "", rainExpandedObra: "", tableDrilldown: null
+  sortKey: "dateKey", sortDir: -1, formMap: new Map(), excelMap: new Map(), infoCases: new Map(), sheetSummary: null, lmSummary: null, summaryObras: [], rainWorks: [], summaryCheck: null, session: null, datasetMeta: null, serverSettings: null, chartExpandedObra: "", rainExpandedObra: "", tableDrilldown: null, driveHashes: {}, lastDriveSyncAt: ""
 };
 
 const $ = id => document.getElementById(id);
@@ -1120,11 +1120,17 @@ function exportCSV(){
   const lines=[headers.map(csvCell).join(";")]; for(const r of state.filtered)lines.push([r.date,periodLabel(r.period),r.obra,r.obraName,r.gd,r.gp,r.pa,r.provider,r.rut,r.oc,r.document,r.description,r.costGroup||costGroup(r.account),r.account,r.amount,r.classification,r.isInSummary?"Sí":"No",r.reason,state.mainSheet,r.sourceRow,r.pdf].map(csvCell).join(";")); const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob);a.download=`AALL_vista_${new Date().toISOString().slice(0,10)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
+async function sha256Blob(blob){
+  const ab=await blob.arrayBuffer();
+  const digest=await crypto.subtle.digest("SHA-256",ab);
+  return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
 async function fetchDriveFile(type,name){
   const res=await fetch('/api/drive/source?type='+encodeURIComponent(type),{credentials:'same-origin'});
   if(!res.ok){let msg='No fue posible leer la fuente Drive.';try{const x=await res.json();msg=x.error||msg;}catch(_){}throw new Error(msg);}
   const blob=await res.blob();
-  return new File([blob],name,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const hash=await sha256Blob(blob);
+  return {file:new File([blob],name,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),hash};
 }
 const AUTO_SYNC_INTERVAL_MS=10*60*1000;
 const AUTO_SYNC_MIN_GAP_MS=3*60*1000;
@@ -1153,23 +1159,35 @@ async function runAutoSync(force=false){
 async function syncFromDrive(options={}){
   if(!canUpdateClient())return;
   const silent=!!options.silent;
-  if(!silent){ clearMessage(); setLoader("Descargando matriz de costos desde Drive…"); }
+  const force=!!options.force;
+  if(!silent){ clearMessage(); setLoader("Comprobando cambios en Google Drive…"); }
   const btn=$("driveSyncBtn"); if(btn)btn.disabled=true;
   try{
-    const costFile=await fetchDriveFile('cost','Gastos AALL 2026 JG.xlsx');
-    if(!silent)setLoader("Procesando matriz de costos…");
-    const parsed=await parseExcel(costFile);
+    const costSrc=await fetchDriveFile('cost','Gastos AALL 2026 JG.xlsx');
+    if(!silent)setLoader("Comprobando Reporte OC…");
+    const ocSrc=await fetchDriveFile('oc','Reporte OC.xlsx');
+    if(!silent)setLoader("Comprobando autorizaciones AALL…");
+    const authSrc=await fetchDriveFile('auth','Formulario Solicitud de OC.xlsx');
+
+    const nextHashes={cost:costSrc.hash,oc:ocSrc.hash,auth:authSrc.hash};
+    const prev=state.driveHashes||state.datasetMeta?.driveHashes||{};
+    const unchanged=prev.cost===nextHashes.cost && prev.oc===nextHashes.oc && prev.auth===nextHashes.auth;
+
+    lastAutoSyncAt=Date.now();
+    if(unchanged && !force){
+      if(!silent)message('Google Drive revisado: <b>sin cambios en las tres fuentes</b>. Se mantiene la última versión publicada.',"good");
+      return {changed:false};
+    }
+
+    if(!silent)setLoader("Procesando matriz de costos modificada…");
+    const parsed=await parseExcel(costSrc.file);
     let externalCount=0;
-    try{
-      if(!silent)setLoader("Descargando Reporte OC desde Drive…");
-      const ocFile=await fetchDriveFile('oc','Reporte OC.xlsx');
-      parsed.ocex=await parseAuxExcel(ocFile,'oc'); externalCount++;
-    }catch(e){console.warn(e); if(!parsed.ocex)throw e;}
-    try{
-      if(!silent)setLoader("Descargando autorización AALL desde Drive…");
-      const authFile=await fetchDriveFile('auth','Formulario Solicitud de OC.xlsx');
-      parsed.form=await parseAuxExcel(authFile,'form'); externalCount++;
-    }catch(e){console.warn(e); if(!parsed.form)throw e;}
+    if(!silent)setLoader("Procesando Reporte OC…");
+    parsed.ocex=await parseAuxExcel(ocSrc.file,'oc'); externalCount++;
+    if(!silent)setLoader("Procesando autorizaciones AALL…");
+    parsed.form=await parseAuxExcel(authSrc.file,'form'); externalCount++;
+    state.driveHashes=nextHashes;
+    state.lastDriveSyncAt=new Date().toISOString();
     if(!silent)setLoader("Construyendo trazabilidad integrada…");
     buildData(parsed);
     state.fileName="Google Drive · Gastos AALL 2026";
@@ -1204,7 +1222,7 @@ async function loadFile(file){
   finally{stopLoader();}
 }
 
-const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});$("driveSyncBtn").addEventListener("click",async()=>{await syncFromDrive();scheduleAutoSync();});
+const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});$("driveSyncBtn").addEventListener("click",async()=>{await syncFromDrive({force:true});scheduleAutoSync();});
 ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)loadFile(f);});
 ["fUniverse","fObra","fGP","fPA","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=k==="amount"||k==="dateKey"?-1:1;}renderTable();}));
@@ -1221,7 +1239,7 @@ async function api(path,options={}){
 }
 function datasetForServer(){
   const rows=state.rows.map(r=>{ const {raw,...rest}=r; return {...rest,costGroup:r.costGroup||costGroup(r.account)}; });
-  return {meta:{fileName:state.fileName,mainSheet:state.mainSheet,sourceSheets:state.sourceSheets},sheetSummary:state.sheetSummary,lmSummary:state.lmSummary,summaryObras:state.summaryObras,rainWorks:state.rainWorks,summaryCheck:state.summaryCheck,rows};
+  return {meta:{fileName:state.fileName,mainSheet:state.mainSheet,sourceSheets:state.sourceSheets,driveHashes:state.driveHashes||{},lastDriveSyncAt:state.lastDriveSyncAt||""},sheetSummary:state.sheetSummary,lmSummary:state.lmSummary,summaryObras:state.summaryObras,rainWorks:state.rainWorks,summaryCheck:state.summaryCheck,rows};
 }
 async function publishCurrentDataset(){
   const p=$("publishState"); p.className="publish-state";p.textContent="Publicando actualización para todos los visores…";
@@ -1229,7 +1247,7 @@ async function publishCurrentDataset(){
   catch(e){p.className="publish-state err";p.textContent=`No se pudo publicar: ${e.message}`;throw e;}
 }
 function hydrateDataset(d){
-  if(!d)return false; state.rows=(d.rows||[]).map(r=>({...r,costGroup:r.costGroup||costGroup(r.account)})); state.fileName=d.meta?.fileName||"Dataset publicado";state.mainSheet=d.meta?.mainSheet||"";state.sourceSheets=d.meta?.sourceSheets||[];state.datasetMeta=d.meta||null;state.sheetSummary=d.sheetSummary||null;state.lmSummary=d.lmSummary||null;state.summaryObras=d.summaryObras||[];state.rainWorks=(d.rainWorks||[]).map(w=>{const amount=num(w.amount), amountBlank=w.amountBlank===true; const noCostAlert=w.noCostAlert===true||amountBlank||w.hasCost===false||Math.abs(amount)<0.005; return {...w,amount,amountBlank,noCostAlert,hasCost:!noCostAlert};});state.summaryCheck=d.summaryCheck||null;
+  if(!d)return false; state.rows=(d.rows||[]).map(r=>({...r,costGroup:r.costGroup||costGroup(r.account)})); state.fileName=d.meta?.fileName||"Dataset publicado";state.mainSheet=d.meta?.mainSheet||"";state.sourceSheets=d.meta?.sourceSheets||[];state.datasetMeta=d.meta||null;state.driveHashes=d.meta?.driveHashes||{};state.lastDriveSyncAt=d.meta?.lastDriveSyncAt||"";state.sheetSummary=d.sheetSummary||null;state.lmSummary=d.lmSummary||null;state.summaryObras=d.summaryObras||[];state.rainWorks=(d.rainWorks||[]).map(w=>{const amount=num(w.amount), amountBlank=w.amountBlank===true; const noCostAlert=w.noCostAlert===true||amountBlank||w.hasCost===false||Math.abs(amount)<0.005; return {...w,amount,amountBlank,noCostAlert,hasCost:!noCostAlert};});state.summaryCheck=d.summaryCheck||null;
   $("infoFile").textContent=state.fileName;$("infoMain").textContent=state.mainSheet||"—";$("infoRows").textContent=state.rows.length.toLocaleString('es-CL');$("infoSheets").textContent=state.sourceSheets.join(' · ')||"—";updateFilterOptions();$("exportBtn").disabled=!state.rows.length;$("resetBtn").disabled=!state.rows.length;resetFilters();
   if(state.datasetMeta?.updatedAt) message(`Versión publicada: <b>${safeText(state.fileName)}</b> · última actualización ${safeText(new Date(state.datasetMeta.updatedAt).toLocaleString('es-CL'))}.`,"good");
   return true;
@@ -1251,7 +1269,7 @@ function hideLocked(){$("lockOverlay").classList.remove('show');}
 async function refreshSession(){const x=await api('/api/session');state.session=x.user;state.serverSettings=x;renderRole();if(x.blocked&&!isAdminClient())showLocked(x.blockMessage);else hideLocked();return x;}
 async function loadPublished(){try{const x=await api('/api/dashboard');if(x.dataset)hydrateDataset(x.dataset);else message('Todavía no existe una planilla publicada. Un administrador o actualizador debe ingresar y cargar el Excel base.', '');}catch(e){if(e.status===423)showLocked(e.data?.message);else message(`No se pudo cargar la versión publicada: ${safeText(e.message)}`,'error');}}
 function openLogin(){$("loginError").textContent='';$("loginPassword").value='';$("loginModal").classList.add('open');setTimeout(()=>$("loginEmail").focus(),30);}
-async function doLogin(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginError").textContent='';try{const x=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});state.session=x.user;$("loginModal").classList.remove('open');renderRole();if(x.blocked&&!isAdminClient())showLocked(state.serverSettings?.blockMessage);else hideLocked();await loadPublished();if(isAdminClient())await refreshAdmin();if(canUpdateClient()){scheduleAutoSync();runAutoSync(true);}}catch(e){$("loginError").textContent=e.message;}}
+async function doLogin(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginError").textContent='';try{const x=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});state.session=x.user;$("loginModal").classList.remove('open');renderRole();if(x.blocked&&!isAdminClient())showLocked(state.serverSettings?.blockMessage);else hideLocked();await loadPublished();if(isAdminClient())await refreshAdmin();if(canUpdateClient()){scheduleAutoSync();runAutoSync(false);}}catch(e){$("loginError").textContent=e.message;}}
 async function doLogout(){stopAutoSync();try{await api('/api/logout',{method:'POST',body:'{}'});}catch(_){ } state.session=null;renderRole();await refreshSession();if(!state.serverSettings?.blocked)await loadPublished();}
 async function refreshAdmin(){
   if(!isAdminClient())return;try{
@@ -1288,12 +1306,12 @@ async function saveDriveSources(){
     st.textContent="Links guardados. Probando acceso y actualizando desde Drive…";
     await refreshAdmin();
     $("adminModal").classList.remove("open");
-    await syncFromDrive();
+    await syncFromDrive({force:true});
     scheduleAutoSync();
   }catch(e){st.textContent="No se pudieron guardar los links: "+e.message;}
 }
 async function toggleBlock(){if(!isAdminClient())return;const x=state.adminData||await refreshAdmin();const next=!x.settings.blocked;try{await api('/api/admin/block',{method:'POST',body:JSON.stringify({blocked:next,message:$("blockMessage").value.trim()})});await refreshSession();await refreshAdmin();}catch(e){alert(e.message);}}
-async function boot(){try{await refreshSession();if(!state.serverSettings?.blocked||isAdminClient())await loadPublished();if(canUpdateClient()){scheduleAutoSync();setTimeout(()=>runAutoSync(true),900);}}catch(e){message(`No se pudo iniciar la conexión con el servidor: ${safeText(e.message)}`,'error');}}
+async function boot(){try{await refreshSession();if(!state.serverSettings?.blocked||isAdminClient())await loadPublished();if(canUpdateClient()){scheduleAutoSync();setTimeout(()=>runAutoSync(false),900);}}catch(e){message(`No se pudo iniciar la conexión con el servidor: ${safeText(e.message)}`,'error');}}
 
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&canUpdateClient())runAutoSync(false);});
 window.addEventListener("focus",()=>{if(canUpdateClient())runAutoSync(false);});
