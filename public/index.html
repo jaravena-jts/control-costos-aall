@@ -165,7 +165,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 35 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 36 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -998,17 +998,15 @@ function renderObraCostChart(){
   };
   const detailHtml=v=>{
     if(!v)return '';
-    const obs=obsText(v);
     const extraMeta=[v.gd?`<div><b>GD</b>${safeText(v.gd)}</div>`:'',v.gp?`<div><b>GP</b>${safeText(v.gp)}</div>`:'',v.pa?`<div><b>PA</b>${safeText(v.pa)}</div>`:''].join('');
     const meta=`<div class="obra-breakdown-meta">${extraMeta}<div><b>Estado</b>${safeText(v.status||'Sin estatus')}</div><div><b>Costo</b>${v.noCost?'$0':safeText(money(v.total))}</div><div><b>Gestionado por</b>${safeText(v.medio||'Sin gestión informada')}</div></div>`;
-    const observations=`<div class="obra-detail-observations"><div><b>Observación 1</b>${safeText(obs.o1)}</div><div><b>Observación 2</b>${safeText(obs.o2)}</div></div>`;
     if(v.noCost){
-      return `<div class="obra-breakdown no-cost-detail"><div class="obra-breakdown-head"><b>${safeText(v.label)}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${meta}${observations}<div class="zero-detail-message">⚠ Esta obra registra atención de Postventa/AALL, pero no registra costo por PV.</div></div>`;
+      return `<div class="obra-breakdown no-cost-detail"><div class="obra-breakdown-head"><b>${safeText(v.label)}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${meta}<div class="zero-detail-message">⚠ Esta obra registra atención de Postventa/AALL, pero no registra costo por PV.</div></div>`;
     }
     const items=orderAccounts(v.accounts.entries());
     const detailMax=Math.max(...items.map(([,val])=>Math.abs(val)),1);
     const breakdown=items.length?items.map(([acc,val])=>{const pctTotal=v.total?Math.abs(val/v.total)*100:0;const bar=Math.abs(val)/detailMax*100;return `<div class="breakdown-row" data-cost-drill="1" data-drill-obra="${safeText(v.key)}" data-drill-account="${safeText(encodeURIComponent(acc))}" title="Filtrar detalle de gastos por ${safeText(acc)}"><div class="breakdown-label">${safeText(acc)}</div><div class="breakdown-track"><div class="breakdown-fill" style="width:${bar}%;background:${accountColor(acc)}"></div></div><div class="breakdown-value">${safeText(money(val))}</div><div class="breakdown-pct">${pctTotal.toLocaleString('es-CL',{maximumFractionDigits:1})}%</div></div>`;}).join(''):'<div class="mini">No hay detalle de movimientos AALL enlazado para esta obra.</div>';
-    return `<div class="obra-breakdown"><div class="obra-breakdown-head"><b>Detalle de ${safeText(v.label)}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${meta}${observations}${breakdown}</div>`;
+    return `<div class="obra-breakdown"><div class="obra-breakdown-head"><b>Detalle de ${safeText(v.label)}</b><button type="button" data-close-detail="1">Cerrar detalle</button></div>${meta}${breakdown}</div>`;
   };
   const rowHtml=v=>{
     const expanded=state.chartExpandedObra===v.key;
