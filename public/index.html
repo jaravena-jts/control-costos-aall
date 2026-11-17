@@ -165,7 +165,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 38 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 39 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -1126,26 +1126,51 @@ async function fetchDriveFile(type,name){
   const blob=await res.blob();
   return new File([blob],name,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 }
-async function syncFromDrive(){
+const AUTO_SYNC_INTERVAL_MS=10*60*1000;
+const AUTO_SYNC_MIN_GAP_MS=3*60*1000;
+let autoSyncTimer=null, autoSyncBusy=false, lastAutoSyncAt=0;
+
+function stopAutoSync(){
+  if(autoSyncTimer){clearInterval(autoSyncTimer);autoSyncTimer=null;}
+}
+function scheduleAutoSync(){
+  stopAutoSync();
   if(!canUpdateClient())return;
-  clearMessage(); setLoader("Descargando matriz de costos desde Drive…");
-  const btn=$("driveSyncBtn"); btn.disabled=true;
+  autoSyncTimer=setInterval(()=>runAutoSync(false),AUTO_SYNC_INTERVAL_MS);
+}
+async function runAutoSync(force=false){
+  if(!canUpdateClient()||autoSyncBusy)return;
+  const now=Date.now();
+  if(!force && now-lastAutoSyncAt<AUTO_SYNC_MIN_GAP_MS)return;
+  autoSyncBusy=true;
+  try{
+    await syncFromDrive({silent:true});
+    lastAutoSyncAt=Date.now();
+  }catch(e){console.warn("Auto-sync Drive",e);}
+  finally{autoSyncBusy=false;}
+}
+
+async function syncFromDrive(options={}){
+  if(!canUpdateClient())return;
+  const silent=!!options.silent;
+  if(!silent){ clearMessage(); setLoader("Descargando matriz de costos desde Drive…"); }
+  const btn=$("driveSyncBtn"); if(btn)btn.disabled=true;
   try{
     const costFile=await fetchDriveFile('cost','Gastos AALL 2026 JG.xlsx');
-    setLoader("Procesando matriz de costos…");
+    if(!silent)setLoader("Procesando matriz de costos…");
     const parsed=await parseExcel(costFile);
     let externalCount=0;
     try{
-      setLoader("Descargando Reporte OC desde Drive…");
+      if(!silent)setLoader("Descargando Reporte OC desde Drive…");
       const ocFile=await fetchDriveFile('oc','Reporte OC.xlsx');
       parsed.ocex=await parseAuxExcel(ocFile,'oc'); externalCount++;
     }catch(e){console.warn(e); if(!parsed.ocex)throw e;}
     try{
-      setLoader("Descargando autorización AALL desde Drive…");
+      if(!silent)setLoader("Descargando autorización AALL desde Drive…");
       const authFile=await fetchDriveFile('auth','Formulario Solicitud de OC.xlsx');
       parsed.form=await parseAuxExcel(authFile,'form'); externalCount++;
     }catch(e){console.warn(e); if(!parsed.form)throw e;}
-    setLoader("Construyendo trazabilidad integrada…");
+    if(!silent)setLoader("Construyendo trazabilidad integrada…");
     buildData(parsed);
     state.fileName="Google Drive · Gastos AALL 2026";
     $("infoFile").textContent=state.fileName;
@@ -1155,10 +1180,11 @@ async function syncFromDrive(){
     updateFilterOptions(); $("exportBtn").disabled=false;$("resetBtn").disabled=false;resetFilters();
     await publishCurrentDataset();
     const lm=state.lmSummary||{}, sh=state.sheetSummary||{}, diff=(lm.Total||0)-(sh.Total||0);
-    message(`Actualización desde Drive completada. <b>${state.rows.length.toLocaleString("es-CL")} movimientos</b> · Total oficial <b>${money(sh.Total||0)}</b> · diferencia LM/Resumen <b>${money(diff)}</b>. Fuentes auxiliares externas leídas: <b>${externalCount}/2</b>.`,"good");
+    lastAutoSyncAt=Date.now();
+    if(!silent)message(`Actualización desde Drive completada. <b>${state.rows.length.toLocaleString("es-CL")} movimientos</b> · Total oficial <b>${money(sh.Total||0)}</b> · diferencia LM/Resumen <b>${money(diff)}</b>. Fuentes auxiliares externas leídas: <b>${externalCount}/2</b>.`,"good");
   }catch(e){
-    console.error(e); message(`<b>No pude actualizar desde Drive.</b> ${safeText(e.message||e)}<br>Revisa en el Panel administrador que los tres links estén guardados y compartidos como “Cualquiera con el enlace · Lector”.`,"error");
-  }finally{btn.disabled=false;stopLoader();}
+    console.error(e); if(!silent)message(`<b>No pude actualizar desde Drive.</b> ${safeText(e.message||e)}<br>Revisa en el Panel administrador que los tres links estén guardados y compartidos como “Cualquiera con el enlace · Lector”.`,"error"); else throw e;
+  }finally{if(btn)btn.disabled=false;if(!silent)stopLoader();}
 }
 
 async function loadFile(file){
@@ -1174,7 +1200,7 @@ async function loadFile(file){
   finally{stopLoader();}
 }
 
-const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});$("driveSyncBtn").addEventListener("click",syncFromDrive);
+const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});$("driveSyncBtn").addEventListener("click",async()=>{await syncFromDrive();scheduleAutoSync();});
 ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)loadFile(f);});
 ["fUniverse","fObra","fGP","fPA","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=k==="amount"||k==="dateKey"?-1:1;}renderTable();}));
@@ -1221,8 +1247,8 @@ function hideLocked(){$("lockOverlay").classList.remove('show');}
 async function refreshSession(){const x=await api('/api/session');state.session=x.user;state.serverSettings=x;renderRole();if(x.blocked&&!isAdminClient())showLocked(x.blockMessage);else hideLocked();return x;}
 async function loadPublished(){try{const x=await api('/api/dashboard');if(x.dataset)hydrateDataset(x.dataset);else message('Todavía no existe una planilla publicada. Un administrador o actualizador debe ingresar y cargar el Excel base.', '');}catch(e){if(e.status===423)showLocked(e.data?.message);else message(`No se pudo cargar la versión publicada: ${safeText(e.message)}`,'error');}}
 function openLogin(){$("loginError").textContent='';$("loginPassword").value='';$("loginModal").classList.add('open');setTimeout(()=>$("loginEmail").focus(),30);}
-async function doLogin(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginError").textContent='';try{const x=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});state.session=x.user;$("loginModal").classList.remove('open');renderRole();if(x.blocked&&!isAdminClient())showLocked(state.serverSettings?.blockMessage);else hideLocked();await loadPublished();if(isAdminClient())await refreshAdmin();}catch(e){$("loginError").textContent=e.message;}}
-async function doLogout(){try{await api('/api/logout',{method:'POST',body:'{}'});}catch(_){ } state.session=null;renderRole();await refreshSession();if(!state.serverSettings?.blocked)await loadPublished();}
+async function doLogin(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginError").textContent='';try{const x=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});state.session=x.user;$("loginModal").classList.remove('open');renderRole();if(x.blocked&&!isAdminClient())showLocked(state.serverSettings?.blockMessage);else hideLocked();await loadPublished();if(isAdminClient())await refreshAdmin();if(canUpdateClient()){scheduleAutoSync();runAutoSync(true);}}catch(e){$("loginError").textContent=e.message;}}
+async function doLogout(){stopAutoSync();try{await api('/api/logout',{method:'POST',body:'{}'});}catch(_){ } state.session=null;renderRole();await refreshSession();if(!state.serverSettings?.blocked)await loadPublished();}
 async function refreshAdmin(){
   if(!isAdminClient())return;try{
     const x=await api('/api/admin');state.adminData=x;
@@ -1259,11 +1285,14 @@ async function saveDriveSources(){
     await refreshAdmin();
     $("adminModal").classList.remove("open");
     await syncFromDrive();
+    scheduleAutoSync();
   }catch(e){st.textContent="No se pudieron guardar los links: "+e.message;}
 }
 async function toggleBlock(){if(!isAdminClient())return;const x=state.adminData||await refreshAdmin();const next=!x.settings.blocked;try{await api('/api/admin/block',{method:'POST',body:JSON.stringify({blocked:next,message:$("blockMessage").value.trim()})});await refreshSession();await refreshAdmin();}catch(e){alert(e.message);}}
-async function boot(){try{await refreshSession();if(!state.serverSettings?.blocked||isAdminClient())await loadPublished();}catch(e){message(`No se pudo iniciar la conexión con el servidor: ${safeText(e.message)}`,'error');}}
+async function boot(){try{await refreshSession();if(!state.serverSettings?.blocked||isAdminClient())await loadPublished();if(canUpdateClient()){scheduleAutoSync();setTimeout(()=>runAutoSync(true),900);}}catch(e){message(`No se pudo iniciar la conexión con el servidor: ${safeText(e.message)}`,'error');}}
 
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&canUpdateClient())runAutoSync(false);});
+window.addEventListener("focus",()=>{if(canUpdateClient())runAutoSync(false);});
 $("loginBtn").addEventListener('click',openLogin);$("lockLoginBtn").addEventListener('click',openLogin);$("loginClose").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginCancel").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginSubmit").addEventListener('click',doLogin);$("loginPassword").addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});$("logoutBtn").addEventListener('click',doLogout);$("adminBtn").addEventListener('click',async()=>{await refreshAdmin();$("adminModal").classList.add('open');});$("adminClose").addEventListener('click',()=>$("adminModal").classList.remove('open'));$("saveDriveSourcesBtn").addEventListener('click',saveDriveSources);$("toggleBlockBtn").addEventListener('click',toggleBlock);$("adminModal").addEventListener('click',e=>{if(e.target===$("adminModal"))$("adminModal").classList.remove('open');});
 boot();
 
