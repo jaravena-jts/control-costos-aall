@@ -165,7 +165,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 36 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 37 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -250,6 +250,9 @@ function normCode(v){
 }
 function normOC(v){
   let s=String(v ?? "").trim().replace(/\s+/g,"").replace(/\.0+$/,"");
+  /* Las OC numéricas pueden venir como 947981, 0947981, 00947981, etc.
+     Para el cruce se consideran la misma OC, conservando intactos los formatos alfanuméricos. */
+  if(/^\d+$/.test(s)) return s.replace(/^0+(?=\d)/,"");
   return s;
 }
 function safeText(v){ return String(v ?? "").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
