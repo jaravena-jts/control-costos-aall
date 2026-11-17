@@ -165,7 +165,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 39 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 40 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -1180,8 +1180,12 @@ async function syncFromDrive(options={}){
     updateFilterOptions(); $("exportBtn").disabled=false;$("resetBtn").disabled=false;resetFilters();
     await publishCurrentDataset();
     const lm=state.lmSummary||{}, sh=state.sheetSummary||{}, diff=(lm.Total||0)-(sh.Total||0);
+    const sq=state.summaryCheck||{ok:Math.abs(diff)<1,diffs:[]};
+    const diffText=Math.abs(diff)<1
+      ? '<b>CUADRA $0</b>'
+      : `<b>${safeText(money(diff))}</b>${sq.diffs?.length?' · '+sq.diffs.slice(0,3).map(x=>'Obra '+safeText(x.obra)+' '+safeText(money(x.diferencia))).join(' / '):''}`;
     lastAutoSyncAt=Date.now();
-    if(!silent)message(`Actualización desde Drive completada. <b>${state.rows.length.toLocaleString("es-CL")} movimientos</b> · Total oficial <b>${money(sh.Total||0)}</b> · diferencia LM/Resumen <b>${money(diff)}</b>. Fuentes auxiliares externas leídas: <b>${externalCount}/2</b>.`,"good");
+    if(!silent)message(`Actualización desde Drive completada. <b>${state.rows.length.toLocaleString("es-CL")} movimientos</b> · Total oficial <b>${money(sh.Total||0)}</b> · Cuadratura LM/Resumen: ${diffText}. Fuentes auxiliares externas leídas: <b>${externalCount}/2</b>.`,Math.abs(diff)<1?"good":"");
   }catch(e){
     console.error(e); if(!silent)message(`<b>No pude actualizar desde Drive.</b> ${safeText(e.message||e)}<br>Revisa en el Panel administrador que los tres links estén guardados y compartidos como “Cualquiera con el enlace · Lector”.`,"error"); else throw e;
   }finally{if(btn)btn.disabled=false;if(!silent)stopLoader();}
