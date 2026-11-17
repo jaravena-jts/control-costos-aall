@@ -818,7 +818,7 @@ function updateFilterOptions(){
   fillSelect("fMedio",works.map(w=>w.medio),"Todos");
 }
 function applyFilters(){
-  const universe=$("fUniverse").value, obra=$("fObra").value, gp=$("fGP").value, pa=$("fPA").value, so=$("fSupObra").value, cl=$("fClass").value, account=$("fAccount").value, pe=$("fPeriod").value, pr=$("fProvider").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  const universe=$("fUniverse").value, obra=$("fObra").value, gp=$("fGP").value, pa=$("fPA").value, cl=$("fClass").value, account=$("fAccount").value, pe=$("fPeriod").value, pr=$("fProvider").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
   const workMap=new Map((state.rainWorks||[]).map(w=>[w.obra,w]));
   state.filtered=state.rows.filter(r=>{
     if(universe==="summary" && !r.isInSummary)return false;
@@ -969,7 +969,7 @@ function renderObraCostChart(){
 
 function statusClass(v){ const n=norm(v); if(n==="EN CURSO")return"en-curso"; if(n==="TERMINADO")return"terminado"; if(n==="RECHAZADO")return"rechazado"; if(n==="SIN GESTION")return"sin-gestion"; return""; }
 function filteredRainWorks(){
-  const obra=$("fObra").value, gp=$("fGP").value, pa=$("fPA").value, so=$("fSupObra").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
+  const obra=$("fObra").value, gp=$("fGP").value, pa=$("fPA").value, st=$("fStatus").value, medio=$("fMedio").value, q=norm($("fSearch").value);
   return (state.rainWorks||[]).filter(w=>{
     if(obra&&w.obra!==obra)return false;
     if(gp&&w.gp!==gp)return false;
@@ -1000,7 +1000,7 @@ function openDetail(id){
   const invoiceHero=validHttp(r.pdf)?`<div class="invoice-hero"><div class="invoice-copy"><b>Factura / documento ${safeText(r.document||"—")}</b><span>Documento de respaldo disponible desde la URL PDF del Libro Mayor.</span></div><a href="${safeText(String(r.pdf).trim())}" target="_blank" rel="noopener noreferrer">Ver factura PDF ↗</a></div>`:"";
   $("modalBody").innerHTML=`
     ${invoiceHero}
-    <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("GD",r.gd)}${detailItem("GP",r.gp)}${detailItem("PA",r.pa)}${detailItem("Supervisor obra",r.supervisorObra)}${detailItem("Supervisor costo (LM)",r.supervisorCosto)}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
+    <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("GD",r.gd)}${detailItem("GP",r.gp)}${detailItem("PA",r.pa)}${detailItem("Supervisor costo (LM)",r.supervisorCosto)}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
     <div class="section-title">Trabajo / glosa</div><div class="raw">${safeText(r.description||"Sin descripción")}</div>
     <div class="section-title">Documentos</div><div class="doc-actions">${docs||'<span class="mini">No se detectaron enlaces web de respaldo en esta línea.</span>'}</div>
     <div class="section-title">Trazabilidad</div>${ev}
@@ -1011,7 +1011,7 @@ Clasificación Resumen: ${safeText(r.resumenCategory||"—")}</div>
     <div class="section-title">Fila original del Libro Mayor</div><div class="raw">${safeText(raw)}</div>`;
   $("modal").classList.add("open");
 }
-function resetFilters(){ ["fObra","fGP","fPA","fSupObra","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
+function resetFilters(){ ["fObra","fGP","fPA","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).value=""); $("fUniverse").value="summary";$("fSearch").value="";applyFilters(); }
 function csvCell(v){const s=String(v??"");return `"${s.replace(/"/g,'""')}"`;}
 function exportCSV(){
   const headers=["Fecha","Periodo","Obra","Nombre obra","GD","GP","PA","Proveedor","RUT","OC","Documento","Descripción","Clasificación gasto","Descripción Cuenta original","Monto","Clasificación Resumen","Incluido Resumen","Motivo","Hoja origen","Fila origen","PDF"];
@@ -1033,7 +1033,7 @@ async function loadFile(file){
 
 const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});
 ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)loadFile(f);});
-["fUniverse","fObra","fGP","fPA","fSupObra","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
+["fUniverse","fObra","fGP","fPA","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=k==="amount"||k==="dateKey"?-1:1;}renderTable();}));
 $("modalClose").addEventListener("click",()=>$("modal").classList.remove("open"));$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
 
