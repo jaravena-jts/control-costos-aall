@@ -64,7 +64,7 @@ async function downloadDriveXlsx(sourceUrl){
       const ab=await r.arrayBuffer(); const buf=Buffer.from(ab);
       if(buf.length>MAX_BODY)throw Object.assign(new Error('El archivo de Drive excede el tamaño permitido.'),{status:413});
       if(buf.length>=4 && buf[0]===0x50 && buf[1]===0x4b)return buf;
-      last='Google devolvió una página web en vez del Excel. Revisa que el archivo esté en “Cualquiera con el enlace · Lector”.';
+      last='Google Drive bloqueó la descarga. El archivo debe estar compartido como “Cualquiera con el enlace · Lector”; compartirlo solo con correos específicos no permite que Railway lo lea.';
     }catch(e){last=e.message||String(e);}
   }
   throw Object.assign(new Error(last||'No fue posible descargar el Excel desde Google Drive.'),{status:502});
@@ -253,7 +253,12 @@ const server=http.createServer(async (req,res)=>{
       if(!key) return json(res,400,{error:'Fuente Drive inválida.'});
       const source=cfg.driveSources?.[key]||'';
       if(!source) return json(res,404,{error:'Este archivo Drive todavía no está configurado en el panel administrador.'});
-      const buf=await downloadDriveXlsx(source);
+      let buf;
+      try{ buf=await downloadDriveXlsx(source); }
+      catch(e){
+        const label=type==='cost'?'Matriz de costos':type==='oc'?'Reporte OC':'Formulario de autorización AALL';
+        return json(res,e.status||502,{error:`${label}: ${e.message||'No se pudo descargar desde Drive.'}`});
+      }
       res.writeHead(200,{
         'Content-Type':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Length':String(buf.length),
