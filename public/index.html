@@ -161,7 +161,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 27 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 28 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -192,6 +192,10 @@ button,input,select{font:inherit} button{cursor:pointer}
     <div class="modal-body">
       <div class="admin-only-note"><b>Acceso exclusivo administrador.</b> Este panel de bloqueo es exclusivo del administrador general. El actualizador puede cargar planillas y ver el dashboard completo, pero no puede acceder a este panel ni bloquear la página.</div>
       <div class="admin-grid" id="adminStats"></div>
+      <div class="admin-section">
+        <h3>Fuentes y última actualización</h3>
+        <div class="admin-users" id="adminSources"></div>
+      </div>
       <div class="admin-section">
         <h3>Bloqueo general de la página</h3>
         <input class="admin-input" id="blockMessage" maxlength="300" placeholder="Mensaje que verán los usuarios cuando la página esté bloqueada">
@@ -1081,7 +1085,28 @@ function openLogin(){$("loginError").textContent='';$("loginPassword").value='';
 async function doLogin(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginError").textContent='';try{const x=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});state.session=x.user;$("loginModal").classList.remove('open');renderRole();if(x.blocked&&!isAdminClient())showLocked(state.serverSettings?.blockMessage);else hideLocked();await loadPublished();if(isAdminClient())await refreshAdmin();}catch(e){$("loginError").textContent=e.message;}}
 async function doLogout(){try{await api('/api/logout',{method:'POST',body:'{}'});}catch(_){ } state.session=null;renderRole();await refreshSession();if(!state.serverSettings?.blocked)await loadPublished();}
 async function refreshAdmin(){
-  if(!isAdminClient())return;try{const x=await api('/api/admin');state.adminData=x;const lm=x.lmSummary||{},sh=x.sheetSummary||{};const diff=(lm.Total||0)-(sh.Total||0);$("adminStats").innerHTML=`<div class="admin-stat"><div class="k">Estado página</div><div class="v">${x.settings.blocked?'BLOQUEADA':'ACTIVA'}</div></div><div class="admin-stat"><div class="k">Total publicado</div><div class="v">${money(lm.Total||0)}</div></div><div class="admin-stat"><div class="k">Cuadratura resumen</div><div class="v">${money(diff)}</div></div>`;$("blockMessage").value=x.settings.message||'';$("toggleBlockBtn").textContent=x.settings.blocked?'Desbloquear página':'Bloquear página';$("toggleBlockBtn").className=x.settings.blocked?'btn':'btn danger';$("adminUsers").innerHTML=(x.users||[]).map(u=>`<div class="admin-user"><span><b>${safeText(u.email)}</b><br><span class="mini">${u.role==='admin'?'Administrador':'Actualizador'}</span></span><span class="status-pill ${u.configured?'on':'off'}">${u.configured?'Configurado':'Falta clave en Railway'}</span></div>`).join('');$("adminHistory").innerHTML=(x.history||[]).length?(x.history||[]).map(h=>`<div class="history-row"><span>${safeText(new Date(h.at).toLocaleString('es-CL'))}</span><span>${safeText(h.fileName||'—')}<br><span class="mini">${safeText(h.by||'—')}</span></span><span>${Number(h.rows||0).toLocaleString('es-CL')} filas</span><span class="num">${money(h.total||0)}</span></div>`).join(''):'<div class="mini">Sin actualizaciones registradas.</div>';return x;}catch(e){message(`Error panel administrador: ${safeText(e.message)}`,'error');}
+  if(!isAdminClient())return;try{
+    const x=await api('/api/admin');state.adminData=x;
+    const lm=x.lmSummary||{},sh=x.sheetSummary||{},meta=x.datasetMeta||{};
+    const diff=(lm.Total||0)-(sh.Total||0);
+    const lastUpdate=meta.updatedAt?new Date(meta.updatedAt).toLocaleString('es-CL'):'Sin actualización publicada';
+    const lastFile=meta.fileName||state.fileName||'—';
+    $("adminStats").innerHTML=
+      `<div class="admin-stat"><div class="k">Estado página</div><div class="v">${x.settings.blocked?'BLOQUEADA':'ACTIVA'}</div></div>`+
+      `<div class="admin-stat"><div class="k">Última actualización</div><div class="v" style="font-size:13px">${safeText(lastUpdate)}</div></div>`+
+      `<div class="admin-stat"><div class="k">Última matriz publicada</div><div class="v" style="font-size:13px">${safeText(lastFile)}</div></div>`+
+      `<div class="admin-stat"><div class="k">Total publicado</div><div class="v">${money(lm.Total||0)}</div></div>`+
+      `<div class="admin-stat"><div class="k">Cuadratura resumen</div><div class="v">${money(diff)}</div></div>`;
+    $("adminSources").innerHTML=
+      `<div class="admin-user"><span><b>Gastos AALL 2026 JG.xlsx</b><br><span class="mini">Matriz maestra de costos · Google Drive</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/12RUL2fQns7kS4MnKmqvTmwnXqc3tfaE0/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`+
+      `<div class="admin-user"><span><b>Reporte OC 16112026.xlsx</b><br><span class="mini">Trazabilidad de órdenes de compra · Google Drive</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/1O22T6sHCtBa_CJLHSfl9ff-vU-AyX3eb/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`;
+    $("blockMessage").value=x.settings.message||'';
+    $("toggleBlockBtn").textContent=x.settings.blocked?'Desbloquear página':'Bloquear página';
+    $("toggleBlockBtn").className=x.settings.blocked?'btn':'btn danger';
+    $("adminUsers").innerHTML=(x.users||[]).map(u=>`<div class="admin-user"><span><b>${safeText(u.email)}</b><br><span class="mini">${u.role==='admin'?'Administrador':'Actualizador'}</span></span><span class="status-pill ${u.configured?'on':'off'}">${u.configured?'Configurado':'Falta clave en Railway'}</span></div>`).join('');
+    $("adminHistory").innerHTML=(x.history||[]).length?(x.history||[]).map(h=>`<div class="history-row"><span>${safeText(new Date(h.at).toLocaleString('es-CL'))}</span><span>${safeText(h.fileName||'—')}<br><span class="mini">${safeText(h.by||'—')}</span></span><span>${Number(h.rows||0).toLocaleString('es-CL')} filas</span><span class="num">${money(h.total||0)}</span></div>`).join(''):'<div class="mini">Sin actualizaciones registradas.</div>';
+    return x;
+  }catch(e){message(`Error panel administrador: ${safeText(e.message)}`,'error');}
 }
 async function toggleBlock(){if(!isAdminClient())return;const x=state.adminData||await refreshAdmin();const next=!x.settings.blocked;try{await api('/api/admin/block',{method:'POST',body:JSON.stringify({blocked:next,message:$("blockMessage").value.trim()})});await refreshSession();await refreshAdmin();}catch(e){alert(e.message);}}
 async function boot(){try{await refreshSession();if(!state.serverSettings?.blocked||isAdminClient())await loadPublished();}catch(e){message(`No se pudo iniciar la conexión con el servidor: ${safeText(e.message)}`,'error');}}
