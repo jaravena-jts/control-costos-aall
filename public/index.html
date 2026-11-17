@@ -22,7 +22,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 .import-card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
 .import-grid{display:grid;grid-template-columns:minmax(300px,1.1fr) minmax(280px,.9fr);gap:18px;align-items:stretch}
 .drop{min-height:150px;border:2px dashed #aebdca;border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#f9fbfc;transition:.15s}.drop.drag{border-color:var(--teal);background:#edf9fb}.drop strong{font-size:16px}.drop span{font-size:12px;color:var(--muted);margin-top:7px}.drop input{display:none}.upload-label{margin-top:14px;display:inline-block;background:var(--navy);color:white;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer}
-.info-panel{border:1px solid #dce7ee;border-radius:12px;background:#f7fafc;padding:16px}.info-panel h3{margin:0 0 10px;font-size:14px}.info-line{display:grid;grid-template-columns:130px 1fr;gap:8px;font-size:12px;margin:6px 0}.info-line b{color:#435263}.privacy{margin-top:12px;color:#506070;font-size:11px;line-height:1.5}
+.info-panel{border:1px solid #dce7ee;border-radius:12px;background:#f7fafc;padding:16px}.drive-actions{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px}.drive-config{display:grid;gap:10px}.drive-config label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:760;letter-spacing:.35px}.drive-config input{margin-top:5px;width:100%}.drive-source-status{font-size:10px;color:var(--muted);margin-top:8px;line-height:1.4}.info-panel h3{margin:0 0 10px;font-size:14px}.info-line{display:grid;grid-template-columns:130px 1fr;gap:8px;font-size:12px;margin:6px 0}.info-line b{color:#435263}.privacy{margin-top:12px;color:#506070;font-size:11px;line-height:1.5}
 .notice{border-left:4px solid var(--amber);background:#fff8e8;color:#694600;padding:11px 14px;border-radius:8px;margin:0 0 18px;font-size:12px;line-height:1.45}.notice.good{border-left-color:var(--green);background:#eefaf4;color:#155f43}.notice.error{border-left-color:var(--red);background:#fff0ef;color:#8c2018}
 .kpis{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px;margin-bottom:18px}.kpis.viewer-mode{grid-template-columns:minmax(220px,360px)}.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow)}.kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);font-weight:700}.kpi .value{font-size:23px;margin-top:8px;font-weight:760;color:var(--navy)}.kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}.kpi.emph .value{color:var(--green)}.kpi.warn .value{color:var(--amber)}.kpi.no .value{color:var(--red)}
 .filters{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);margin-bottom:18px}.filters-grid{display:grid;grid-template-columns:repeat(6,minmax(145px,1fr));gap:10px}.field label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:760;letter-spacing:.45px;display:block;margin:0 0 5px}.field select,.field input{width:100%;border:1px solid #ccd7df;border-radius:8px;background:white;padding:8px 9px;color:var(--ink);min-height:38px}.field.search{grid-column:span 2}
@@ -87,7 +87,10 @@ button,input,select{font:inherit} button{cursor:pointer}
       <div id="dropZone" class="drop">
         <strong>Sube el Excel actualizado de Gastos AALL</strong>
         <span>Solo administrador y actualizador pueden publicar una nueva planilla. El Excel se analiza en el navegador y el resultado se guarda en el servidor.</span>
-        <label class="upload-label" for="fileInput">Seleccionar Excel</label>
+        <div class="drive-actions">
+          <label class="upload-label" for="fileInput">Seleccionar Excel</label>
+          <button class="btn ghost" type="button" id="driveSyncBtn">Actualizar desde Drive</button>
+        </div>
         <input id="fileInput" type="file" accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
       </div>
       <div class="info-panel">
@@ -160,7 +163,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 31 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 32 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -192,8 +195,20 @@ button,input,select{font:inherit} button{cursor:pointer}
       <div class="admin-only-note"><b>Acceso exclusivo administrador.</b> Este panel de bloqueo es exclusivo del administrador general. El actualizador puede cargar planillas y ver el dashboard completo, pero no puede acceder a este panel ni bloquear la página.</div>
       <div class="admin-grid" id="adminStats"></div>
       <div class="admin-section">
-        <h3>Fuentes y última actualización</h3>
-        <div class="admin-users" id="adminSources"></div>
+        <h3>Fuentes Google Drive</h3>
+        <div class="drive-config">
+          <label>Matriz de costos / Resumen
+            <input class="admin-input" id="driveCostUrl" placeholder="Pega aquí el link de Gastos AALL">
+          </label>
+          <label>Reporte de órdenes de compra
+            <input class="admin-input" id="driveOcUrl" placeholder="Pega aquí el link del Reporte OC">
+          </label>
+          <label>Solicitud / autorización de costo AALL
+            <input class="admin-input" id="driveAuthUrl" placeholder="Pega aquí el link del Formulario de autorización">
+          </label>
+        </div>
+        <div class="login-actions" style="justify-content:flex-start;margin-top:10px"><button class="btn" id="saveDriveSourcesBtn">Guardar links Drive</button></div>
+        <div class="drive-source-status" id="driveSourceStatus">Los archivos deben estar compartidos como “Cualquiera con el enlace · Lector”.</div>
       </div>
       <div class="admin-section">
         <h3>Bloqueo general de la página</h3>
@@ -533,6 +548,31 @@ async function parseExcel(file){
   main={...main,table:full.get(main.path)};
   if(headerScore(main.table.headers,["PROVEEDOR","MONTO","PARTIDA","OC"])<4) throw new Error(`La hoja “${main.name}” no parece contener el Libro Mayor esperado (Proveedor, Monto, Partida y OC).`);
   return {sheets, main, obras:obras?{...obras,table:full.get(obras.path)}:null, info:info?{...info,table:full.get(info.path)}:null, form:form?{...form,table:full.get(form.path)}:null, ocex:ocex?{...ocex,table:full.get(ocex.path)}:null, summary:summary?{...summary,raw:summaryRaw}:null};
+}
+
+async function parseAuxExcel(file,kind){
+  const buffer=await file.arrayBuffer(); const zip=new ZipReader(buffer);
+  const workbookDoc=xml(await zip.text("xl/workbook.xml")); const relDoc=xml(await zip.text("xl/_rels/workbook.xml.rels")); const rels=new Map();
+  els(relDoc,"Relationship").forEach(r=>rels.set(r.getAttribute("Id"),r.getAttribute("Target")));
+  const sheets=els(workbookDoc,"sheet").map(s=>{const rid=s.getAttributeNS(REL_NS,"id")||s.getAttribute("r:id");return{name:s.getAttribute("name"),path:resolvePath("xl/workbook.xml",rels.get(rid)||"")};});
+  let shared=[];
+  if(zip.has("xl/sharedStrings.xml")){const sd=xml(await zip.text("xl/sharedStrings.xml"));shared=els(sd,"si").map(si=>els(si,"t").map(t=>t.textContent||"").join(""));}
+  const previews=[];
+  for(const s of sheets){
+    const rr=await readSheet(zip,s.path,shared,20);
+    previews.push({...s,table:makeTable(rr)});
+  }
+  let chosen=null;
+  if(kind==="oc"){
+    chosen=pickSheet(previews,"Reporte OC",["PROVEEDOR","MONTO","SALDO"],2)
+      ||pickSheet(previews,"OCExcell",["PROVEEDOR","MONTO","OBRA"],2);
+  }else{
+    chosen=pickSheet(previews,"OC Formulario",["N DE OBRA","NOMBRE DE LA OBRA","N OC"],2)
+      ||pickSheet(previews,"Respuestas de formulario",["N DE OBRA","N OC"],2);
+  }
+  if(!chosen) throw new Error(kind==="oc"?"No pude identificar la tabla del Reporte OC.":"No pude identificar la tabla de Solicitud/Autorización OC.");
+  const limit=kind==="form"?15000:30000;
+  return {...chosen,table:makeTable(await readSheet(zip,chosen.path,shared,limit))};
 }
 
 function extractSummaryTotals(summaryRaw){
@@ -1078,6 +1118,47 @@ function exportCSV(){
   const lines=[headers.map(csvCell).join(";")]; for(const r of state.filtered)lines.push([r.date,periodLabel(r.period),r.obra,r.obraName,r.gd,r.gp,r.pa,r.provider,r.rut,r.oc,r.document,r.description,r.costGroup||costGroup(r.account),r.account,r.amount,r.classification,r.isInSummary?"Sí":"No",r.reason,state.mainSheet,r.sourceRow,r.pdf].map(csvCell).join(";")); const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob);a.download=`AALL_vista_${new Date().toISOString().slice(0,10)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
+async function fetchDriveFile(type,name){
+  const res=await fetch('/api/drive/source?type='+encodeURIComponent(type),{credentials:'same-origin'});
+  if(!res.ok){let msg='No fue posible leer la fuente Drive.';try{const x=await res.json();msg=x.error||msg;}catch(_){}throw new Error(msg);}
+  const blob=await res.blob();
+  return new File([blob],name,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+async function syncFromDrive(){
+  if(!canUpdateClient())return;
+  clearMessage(); setLoader("Descargando matriz de costos desde Drive…");
+  const btn=$("driveSyncBtn"); btn.disabled=true;
+  try{
+    const costFile=await fetchDriveFile('cost','Gastos AALL 2026 JG.xlsx');
+    setLoader("Procesando matriz de costos…");
+    const parsed=await parseExcel(costFile);
+    let externalCount=0;
+    try{
+      setLoader("Descargando Reporte OC desde Drive…");
+      const ocFile=await fetchDriveFile('oc','Reporte OC.xlsx');
+      parsed.ocex=await parseAuxExcel(ocFile,'oc'); externalCount++;
+    }catch(e){console.warn(e); if(!parsed.ocex)throw e;}
+    try{
+      setLoader("Descargando autorización AALL desde Drive…");
+      const authFile=await fetchDriveFile('auth','Formulario Solicitud de OC.xlsx');
+      parsed.form=await parseAuxExcel(authFile,'form'); externalCount++;
+    }catch(e){console.warn(e); if(!parsed.form)throw e;}
+    setLoader("Construyendo trazabilidad integrada…");
+    buildData(parsed);
+    state.fileName="Google Drive · Gastos AALL 2026";
+    $("infoFile").textContent=state.fileName;
+    $("infoMain").textContent=state.mainSheet;
+    $("infoRows").textContent=state.rows.length.toLocaleString("es-CL");
+    $("infoSheets").textContent=state.sourceSheets.join(" · ");
+    updateFilterOptions(); $("exportBtn").disabled=false;$("resetBtn").disabled=false;resetFilters();
+    await publishCurrentDataset();
+    const lm=state.lmSummary||{}, sh=state.sheetSummary||{}, diff=(lm.Total||0)-(sh.Total||0);
+    message(`Actualización desde Drive completada. <b>${state.rows.length.toLocaleString("es-CL")} movimientos</b> · Total oficial <b>${money(sh.Total||0)}</b> · diferencia LM/Resumen <b>${money(diff)}</b>. Fuentes auxiliares externas leídas: <b>${externalCount}/2</b>.`,"good");
+  }catch(e){
+    console.error(e); message(`<b>No pude actualizar desde Drive.</b> ${safeText(e.message||e)}<br>Revisa en el Panel administrador que los tres links estén guardados y compartidos como “Cualquiera con el enlace · Lector”.`,"error");
+  }finally{btn.disabled=false;stopLoader();}
+}
+
 async function loadFile(file){
   clearMessage(); setLoader("Abriendo Excel…"); $("infoFile").textContent=file.name; try{
     const parsed=await parseExcel(file); setLoader("Construyendo trazabilidad…"); buildData(parsed); state.fileName=file.name; $("infoMain").textContent=state.mainSheet;$("infoRows").textContent=state.rows.length.toLocaleString("es-CL");$("infoSheets").textContent=state.sourceSheets.join(" · "); updateFilterOptions(); $("exportBtn").disabled=false;$("resetBtn").disabled=false; resetFilters();
@@ -1091,7 +1172,7 @@ async function loadFile(file){
   finally{stopLoader();}
 }
 
-const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});
+const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});$("driveSyncBtn").addEventListener("click",syncFromDrive);
 ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)loadFile(f);});
 ["fUniverse","fObra","fGP","fPA","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=k==="amount"||k==="dateKey"?-1:1;}renderTable();}));
@@ -1153,10 +1234,11 @@ async function refreshAdmin(){
       `<div class="admin-stat"><div class="k">Última matriz publicada</div><div class="v" style="font-size:13px">${safeText(lastFile)}</div></div>`+
       `<div class="admin-stat"><div class="k">Total publicado</div><div class="v">${money(lm.Total||0)}</div></div>`+
       `<div class="admin-stat"><div class="k">Cuadratura resumen</div><div class="v">${money(diff)}</div></div>`;
-    $("adminSources").innerHTML=
-      `<div class="admin-user"><span><b>Gastos AALL 2026 JG.xlsx</b><br><span class="mini">Matriz maestra consolidada · costos + resumen</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/12RUL2fQns7kS4MnKmqvTmwnXqc3tfaE0/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`+
-      `<div class="admin-user"><span><b>Reporte OC 16112026.xlsx</b><br><span class="mini">Estado y trazabilidad de órdenes de compra</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/1O22T6sHCtBa_CJLHSfl9ff-vU-AyX3eb/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`+
-      `<div class="admin-user"><span><b>Formulario Solicitud de OC (respuestas)</b><br><span class="mini">Solicitud y autorización del costo AALL</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/172wYArVU0sl4xprAP3mK_Hal8kj6xgLGtp7avr-w8l4/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`;
+    const ds=x.driveSources||x.settings?.driveSources||{};
+    $("driveCostUrl").value=ds.costUrl||"";
+    $("driveOcUrl").value=ds.ocUrl||"";
+    $("driveAuthUrl").value=ds.authUrl||"";
+    $("driveSourceStatus").textContent=(ds.costUrl&&ds.ocUrl&&ds.authUrl)?"Tres fuentes configuradas. Puedes usar “Actualizar desde Drive”.":"Falta configurar uno o más links de Drive.";
     $("blockMessage").value=x.settings.message||'';
     $("toggleBlockBtn").textContent=x.settings.blocked?'Desbloquear página':'Bloquear página';
     $("toggleBlockBtn").className=x.settings.blocked?'btn':'btn danger';
@@ -1165,10 +1247,20 @@ async function refreshAdmin(){
     return x;
   }catch(e){message(`Error panel administrador: ${safeText(e.message)}`,'error');}
 }
+async function saveDriveSources(){
+  if(!isAdminClient())return;
+  const payload={costUrl:$("driveCostUrl").value.trim(),ocUrl:$("driveOcUrl").value.trim(),authUrl:$("driveAuthUrl").value.trim()};
+  const st=$("driveSourceStatus"); st.textContent="Guardando fuentes…";
+  try{
+    await api('/api/admin/drive-sources',{method:'POST',body:JSON.stringify(payload)});
+    st.textContent="Links guardados. Ya puedes usar “Actualizar desde Drive”.";
+    await refreshAdmin();
+  }catch(e){st.textContent="No se pudieron guardar los links: "+e.message;}
+}
 async function toggleBlock(){if(!isAdminClient())return;const x=state.adminData||await refreshAdmin();const next=!x.settings.blocked;try{await api('/api/admin/block',{method:'POST',body:JSON.stringify({blocked:next,message:$("blockMessage").value.trim()})});await refreshSession();await refreshAdmin();}catch(e){alert(e.message);}}
 async function boot(){try{await refreshSession();if(!state.serverSettings?.blocked||isAdminClient())await loadPublished();}catch(e){message(`No se pudo iniciar la conexión con el servidor: ${safeText(e.message)}`,'error');}}
 
-$("loginBtn").addEventListener('click',openLogin);$("lockLoginBtn").addEventListener('click',openLogin);$("loginClose").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginCancel").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginSubmit").addEventListener('click',doLogin);$("loginPassword").addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});$("logoutBtn").addEventListener('click',doLogout);$("adminBtn").addEventListener('click',async()=>{await refreshAdmin();$("adminModal").classList.add('open');});$("adminClose").addEventListener('click',()=>$("adminModal").classList.remove('open'));$("toggleBlockBtn").addEventListener('click',toggleBlock);$("adminModal").addEventListener('click',e=>{if(e.target===$("adminModal"))$("adminModal").classList.remove('open');});
+$("loginBtn").addEventListener('click',openLogin);$("lockLoginBtn").addEventListener('click',openLogin);$("loginClose").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginCancel").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginSubmit").addEventListener('click',doLogin);$("loginPassword").addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});$("logoutBtn").addEventListener('click',doLogout);$("adminBtn").addEventListener('click',async()=>{await refreshAdmin();$("adminModal").classList.add('open');});$("adminClose").addEventListener('click',()=>$("adminModal").classList.remove('open'));$("saveDriveSourcesBtn").addEventListener('click',saveDriveSources);$("toggleBlockBtn").addEventListener('click',toggleBlock);$("adminModal").addEventListener('click',e=>{if(e.target===$("adminModal"))$("adminModal").classList.remove('open');});
 boot();
 
 </script>
