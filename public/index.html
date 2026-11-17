@@ -160,7 +160,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </table>
     </div>
   </section>
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 30 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 31 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -689,10 +689,46 @@ function buildData(parsed){
     for(const [code,arr] of grp){ const meta=state.obraMeta.get(code)||{code,name:String(get(arr[0],["Proyecto"])||code),supervisorObra:"",gp:"",cases:0}; meta.gp=mostCommon(arr.map(r=>String(get(r,["GP"])||""))); if(!meta.supervisorObra)meta.supervisorObra=mostCommon(arr.map(r=>String(get(r,["Supervisor Pvta","Supervisor"])||""))); meta.cases=arr.length; meta.gd=mostCommon(arr.map(r=>String(get(r,["GD"])||""))); meta.ad=mostCommon(arr.map(r=>String(get(r,["AD"])||""))); state.obraMeta.set(code,meta); state.infoCases.set(code,arr); }
   }
   if(parsed.form){
-    source.push(parsed.form.name); for(const r of parsed.form.table.rows){ const oc=normOC(get(r,["N° OC","N OC","OC"])); if(!oc)continue; const charges=getAllPrefix(r,"Se debe cobrar a").map(String); const f={oc,obra:normCode(get(r,["N° de Obra","N Obra","Obra"])),obraName:String(get(r,["Nombre de la Obra","Nombre de obra"])||""),depto:String(get(r,["N° Depto","N Depto"])||""),folio:String(get(r,["N° de Folio Planok","Folio Planok"])||""),description:String(get(r,["Descripción gral. del trabajo","Descripcion gral del trabajo","Descripción"] )||""),quote:String(get(r,["N° de Cotización","N de Cotizacion","Cotización"])||""),charges,category:String(get(r,["CATEGORIA","Categoría"])||""),quoteUrl:findUrl(r,["Adjuntar cotización"]),approvalUrl:String(get(r,["Adjuntar notificación a SC, aprobación de Obra o Mandante (Según corresponda)"])||"")}; state.formMap.set(oc,f); }
+    source.push(parsed.form.name); for(const r of parsed.form.table.rows){ const oc=normOC(get(r,["N° OC","N OC","OC"])); if(!oc)continue; const charges=getAllPrefix(r,"Se debe cobrar a").map(String); const f={
+      oc,
+      requestedAt:get(r,["Marca temporal","Fecha solicitud","Fecha"]),
+      obra:normCode(get(r,["N° de Obra","N Obra","Obra"])),
+      obraName:String(get(r,["Nombre de la Obra","Nombre de obra"])||""),
+      depto:String(get(r,["N° Depto","N Depto"])||""),
+      folio:String(get(r,["N° de Folio Planok","Folio Planok"])||""),
+      description:String(get(r,["Descripción gral. del trabajo","Descripcion gral del trabajo","Descripción"] )||""),
+      quote:String(get(r,["N° de Cotización","N de Cotizacion","Cotización"])||""),
+      isAALL:String(get(r,["Corresponde a AALL","AALL"])||""),
+      charges,
+      amount:num(get(r,["Monto Neto Total","Monto Neto","Monto"])),
+      category:String(get(r,["CATEGORIA","Categoría"])||""),
+      quoteUrl:findUrl(r,["Adjuntar cotización"]),
+      approvalUrl:String(get(r,["Adjuntar notificación a SC, aprobación de Obra o Mandante (Según corresponda)"])||"")
+    }; state.formMap.set(oc,f); }
   }
   if(parsed.ocex){
-    source.push(parsed.ocex.name); for(const r of parsed.ocex.table.rows){ const oc=normOC(get(r,["OC"])); if(!oc)continue; state.excelMap.set(oc,{oc,date:get(r,["FECHA","Fecha"]),provider:String(get(r,["PROVEEDOR","Proveedor"])||""),product:String(get(r,["PRODUCTO","Producto"])||""),obra:normCode(get(r,["OBRA","Obra"])),quote:String(get(r,["COTIZACION","Cotizacion"])||""),net:num(get(r,["MONTO NETO","Monto Neto"])),requestedBy:String(get(r,["SOLICITA","Solicita"])||"")}); }
+    source.push(parsed.ocex.name); for(const r of parsed.ocex.table.rows){
+      const oc=normOC(get(r,["OC","N° REQ/OC","N REQ/OC","N° OC","N OC"])); if(!oc)continue;
+      state.excelMap.set(oc,{
+        oc,
+        date:get(r,["FECHA","Fecha","CREACION OC","Creacion OC"]),
+        status:String(get(r,["Estado OC","ESTADO OC","Estado"])||""),
+        imageUrl:String(get(r,["Imagen OC","IMAGEN OC","PDF OC"])||""),
+        provider:String(get(r,["PROVEEDOR","Proveedor"])||""),
+        rut:String(get(r,["RUT PROVEEDOR","RUT Proveedor"])||""),
+        product:String(get(r,["PRODUCTO","Producto"])||""),
+        obra:normCode(get(r,["OBRA","Obra"])),
+        obraName:String(get(r,["NOMBRE OBRA","Nombre obra"])||""),
+        quote:String(get(r,["COTIZACION","Cotizacion"])||""),
+        net:num(get(r,["MONTO NETO","Monto Neto","MONTO","Monto"])),
+        balance:num(get(r,["SALDO","Saldo"])),
+        sent:String(get(r,["ENVIO BC","Envío BC","Envio BC"])||""),
+        completed:String(get(r,["COMPLETADA","Completada"])||""),
+        type:String(get(r,["TIPO OC","Tipo OC"])||""),
+        ingreso:String(get(r,["INGRESO","Ingreso"])||""),
+        requestedBy:String(get(r,["SOLICITA","Solicita"])||"")
+      });
+    }
   }
   if(parsed.summary) source.push(parsed.summary.name);
   source.unshift(parsed.main.name); state.sourceSheets=[...new Set(source)]; state.mainSheet=parsed.main.name;
@@ -1016,15 +1052,15 @@ function render(){ renderKpis();renderObraCostChart();renderTable(); }
 function detailItem(k,v){return `<div class="detail"><div class="k">${safeText(k)}</div><div class="v">${safeText(v||"—")}</div></div>`;}
 function openDetail(id){
   const r=state.rows.find(x=>x.id===id); if(!r)return; $("modalTitle").textContent=`${r.obra} · ${r.obraName} · ${money(r.amount)}`;
-  let docs=""; if(validHttp(r.pdf))docs+=`<a href="${safeText(r.pdf)}" target="_blank" rel="noopener noreferrer">Ver factura PDF ↗</a>`; if(validHttp(r.photo))docs+=`<a href="${safeText(r.photo)}" target="_blank" rel="noopener">Abrir foto</a>`; if(r.form&&validHttp(r.form.quoteUrl))docs+=`<a href="${safeText(r.form.quoteUrl)}" target="_blank" rel="noopener">Abrir cotización</a>`; if(r.form&&validHttp(r.form.approvalUrl))docs+=`<a href="${safeText(r.form.approvalUrl)}" target="_blank" rel="noopener">Abrir aprobación</a>`;
+  let docs=""; if(validHttp(r.pdf))docs+=`<a href="${safeText(r.pdf)}" target="_blank" rel="noopener noreferrer">Ver factura PDF ↗</a>`; if(validHttp(r.photo))docs+=`<a href="${safeText(r.photo)}" target="_blank" rel="noopener">Abrir foto</a>`; if(r.ox&&validHttp(r.ox.imageUrl))docs+=`<a href="${safeText(r.ox.imageUrl)}" target="_blank" rel="noopener noreferrer">Ver OC PDF ↗</a>`; if(r.form&&validHttp(r.form.quoteUrl))docs+=`<a href="${safeText(r.form.quoteUrl)}" target="_blank" rel="noopener">Abrir cotización</a>`; if(r.form&&validHttp(r.form.approvalUrl))docs+=`<a href="${safeText(r.form.approvalUrl)}" target="_blank" rel="noopener">Ver autorización / aprobación ↗</a>`;
   let ev=`<div class="evidence ${r.classification==="Pendiente clasificar"?'no':''}"><b>${safeText(r.classification)}</b><br>${safeText(r.reason)}</div>`;
-  if(r.form)ev+=`<div class="evidence"><b>Vínculo OC Formulario — OC ${safeText(r.form.oc)}</b><br>Obra: ${safeText(r.form.obra)} ${safeText(r.form.obraName)}<br>Depto/sector: ${safeText(r.form.depto||"—")} · Folio: ${safeText(r.form.folio||"—")}<br>Cobro: ${safeText(r.form.charges.join(" / ")||"—")}<br>Trabajo: ${safeText(r.form.description||"—")}<br>Cotización: ${safeText(r.form.quote||"—")}</div>`;
-  if(r.ox)ev+=`<div class="evidence"><b>Vínculo OCExcell — OC ${safeText(r.ox.oc)}</b><br>Proveedor: ${safeText(r.ox.provider||"—")}<br>Producto/trabajo: ${safeText(r.ox.product||"—")}<br>Obra: ${safeText(r.ox.obra||"—")} · Monto neto OC: ${safeText(money(r.ox.net))}<br>Solicita: ${safeText(r.ox.requestedBy||"—")}</div>`;
+  if(r.form)ev+=`<div class="evidence"><b>Solicitud / autorización del costo — OC ${safeText(r.form.oc)}</b><br>Fecha solicitud: ${safeText(dateDisplay(r.form.requestedAt)||"—")}<br>Obra: ${safeText(r.form.obra)} ${safeText(r.form.obraName)}<br>Depto/sector: ${safeText(r.form.depto||"—")} · Folio: ${safeText(r.form.folio||"—")}<br>Corresponde a AALL: ${safeText(r.form.isAALL||"—")} · Cobro: ${safeText(r.form.charges.join(" / ")||"—")}<br>Monto solicitud: ${safeText(r.form.amount?money(r.form.amount):"—")}<br>Categoría: ${safeText(r.form.category||"—")}<br>Trabajo: ${safeText(r.form.description||"—")}<br>Cotización: ${safeText(r.form.quote||"—")}</div>`;
+  if(r.ox)ev+=`<div class="evidence"><b>Estado y trazabilidad de OC — OC ${safeText(r.ox.oc)}</b><br>Estado: ${safeText(r.ox.status||"—")} · Creación: ${safeText(dateDisplay(r.ox.date)||"—")}<br>Proveedor: ${safeText(r.ox.provider||"—")}${r.ox.rut?" · RUT "+safeText(r.ox.rut):""}<br>Obra: ${safeText(r.ox.obra||"—")} ${safeText(r.ox.obraName||"")}<br>Monto OC: ${safeText(money(r.ox.net))} · Saldo: ${safeText(money(r.ox.balance))}<br>Tipo: ${safeText(r.ox.type||"—")} · Envío BC: ${safeText(r.ox.sent||"—")} · Completada: ${safeText(r.ox.completed||"—")}<br>Ingreso: ${safeText(r.ox.ingreso||"—")}${r.ox.product?"<br>Producto/trabajo: "+safeText(r.ox.product):""}${r.ox.requestedBy?"<br>Solicita: "+safeText(r.ox.requestedBy):""}</div>`;
   const raw=Object.entries(r.raw||{}).filter(([k,v])=>!k.startsWith("__")&&!isNA(v)).map(([k,v])=>`${k}: ${v}`).join("\n");
   const invoiceHero=validHttp(r.pdf)?`<div class="invoice-hero"><div class="invoice-copy"><b>Factura / documento ${safeText(r.document||"—")}</b><span>Documento de respaldo disponible desde la URL PDF del Libro Mayor.</span></div><a href="${safeText(String(r.pdf).trim())}" target="_blank" rel="noopener noreferrer">Ver factura PDF ↗</a></div>`:"";
   $("modalBody").innerHTML=`
     ${invoiceHero}
-    <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("GD",r.gd)}${detailItem("GP",r.gp)}${detailItem("PA",r.pa)}${detailItem("Supervisor costo (LM)",r.supervisorCosto)}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
+    <div class="detail-grid">${detailItem("Fecha",r.date)}${detailItem("Periodo",periodLabel(r.period))}${detailItem("Monto",money(r.amount))}${detailItem("Proveedor",r.provider)}${detailItem("RUT proveedor",r.rut)}${detailItem("OC",r.oc)}${detailItem("Factura / documento",r.document)}${detailItem("Clasificación de gasto",r.costGroup||costGroup(r.account))}${detailItem("Descripción Cuenta original",r.account)}${detailItem("Insumo",r.insumo)}${detailItem("GD",r.gd)}${detailItem("GP",r.gp)}${detailItem("PA",r.pa)}${detailItem("Estado OC",r.ox?.status||"—")}${detailItem("Autorización AALL",r.form?(r.form.isAALL||r.form.charges.join(" / ")||"Registrada"):"Sin registro")}${detailItem("Referencia",r.ref)}${detailItem("Referencia origen",r.refOrigin)}${detailItem("Origen",r.origin)}</div>
     <div class="section-title">Trabajo / glosa</div><div class="raw">${safeText(r.description||"Sin descripción")}</div>
     <div class="section-title">Documentos</div><div class="doc-actions">${docs||'<span class="mini">No se detectaron enlaces web de respaldo en esta línea.</span>'}</div>
     <div class="section-title">Trazabilidad</div>${ev}
@@ -1118,8 +1154,9 @@ async function refreshAdmin(){
       `<div class="admin-stat"><div class="k">Total publicado</div><div class="v">${money(lm.Total||0)}</div></div>`+
       `<div class="admin-stat"><div class="k">Cuadratura resumen</div><div class="v">${money(diff)}</div></div>`;
     $("adminSources").innerHTML=
-      `<div class="admin-user"><span><b>Gastos AALL 2026 JG.xlsx</b><br><span class="mini">Matriz maestra de costos · Google Drive</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/12RUL2fQns7kS4MnKmqvTmwnXqc3tfaE0/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`+
-      `<div class="admin-user"><span><b>Reporte OC 16112026.xlsx</b><br><span class="mini">Trazabilidad de órdenes de compra · Google Drive</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/1O22T6sHCtBa_CJLHSfl9ff-vU-AyX3eb/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`;
+      `<div class="admin-user"><span><b>Gastos AALL 2026 JG.xlsx</b><br><span class="mini">Matriz maestra consolidada · costos + resumen</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/12RUL2fQns7kS4MnKmqvTmwnXqc3tfaE0/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`+
+      `<div class="admin-user"><span><b>Reporte OC 16112026.xlsx</b><br><span class="mini">Estado y trazabilidad de órdenes de compra</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/1O22T6sHCtBa_CJLHSfl9ff-vU-AyX3eb/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`+
+      `<div class="admin-user"><span><b>Formulario Solicitud de OC (respuestas)</b><br><span class="mini">Solicitud y autorización del costo AALL</span></span><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/172wYArVU0sl4xprAP3mK_Hal8kj6xgLGtp7avr-w8l4/edit" target="_blank" rel="noopener">Abrir Drive</a></div>`;
     $("blockMessage").value=x.settings.message||'';
     $("toggleBlockBtn").textContent=x.settings.blocked?'Desbloquear página':'Bloquear página';
     $("toggleBlockBtn").className=x.settings.blocked?'btn':'btn danger';
