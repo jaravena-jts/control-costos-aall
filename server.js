@@ -11,7 +11,7 @@ const PUBLIC_DIR = path.join(ROOT, 'public');
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, 'data');
 const PORT = Number(process.env.PORT || 3000);
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'javier.aravena@usach.cl').trim().toLowerCase();
-const UPDATER_EMAIL = (process.env.UPDATER_EMAIL || 'jgonzalez@ingevec.cl').trim().toLowerCase();
+const UPDATER_EMAIL = (process.env.UPDATER_EMAIL || 'jgonzalezp@ingevec.cl').trim().toLowerCase();
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const UPDATER_PASSWORD = process.env.UPDATER_PASSWORD || '';
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(48).toString('hex');
@@ -253,12 +253,12 @@ const server=http.createServer(async (req,res)=>{
       return json(res,200,{ok:true,meta:body.meta});
     }
     if (pathname === '/api/admin' && req.method==='GET') {
-      if(!isAdmin(me)) return json(res,403,{error:'Acceso exclusivo del administrador.'});
+      if(!canUpdate(me)) return json(res,403,{error:'Acceso exclusivo de administrador o actualizador.'});
       const d=readJson(DASHBOARD_FILE,null);
       return json(res,200,{settings:cfg,driveSources:cfg.driveSources||{},history:history().slice(0,20),datasetMeta:d?.meta||null,lmSummary:d?.lmSummary||null,sheetSummary:d?.sheetSummary||null,users:[{email:ADMIN_EMAIL,role:'admin',configured:!!ADMIN_PASSWORD},{email:UPDATER_EMAIL,role:'updater',configured:!!UPDATER_PASSWORD}]});
     }
     if (pathname === '/api/admin/drive-sources' && req.method==='POST') {
-      if(!isAdmin(me)) return json(res,403,{error:'Acceso exclusivo del administrador.'});
+      if(!canUpdate(me)) return json(res,403,{error:'Solo administrador o actualizador pueden modificar las fuentes Drive.'});
       const body=await readJsonBody(req);
       const sources={
         costUrl:String(body.costUrl||'').trim(),
@@ -296,7 +296,7 @@ const server=http.createServer(async (req,res)=>{
 
     if (pathname === '/api/admin/block' && req.method==='POST') {
       if(!isAdmin(me)) return json(res,403,{error:'Acceso exclusivo del administrador.'});
-      const body=await readJsonBody(req); const next={blocked:!!body.blocked,message:String(body.message||'Sistema temporalmente bloqueado por administración.').slice(0,300)}; atomicWrite(SETTINGS_FILE,next); return json(res,200,{ok:true,settings:next});
+      const body=await readJsonBody(req); const next={...cfg,blocked:!!body.blocked,message:String(body.message||'Sistema temporalmente bloqueado por administración.').slice(0,300)}; atomicWrite(SETTINGS_FILE,next); return json(res,200,{ok:true,settings:next});
     }
 
     if (req.method==='GET' || req.method==='HEAD') {
