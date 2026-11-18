@@ -17,6 +17,11 @@ const UPDATER_PASSWORD = process.env.UPDATER_PASSWORD || '';
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(48).toString('hex');
 const PROD = process.env.NODE_ENV === 'production';
 const MAX_BODY = 60 * 1024 * 1024;
+const DRIVE_CONFIG_VERSION = process.env.DRIVE_CONFIG_VERSION || '';
+const DRIVE_COST_ID = (process.env.GOOGLE_DRIVE_COST_FILE_ID || '').trim();
+const DRIVE_OC_ID = (process.env.GOOGLE_DRIVE_OC_FILE_ID || '').trim();
+const DRIVE_AUTH_ID = (process.env.GOOGLE_DRIVE_AUTH_FILE_ID || '').trim();
+function driveUrlFromId(id){ return id ? `https://docs.google.com/spreadsheets/d/${id}/edit?usp=sharing` : ''; }
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
@@ -32,9 +37,26 @@ function atomicWrite(file, value) {
   fs.renameSync(tmp, file);
 }
 function settings() {
-  const base={blocked:false,message:'Sistema temporalmente bloqueado por administración.',driveSources:{costUrl:'',ocUrl:'',authUrl:''}};
+  const envSources={
+    costUrl:driveUrlFromId(DRIVE_COST_ID),
+    ocUrl:driveUrlFromId(DRIVE_OC_ID),
+    authUrl:driveUrlFromId(DRIVE_AUTH_ID)
+  };
+  const base={blocked:false,message:'Sistema temporalmente bloqueado por administración.',driveConfigVersion:'',driveSources:{costUrl:'',ocUrl:'',authUrl:''}};
   const x=readJson(SETTINGS_FILE,base);
-  return {...base,...x,driveSources:{...base.driveSources,...(x.driveSources||{})}};
+  const merged={...base,...x,driveSources:{...base.driveSources,...(x.driveSources||{})}};
+  /* Cuando cambiamos oficialmente las fuentes desde Railway, migramos una sola vez
+     el volumen persistente. Después el administrador puede seguir editando los links. */
+  if(DRIVE_CONFIG_VERSION && merged.driveConfigVersion!==DRIVE_CONFIG_VERSION){
+    merged.driveSources={
+      costUrl:envSources.costUrl||merged.driveSources.costUrl,
+      ocUrl:envSources.ocUrl||merged.driveSources.ocUrl,
+      authUrl:envSources.authUrl||merged.driveSources.authUrl
+    };
+    merged.driveConfigVersion=DRIVE_CONFIG_VERSION;
+    try{atomicWrite(SETTINGS_FILE,merged);}catch(_){}
+  }
+  return merged;
 }
 function driveFileId(value){
   const s=String(value||'').trim();
