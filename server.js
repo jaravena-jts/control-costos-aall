@@ -52,9 +52,13 @@ function validDriveSource(value){ return !value || !!driveFileId(value); }
 async function downloadDriveXlsx(sourceUrl){
   const id=driveFileId(sourceUrl); if(!id)throw Object.assign(new Error('Link de Google Drive inválido.'),{status:400});
   const candidates=[
-    `https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/export?format=xlsx`,
+    /* Primero intentamos descargar el archivo ORIGINAL de Drive. Esto es crítico
+       para matrices XLSX con tablas dinámicas: la conversión vía Google Sheets
+       puede mantener la hoja pero perder/cambiar el contenido calculado de pivots. */
     `https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download&confirm=t`,
-    `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}`
+    `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}`,
+    /* Fallback para archivos nativos de Google Sheets, como el Formulario OC. */
+    `https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/export?format=xlsx`
   ];
   let last='';
   for(const url of candidates){
