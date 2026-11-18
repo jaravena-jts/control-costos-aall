@@ -166,7 +166,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 42 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 43 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -515,7 +515,9 @@ async function parseExcel(file){
   if(summary){
     setLoader(`Leyendo hoja oficial ${summary.name}…`);
     summaryRaw=await readSheet(zip,summary.path,shared);
-    if(!extractSummaryTotals(summaryRaw)) throw new Error(`La hoja “${summary.name}” existe, pero no pude localizar la tabla Resumen esperada (AALL / Mandante / OBRA / Total general).`);
+    /* Algunos XLSX guardados en Drive conservan la definición de la tabla dinámica
+       pero no materializan sus valores A:E. No abortamos: buildData reconstruye
+       exactamente el pivot desde LM (AALL 2026? + Resumen + Partida + Monto). */
   }
 
   /* Si cambia el nombre de una hoja NECESARIA, inspeccionamos sólo hojas razonables.
@@ -705,6 +707,27 @@ function extractRainWorks(summaryRaw){
   return out;
 }
 
+function rebuildSummaryFromRows(rows){
+  const byObra=new Map();
+  let AALL=0,Mandante=0,OBRA=0;
+  for(const r of rows||[]){
+    if(!r.isInSummary)continue;
+    const obra=String(r.obra||"");
+    if(!obra)continue;
+    if(!byObra.has(obra))byObra.set(obra,{obra,AALL:0,Mandante:0,OBRA:0,Total:0,row:null});
+    const x=byObra.get(obra);
+    const amount=num(r.amount);
+    if(r.classification==="AALL"){x.AALL+=amount;AALL+=amount;}
+    else if(r.classification==="Mandante"){x.Mandante+=amount;Mandante+=amount;}
+    else if(r.classification==="OBRA"){x.OBRA+=amount;OBRA+=amount;}
+    x.Total+=amount;
+  }
+  return {
+    totals:{AALL,Mandante,OBRA,Total:AALL+Mandante+OBRA,reconstructed:true},
+    obras:[...byObra.values()].sort((a,b)=>String(a.obra).localeCompare(String(b.obra),"es",{numeric:true}))
+  };
+}
+
 function validateSummaryByObra(rows, summaryObras){
   const lm=new Map();
   for(const r of rows){
@@ -785,30 +808,19 @@ function buildData(parsed){
      otro campo. */
   state.sheetSummary=extractSummaryTotals(parsed.summary?.raw||null);
   state.summaryObras=extractSummaryByObra(parsed.summary?.raw||null);
+  const pivotMaterialized=!!state.sheetSummary && (state.summaryObras||[]).length>0;
 
-  /* v22: el costo AALL oficial por obra NO se toma de la columna Total del
-     cuadro operativo. Esa columna puede contener fórmulas incompletas, #N/A o
-     rangos antiguos. La tabla dinámica A:E de la misma hoja resumen es la
-     fuente financiera oficial. El cuadro operativo se mantiene como fuente de
-     Supervisor / GD / GP / PA / Estado / Gestionado por / Observaciones. */
-  const summaryOfficialMap=new Map((state.summaryObras||[]).map(x=>[String(x.obra||""),x]));
-  state.rainWorks=extractRainWorks(parsed.summary?.raw||null).map(w=>{
-    const official=summaryOfficialMap.get(String(w.obra||""))||null;
-    const officialAALL=official?num(official.AALL):0;
-    const hasOfficialAALL=Math.abs(officialAALL)>=0.005;
-    return {
-      ...w,
-      operationalAmount:w.amount,
-      officialAALL,
-      officialSummaryTotal:official?num(official.Total):0,
-      costSource:"Tabla dinámica Resumen · AALL",
-      amount:officialAALL,
-      amountBlank:!hasOfficialAALL,
-      amountZero:!hasOfficialAALL,
-      noCostAlert:!hasOfficialAALL,
-      hasCost:hasOfficialAALL
-    };
-  });
+  /* El cuadro operativo siempre se lee para responsables/estado. El costo oficial
+     se aplica después de construir el LM; si el pivot A:E no viene materializado,
+     se reconstruye con la misma lógica del pivot desde las columnas LM. */
+  state.rainWorks=extractRainWorks(parsed.summary?.raw||null).map(w=>({
+    ...w,
+    operationalAmount:w.amount,
+    officialAALL:0,
+    officialSummaryTotal:0,
+    costSource:pivotMaterialized?"Tabla dinámica Resumen · AALL":"Resumen reconstruido desde Libro Mayor",
+    amount:0,amountBlank:true,amountZero:true,noCostAlert:true,hasCost:false
+  }));
   const summaryWorkMap=new Map((state.rainWorks||[]).map(w=>[String(w.obra||""),w]));
   const summaryAallSet=new Set((state.rainWorks||[])
     .filter(w=>norm(w.aallFlag||"").includes("AALL 2026") || norm(w.aallFlag||"")=="AALL")
@@ -856,6 +868,28 @@ function buildData(parsed){
     r.managedBy=w.medio||"";
   }
   const inc=out.filter(r=>r.isInSummary); state.lmSummary={AALL:inc.filter(r=>r.classification==="AALL").reduce((a,r)=>a+r.amount,0),Mandante:inc.filter(r=>r.classification==="Mandante").reduce((a,r)=>a+r.amount,0),OBRA:inc.filter(r=>r.classification==="OBRA").reduce((a,r)=>a+r.amount,0)}; state.lmSummary.Total=state.lmSummary.AALL+state.lmSummary.Mandante+state.lmSummary.OBRA;
+
+  if(!pivotMaterialized){
+    const rebuilt=rebuildSummaryFromRows(out);
+    state.sheetSummary=rebuilt.totals;
+    state.summaryObras=rebuilt.obras;
+  }
+  const finalOfficialMap=new Map((state.summaryObras||[]).map(x=>[String(x.obra||""),x]));
+  state.rainWorks=state.rainWorks.map(w=>{
+    const official=finalOfficialMap.get(String(w.obra||""))||null;
+    const officialAALL=official?num(official.AALL):0;
+    const hasOfficialAALL=Math.abs(officialAALL)>=0.005;
+    return {...w,
+      officialAALL,
+      officialSummaryTotal:official?num(official.Total):0,
+      costSource:pivotMaterialized?"Tabla dinámica Resumen · AALL":"Resumen reconstruido desde Libro Mayor",
+      amount:officialAALL,
+      amountBlank:!hasOfficialAALL,
+      amountZero:!hasOfficialAALL,
+      noCostAlert:!hasOfficialAALL,
+      hasCost:hasOfficialAALL
+    };
+  });
   state.summaryCheck=validateSummaryByObra(out,state.summaryObras);
   return out;
 }
