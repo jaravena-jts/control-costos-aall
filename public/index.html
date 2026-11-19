@@ -22,6 +22,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 .import-card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
 .import-grid{display:grid;grid-template-columns:minmax(300px,1.1fr) minmax(280px,.9fr);gap:18px;align-items:stretch}
 .drop{min-height:150px;border:2px dashed #aebdca;border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#f9fbfc;transition:.15s}.drop.drag{border-color:var(--teal);background:#edf9fb}.drop strong{font-size:16px}.drop span{font-size:12px;color:var(--muted);margin-top:7px}.drop input{display:none}.upload-label{margin-top:14px;display:inline-block;background:var(--navy);color:white;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer}
+.manual-upload-panel{display:grid;gap:10px}.manual-source{border:1px solid #d9e2e8;border-radius:10px;background:#fbfdfe;padding:12px}.manual-source-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.manual-source-title{font-size:11px;font-weight:760;color:var(--navy)}.manual-source-sub{font-size:9px;color:var(--muted);margin-top:3px;line-height:1.35}.manual-source-status{margin-top:7px;font-size:9px;color:#657482;overflow-wrap:anywhere}.manual-source-status.ok{color:var(--green);font-weight:700}.manual-file-label{display:inline-flex;align-items:center;justify-content:center;border:1px solid #cbd7df;background:#eef4f7;color:var(--navy);border-radius:8px;padding:7px 9px;font-size:9px;font-weight:740;cursor:pointer;white-space:nowrap}.manual-file-label:hover{background:#e5eef3}.manual-source input[type=file]{display:none}.manual-publish-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:2px}.manual-publish-note{font-size:9px;color:var(--muted)}.manual-publish-btn{background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:9px;padding:9px 13px;font-weight:760;font-size:10px;cursor:pointer}.manual-publish-btn:disabled{opacity:.45;cursor:not-allowed}
 .info-panel{border:1px solid #dce7ee;border-radius:12px;background:#f7fafc;padding:16px}.drive-actions{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px}.drive-config{display:grid;gap:10px}.drive-config label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:760;letter-spacing:.35px}.drive-config input{margin-top:5px;width:100%}.drive-source-status{font-size:10px;color:var(--muted);margin-top:8px;line-height:1.4}.info-panel h3{margin:0 0 10px;font-size:14px}.info-line{display:grid;grid-template-columns:130px 1fr;gap:8px;font-size:12px;margin:6px 0}.info-line b{color:#435263}.privacy{margin-top:12px;color:#506070;font-size:11px;line-height:1.5}
 .notice{border-left:4px solid var(--amber);background:#fff8e8;color:#694600;padding:11px 14px;border-radius:8px;margin:0 0 18px;font-size:12px;line-height:1.45}.notice.good{border-left-color:var(--green);background:#eefaf4;color:#155f43}.notice.error{border-left-color:var(--red);background:#fff0ef;color:#8c2018}
 .kpis{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px;margin-bottom:18px}.kpis.viewer-mode{grid-template-columns:minmax(220px,360px)}.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow)}.kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);font-weight:700}.kpi .value{font-size:23px;margin-top:8px;font-weight:760;color:var(--navy)}.kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}.kpi.emph .value{color:var(--green)}.kpi.warn .value{color:var(--amber)}.kpi.no .value{color:var(--red)}
@@ -86,28 +87,49 @@ button,input,select{font:inherit} button{cursor:pointer}
 <main class="container">
   <section class="import-card hidden" id="uploadSection">
     <div class="import-grid">
-      <div id="dropZone" class="drop">
-        <strong>Sube el Excel actualizado de Gastos AALL</strong>
-        <span>Solo administrador y actualizador pueden publicar una nueva planilla. El Excel se analiza en el navegador y el resultado se guarda en el servidor.</span>
-        <div class="drive-actions">
-          <label class="upload-label" for="fileInput">Seleccionar Excel</label>
-          <button class="btn ghost" type="button" id="driveSyncBtn">Actualizar desde Drive</button>
+      <div class="manual-upload-panel">
+        <div class="manual-source">
+          <div class="manual-source-head">
+            <div><div class="manual-source-title">1 · Matriz de costos / Resumen</div><div class="manual-source-sub">Archivo principal: Gastos AALL 2026. Contiene Libro Mayor y hoja resumen.</div></div>
+            <label class="manual-file-label" for="costFileInput">Seleccionar Excel</label>
+          </div>
+          <input id="costFileInput" type="file" accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+          <div class="manual-source-status" id="costFileStatus">Pendiente de seleccionar</div>
         </div>
-        <input id="fileInput" type="file" accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+        <div class="manual-source">
+          <div class="manual-source-head">
+            <div><div class="manual-source-title">2 · Reporte de órdenes de compra</div><div class="manual-source-sub">Estado OC, proveedor, monto, saldo y respaldo PDF de la orden de compra.</div></div>
+            <label class="manual-file-label" for="ocFileInput">Seleccionar Excel</label>
+          </div>
+          <input id="ocFileInput" type="file" accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+          <div class="manual-source-status" id="ocFileStatus">Pendiente de seleccionar</div>
+        </div>
+        <div class="manual-source">
+          <div class="manual-source-head">
+            <div><div class="manual-source-title">3 · Solicitud / autorización de costos AALL</div><div class="manual-source-sub">Formulario con cotizaciones, aprobaciones y trazabilidad de autorización del gasto.</div></div>
+            <label class="manual-file-label" for="authFileInput">Seleccionar Excel</label>
+          </div>
+          <input id="authFileInput" type="file" accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+          <div class="manual-source-status" id="authFileStatus">Pendiente de seleccionar</div>
+        </div>
+        <div class="manual-publish-row">
+          <span class="manual-publish-note">Se publicará una sola versión consolidada con los tres archivos.</span>
+          <button class="manual-publish-btn" id="manualPublishBtn" type="button" disabled>Procesar y publicar</button>
+        </div>
       </div>
       <div class="info-panel">
         <h3>Estado de la carga</h3>
-        <div class="info-line"><b>Archivo</b><span id="infoFile">Sin cargar</span></div>
+        <div class="info-line"><b>Fuente</b><span id="infoFile">Sin cargar</span></div>
         <div class="info-line"><b>Libro mayor</b><span id="infoMain">—</span></div>
         <div class="info-line"><b>Registros LM</b><span id="infoRows">—</span></div>
-        <div class="info-line"><b>Hojas enlazadas</b><span id="infoSheets">—</span></div>
+        <div class="info-line"><b>Fuentes procesadas</b><span id="infoSheets">—</span></div>
         <div class="loader" id="loader"><span class="spin"></span><span id="loaderText">Procesando…</span></div>
-        <div class="privacy">La planilla se procesa en el navegador; luego se publica el dataset normalizado para que todos los visores vean la misma versión. La contraseña nunca se guarda dentro del HTML ni del repositorio.</div><div class="publish-state" id="publishState"></div>
+        <div class="privacy">La carga es manual. Administrador y actualizador pueden publicar los tres archivos. El dataset consolidado queda guardado en el servidor para todos los visores.</div><div class="publish-state" id="publishState"></div>
       </div>
     </div>
   </section>
 
-  <div class="notice" id="traceNotice">La fuente de control es la hoja <b>“resumen”</b>. El Libro Mayor se detecta automáticamente (Agosto, Septiembre, Octubre, etc.) y el tablero se recalcula al publicar una nueva planilla.</div>
+  <div class="notice" id="traceNotice">Carga manual de tres fuentes: <b>matriz de costos</b>, <b>Reporte OC</b> y <b>Solicitud/Autorizaciones AALL</b>. El tablero se recalcula y publica solo al presionar “Procesar y publicar”.</div>
   <div id="messages"></div>
 
   <section class="kpis" id="kpiSection">
@@ -166,7 +188,7 @@ button,input,select{font:inherit} button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">Control de costo de aguas lluvias 2026 · versión 44 · lectura oficial desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
+  <div class="footer">Control de costo de aguas lluvias 2026 · versión 45 · carga manual de tres fuentes desde hoja Resumen · panel por roles · actualización central · GitHub + Railway · factura PDF clickeable · cuadre contra hoja Resumen</div>
 </main>
 
 <div class="modal" id="modal">
@@ -195,10 +217,10 @@ button,input,select{font:inherit} button{cursor:pointer}
   <div class="modal-box" style="width:min(1000px,97vw)">
     <div class="modal-head"><h2 id="adminPanelTitle">Panel de control</h2><button class="close" id="adminClose">×</button></div>
     <div class="modal-body">
-      <div class="admin-only-note" id="adminAccessNote"><b>Panel de control.</b> Administrador y actualizador pueden gestionar las fuentes de Google Drive. El bloqueo general de la página es exclusivo del administrador.</div>
+      <div class="admin-only-note" id="adminAccessNote"><b>Panel de control.</b> Administrador y actualizador pueden cargar y publicar las tres fuentes manuales. El bloqueo general de la página es exclusivo del administrador.</div>
       <div class="admin-grid" id="adminStats"></div>
       <div class="admin-section">
-        <h3>Fuentes Google Drive</h3>
+        <h3>Rutas Google Drive de referencia</h3>
         <div class="drive-config">
           <label>Matriz de costos / Resumen
             <input class="admin-input" id="driveCostUrl" placeholder="Pega aquí el link de Gastos AALL">
@@ -210,7 +232,7 @@ button,input,select{font:inherit} button{cursor:pointer}
             <input class="admin-input" id="driveAuthUrl" placeholder="Pega aquí el link del Formulario de autorización">
           </label>
         </div>
-        <div class="login-actions" style="justify-content:flex-start;margin-top:10px"><button class="btn" id="saveDriveSourcesBtn">Guardar y actualizar desde Drive</button></div>
+        <div class="login-actions" style="justify-content:flex-start;margin-top:10px"><button class="btn" id="saveDriveSourcesBtn">Guardar rutas de referencia</button></div>
         <div class="drive-source-status" id="driveSourceStatus">Los archivos deben estar compartidos como “Cualquiera con el enlace · Lector”.</div>
       </div>
       <div class="admin-section" id="adminBlockSection">
@@ -233,7 +255,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 
 const state = {
   rows: [], filtered: [], obraMeta: new Map(), mainSheet: "", sourceSheets: [], fileName: "",
-  sortKey: "dateKey", sortDir: -1, formMap: new Map(), excelMap: new Map(), infoCases: new Map(), sheetSummary: null, lmSummary: null, summaryObras: [], rainWorks: [], summaryCheck: null, session: null, datasetMeta: null, serverSettings: null, chartExpandedObra: "", rainExpandedObra: "", tableDrilldown: null, driveHashes: {}, lastDriveSyncAt: ""
+  sortKey: "dateKey", sortDir: -1, formMap: new Map(), excelMap: new Map(), infoCases: new Map(), sheetSummary: null, lmSummary: null, summaryObras: [], rainWorks: [], summaryCheck: null, session: null, datasetMeta: null, serverSettings: null, chartExpandedObra: "", rainExpandedObra: "", tableDrilldown: null, driveHashes: {}, lastDriveSyncAt: "", manualFiles:{cost:null,oc:null,auth:null}
 };
 
 const $ = id => document.getElementById(id);
@@ -1175,11 +1197,7 @@ let autoSyncTimer=null, autoSyncBusy=false, lastAutoSyncAt=0;
 function stopAutoSync(){
   if(autoSyncTimer){clearInterval(autoSyncTimer);autoSyncTimer=null;}
 }
-function scheduleAutoSync(){
-  stopAutoSync();
-  if(!canUpdateClient())return;
-  autoSyncTimer=setInterval(()=>runAutoSync(false),AUTO_SYNC_INTERVAL_MS);
-}
+function scheduleAutoSync(){ stopAutoSync(); }
 async function runAutoSync(force=false){
   if(!canUpdateClient()||autoSyncBusy)return;
   const now=Date.now();
@@ -1245,6 +1263,70 @@ async function syncFromDrive(options={}){
   }finally{if(btn)btn.disabled=false;if(!silent)stopLoader();}
 }
 
+function updateManualUploadUI(){
+  const cfg=[
+    ["cost","costFileStatus"],
+    ["oc","ocFileStatus"],
+    ["auth","authFileStatus"]
+  ];
+  let ready=true;
+  for(const [key,id] of cfg){
+    const el=$(id), file=state.manualFiles?.[key]||null;
+    if(file){el.textContent=file.name;el.className="manual-source-status ok";}
+    else{el.textContent="Pendiente de seleccionar";el.className="manual-source-status";ready=false;}
+  }
+  $("manualPublishBtn").disabled=!ready||!canUpdateClient();
+}
+function setManualFile(kind,file){
+  if(!state.manualFiles)state.manualFiles={cost:null,oc:null,auth:null};
+  state.manualFiles[kind]=file||null;
+  updateManualUploadUI();
+}
+async function loadManualSources(){
+  if(!canUpdateClient())return;
+  const files=state.manualFiles||{};
+  if(!files.cost||!files.oc||!files.auth){
+    message("<b>Faltan archivos.</b> Debes seleccionar la matriz de costos, el Reporte OC y la Solicitud/Autorizaciones AALL antes de publicar.","error");
+    return;
+  }
+  clearMessage();
+  $("manualPublishBtn").disabled=true;
+  setLoader("Procesando matriz de costos…");
+  try{
+    const parsed=await parseExcel(files.cost);
+    setLoader("Procesando Reporte OC…");
+    parsed.ocex=await parseAuxExcel(files.oc,"oc");
+    setLoader("Procesando Solicitud/Autorizaciones AALL…");
+    parsed.form=await parseAuxExcel(files.auth,"form");
+    setLoader("Construyendo trazabilidad consolidada…");
+
+    buildData(parsed);
+    state.fileName=`Carga manual · ${files.cost.name}`;
+    state.driveHashes={};
+    state.lastDriveSyncAt="";
+    $("infoFile").textContent=state.fileName;
+    $("infoMain").textContent=state.mainSheet;
+    $("infoRows").textContent=state.rows.length.toLocaleString("es-CL");
+    $("infoSheets").textContent=`${files.cost.name} · ${files.oc.name} · ${files.auth.name}`;
+    updateFilterOptions();
+    $("exportBtn").disabled=false;
+    $("resetBtn").disabled=false;
+    resetFilters();
+
+    await publishCurrentDataset();
+
+    const lm=state.lmSummary||{}, sh=state.sheetSummary||{}, diff=(lm.Total||0)-(sh.Total||0);
+    const square=Math.abs(diff)<1;
+    message(`Carga manual completada y publicada. <b>${state.rows.length.toLocaleString("es-CL")} movimientos</b> · Total oficial <b>${money(sh.Total||0)}</b> · Cuadratura LM/Resumen: <b>${square?"CUADRA $0":money(diff)}</b> · 3/3 fuentes procesadas.`,square?"good":"");
+  }catch(e){
+    console.error(e);
+    message(`<b>No pude procesar los tres archivos.</b> ${safeText(e.message||e)}`,"error");
+  }finally{
+    stopLoader();
+    updateManualUploadUI();
+  }
+}
+
 async function loadFile(file){
   clearMessage(); setLoader("Abriendo Excel…"); $("infoFile").textContent=file.name; try{
     const parsed=await parseExcel(file); setLoader("Construyendo trazabilidad…"); buildData(parsed); state.fileName=file.name; $("infoMain").textContent=state.mainSheet;$("infoRows").textContent=state.rows.length.toLocaleString("es-CL");$("infoSheets").textContent=state.sourceSheets.join(" · "); updateFilterOptions(); $("exportBtn").disabled=false;$("resetBtn").disabled=false; resetFilters();
@@ -1258,8 +1340,10 @@ async function loadFile(file){
   finally{stopLoader();}
 }
 
-const fileInput=$("fileInput"), drop=$("dropZone"); fileInput.addEventListener("change",e=>{const f=e.target.files?.[0];if(f)loadFile(f);});$("driveSyncBtn").addEventListener("click",async()=>{await syncFromDrive({force:true});scheduleAutoSync();});
-["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)loadFile(f);});
+$("costFileInput").addEventListener("change",e=>setManualFile("cost",e.target.files?.[0]||null));
+$("ocFileInput").addEventListener("change",e=>setManualFile("oc",e.target.files?.[0]||null));
+$("authFileInput").addEventListener("change",e=>setManualFile("auth",e.target.files?.[0]||null));
+$("manualPublishBtn").addEventListener("click",loadManualSources);
 ["fUniverse","fObra","fGP","fPA","fClass","fAccount","fPeriod","fProvider","fStatus","fMedio"].forEach(id=>$(id).addEventListener("change",applyFilters)); let st;$("fSearch").addEventListener("input",()=>{clearTimeout(st);st=setTimeout(applyFilters,180)});$("resetBtn").addEventListener("click",resetFilters);$("exportBtn").addEventListener("click",exportCSV);
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=k==="amount"||k==="dateKey"?-1:1;}renderTable();}));
 $("modalClose").addEventListener("click",()=>$("modal").classList.remove("open"));$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open")});document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open")});
@@ -1306,7 +1390,7 @@ function hideLocked(){$("lockOverlay").classList.remove('show');}
 async function refreshSession(){const x=await api('/api/session');state.session=x.user;state.serverSettings=x;renderRole();if(x.blocked&&!isAdminClient())showLocked(x.blockMessage);else hideLocked();return x;}
 async function loadPublished(){try{const x=await api('/api/dashboard');if(x.dataset)hydrateDataset(x.dataset);else message('Todavía no existe una planilla publicada. Un administrador o actualizador debe ingresar y cargar el Excel base.', '');}catch(e){if(e.status===423)showLocked(e.data?.message);else message(`No se pudo cargar la versión publicada: ${safeText(e.message)}`,'error');}}
 function openLogin(){$("loginError").textContent='';$("loginPassword").value='';$("loginModal").classList.add('open');setTimeout(()=>$("loginEmail").focus(),30);}
-async function doLogin(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginError").textContent='';try{const x=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});state.session=x.user;$("loginModal").classList.remove('open');renderRole();if(x.blocked&&!isAdminClient())showLocked(state.serverSettings?.blockMessage);else hideLocked();await loadPublished();if(canUpdateClient())await refreshAdmin();if(canUpdateClient()){scheduleAutoSync();runAutoSync(false);}}catch(e){$("loginError").textContent=e.message;}}
+async function doLogin(){const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginError").textContent='';try{const x=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});state.session=x.user;$("loginModal").classList.remove('open');renderRole();if(x.blocked&&!isAdminClient())showLocked(state.serverSettings?.blockMessage);else hideLocked();await loadPublished();if(canUpdateClient())await refreshAdmin();if(canUpdateClient())updateManualUploadUI();}catch(e){$("loginError").textContent=e.message;}}
 async function doLogout(){stopAutoSync();try{await api('/api/logout',{method:'POST',body:'{}'});}catch(_){ } state.session=null;renderRole();await refreshSession();if(!state.serverSettings?.blocked)await loadPublished();}
 async function refreshAdmin(){
   if(!canUpdateClient())return;try{
@@ -1328,8 +1412,8 @@ async function refreshAdmin(){
     $("driveSourceStatus").textContent=(ds.costUrl&&ds.ocUrl&&ds.authUrl)?"Tres fuentes configuradas. Puedes usar “Actualizar desde Drive”.":"Falta configurar uno o más links de Drive.";
     $("adminPanelTitle").textContent=isAdminClient()?'Panel administrador':'Panel de control';
     $("adminAccessNote").innerHTML=isAdminClient()
-      ? '<b>Administrador general.</b> Puede gestionar las fuentes de Google Drive y controlar el bloqueo general de la página.'
-      : '<b>Actualizador.</b> Puede gestionar las fuentes de Google Drive y revisar el historial. El bloqueo general es exclusivo del administrador.';
+      ? '<b>Administrador general.</b> Puede cargar y publicar las tres fuentes manuales y controlar el bloqueo general de la página.'
+      : '<b>Actualizador.</b> Puede cargar y publicar las tres fuentes manuales y revisar el historial. El bloqueo general es exclusivo del administrador.';
     $("adminBlockSection").classList.toggle("hidden",!isAdminClient());
     $("blockMessage").value=x.settings.message||'';
     $("toggleBlockBtn").textContent=x.settings.blocked?'Desbloquear página':'Bloquear página';
@@ -1347,16 +1431,14 @@ async function saveDriveSources(){
     await api('/api/admin/drive-sources',{method:'POST',body:JSON.stringify(payload)});
     st.textContent="Links guardados. Probando acceso y actualizando desde Drive…";
     await refreshAdmin();
-    $("adminModal").classList.remove("open");
-    await syncFromDrive({force:true});
-    scheduleAutoSync();
+    st.textContent="Rutas guardadas como referencia. La publicación se realiza desde la carga manual de los tres Excel.";
   }catch(e){st.textContent="No se pudieron guardar los links: "+e.message;}
 }
 async function toggleBlock(){if(!isAdminClient())return;const x=state.adminData||await refreshAdmin();const next=!x.settings.blocked;try{await api('/api/admin/block',{method:'POST',body:JSON.stringify({blocked:next,message:$("blockMessage").value.trim()})});await refreshSession();await refreshAdmin();}catch(e){alert(e.message);}}
-async function boot(){try{await refreshSession();if(!state.serverSettings?.blocked||isAdminClient())await loadPublished();if(canUpdateClient()){scheduleAutoSync();setTimeout(()=>runAutoSync(false),900);}}catch(e){message(`No se pudo iniciar la conexión con el servidor: ${safeText(e.message)}`,'error');}}
+async function boot(){try{await refreshSession();if(!state.serverSettings?.blocked||isAdminClient())await loadPublished();if(canUpdateClient())updateManualUploadUI();}catch(e){message(`No se pudo iniciar la conexión con el servidor: ${safeText(e.message)}`,'error');}}
 
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&canUpdateClient())runAutoSync(false);});
-window.addEventListener("focus",()=>{if(canUpdateClient())runAutoSync(false);});
+document.addEventListener("visibilitychange",()=>{});
+window.addEventListener("focus",()=>{});
 $("loginBtn").addEventListener('click',openLogin);$("lockLoginBtn").addEventListener('click',openLogin);$("loginClose").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginCancel").addEventListener('click',()=>$("loginModal").classList.remove('open'));$("loginSubmit").addEventListener('click',doLogin);$("loginPassword").addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});$("logoutBtn").addEventListener('click',doLogout);$("adminBtn").addEventListener('click',async()=>{await refreshAdmin();$("adminModal").classList.add('open');});$("adminClose").addEventListener('click',()=>$("adminModal").classList.remove('open'));$("saveDriveSourcesBtn").addEventListener('click',saveDriveSources);$("toggleBlockBtn").addEventListener('click',toggleBlock);$("adminModal").addEventListener('click',e=>{if(e.target===$("adminModal"))$("adminModal").classList.remove('open');});
 boot();
 
